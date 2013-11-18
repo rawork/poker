@@ -10,7 +10,7 @@ class Router {
 	private $url;
 	private $params = array();
 	private $paths = array();
-	private $locales = array(array('name' => 'ru'), array('name' => 'ua'));
+	private $locales = array(array('name' => 'ru'));
 	private $redirectCodes = array(
 		'301' => 'Moved Permanently',
 		'302' => 'Moved Temporarily',

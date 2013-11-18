@@ -2,7 +2,7 @@
     "require": {
         "twig/twig": "1.12.*",
 	"doctrine/orm": "2.3.*",
-	"doctrine/mongodb": "1.1.*@dev",
+	"doctrine/mongodb-odm": "1.0.0-BETA9",
 	"symfony/yaml": "2.2.*",
 	"symfony/config": "2.2.*",
 	"symfony/http-foundation": "2.2.*",
