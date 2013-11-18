@@ -1,0 +1,124 @@
+body {
+	padding-top: 70px;
+	padding-bottom: 40px;
+}
+
+.navbar .brand {
+	margin-left: 10px;
+}
+
+.pointer-view {
+	cursor: pointer;
+}
+
+.left-padding {
+	padding-left: 5px;
+}
+
+#moduleMenu {
+	/*width: 190px;*/
+}
+
+#moduleMenu a {
+	font-size: 14px;
+}
+
+.footer {
+	min-height: 24px;
+	font-size: 11px;
+	padding: 3px 0;
+	text-align: center;
+	border-top: 1px solid #ddd;
+	background-color: #fff;
+}
+
+.admin-submenu {
+	padding: 5px 0 5px 5px;
+}
+
+.admin-submenu div {
+	white-space: nowrap;
+}	
+
+.closed {
+	display: none;
+}
+
+div#waiting {
+	display:none;
+	border:solid 1px #00CC00;
+	background-color:#FFFFFF;
+	z-index: 1031;
+	position: fixed;
+	padding: 3px;
+	top: 100px;
+	left: 300px;
+}
+
+div#waiting * {
+	color: #999999;
+}
+
+.admin-dropdown-menu {
+	min-width: 110px;
+}
+
+.admin-dropdown-toggle {
+	padding:4px 4px;
+}
+
+.admin-dropdown-menu a{
+	padding:4px 4px;
+}
+
+.right {
+	text-align: right;
+}
+
+.admin-modal-header {
+	padding: 2px 15px;
+}
+
+.admin-modal-footer {
+	padding: 8px 15px;
+}
+
+.admin-field-gallery div {
+	font-size: 18px;
+	padding-right: 5px;
+	height: 70px;
+	float: left;
+}
+
+.admin-field-gallery a.delete {
+	color: #7FE1FF;
+	display: block;
+	margin-top: -16px;
+}
+
+textarea.tinymce {
+	width: 98%;
+	height: 400px;
+}
+
+.navbar .nav>li>a.locale {
+	padding: 15px 2px;
+}
+
+.view-button {
+
+}
+
+.pre-pagination {
+	margin-top: 10px;
+	margin-bottom: -18px;
+}
+
+.rpp {
+	width: 200px;
+}
+
+.rpp .input-group-addon {
+	padding: 6px 0;
+}
+

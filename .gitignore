@@ -1,0 +1,38 @@
+# Uploads
+upload/*
+!upload/.htaccess
+files/*
+!files/.htaccess
+thumbs/*
+!thumbs/.htaccess
+
+# Configuration files
+app/config/config.php
+app/config/database.php
+app/config/parameters.php
+
+# Cache
+app/cache/*
+!app/cache/.gitkeep
+!app/cache/smarty
+app/cache/smarty/*
+!app/cache/smarty/.gitkeep
+!app/cache/twig
+app/cache/twig/*
+!app/cache/twig/.gitkeep
+app/logs/*
+!app/logs/.gitkeep
+app/backup/*
+!app/backup/.gitkeep
+
+# Vendors
+composer.lock
+composer.phar
+vendor/bin/*
+vendor/twig/*
+vendor/composer/*
+vendor/doctrine/*
+vendor/symfony/*
+vendor/phpunit/*
+vendor/masterexploder/*
+vendor/autoload.php
