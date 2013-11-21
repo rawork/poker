@@ -68,7 +68,7 @@ class SecurityController extends Controller {
 	
 	public function logoutAction() {
 		$this->get('security')->logout();
-		if (empty($_SERVER['HTTP_REFERER']) || preg_match('/^\\'.PRJ_REF.'\/admin\/logout/', $_SERVER['HTTP_REFERER'])) {
+		if (empty($_SERVER['HTTP_REFERER']) || preg_match('/^'.PRJ_REF.'\/admin\/logout/', $_SERVER['HTTP_REFERER'])) {
 			$uri = PRJ_REF.'/admin/';
 		} else {
 			$uri = $_SERVER['HTTP_REFERER'];

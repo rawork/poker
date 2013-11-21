@@ -103,7 +103,7 @@ if (!$container->get('security')->isAuthenticated() && $container->get('security
 	$controller = new SecurityController();
 	echo $controller->loginAction();
 	exit;
-} elseif (preg_match('/^\\'.PRJ_REF.'\/admin\/(logout|forget|password)/', $_SERVER['REQUEST_URI'], $matches)) {
+} elseif (preg_match('/^'.PRJ_REF.'\/admin\/(logout|forget|password)/', $_SERVER['REQUEST_URI'], $matches)) {
 	$controller = new SecurityController();
 	$methodName = $matches[1].'Action';
 	echo $controller->$methodName();

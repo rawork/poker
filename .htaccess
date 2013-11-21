@@ -47,8 +47,8 @@ DirectoryIndex index.php
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    RewriteCond %{HTTP_HOST} ^www\.poker.ancor\.ru$ [NC]
-    RewriteRule ^(.*)$ http://poker.ancor.ru/$1 [L,R=301]
+#    RewriteCond %{HTTP_HOST} ^www\.poker.ancor\.ru$ [NC]
+#    RewriteRule ^(.*)$ http://poker.ancor.ru/$1 [L,R=301]
 
     <IfModule mod_vhost_alias.c>
         RewriteBase /

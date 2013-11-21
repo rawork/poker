@@ -20,11 +20,11 @@ class SecurityHandler {
 	}
 	
 	public function isSecuredArea() {
-		if (preg_match('/^\\'.PRJ_REF.'\/admin\/(logout|forget|password)/', $_SERVER['REQUEST_URI'])) {
+		if (preg_match('/^'.PRJ_REF.'\/admin\/(logout|forget|password)/', $_SERVER['REQUEST_URI'])) {
 			return false;
 		}
 		
-		return 'Y' == PROJECT_LOCKED || preg_match('/^\\'.PRJ_REF.'\/admin\//', $_SERVER['REQUEST_URI']);
+		return 'Y' == PROJECT_LOCKED || preg_match('/^'.PRJ_REF.'\/admin\//', $_SERVER['REQUEST_URI']);
 	}
 	
 	public function getCurrentUser() {
