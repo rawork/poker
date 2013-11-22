@@ -25,19 +25,24 @@ class Calculator {
 		1 => '2', 2 => '3', 4 => '4', 8 => '5', 16 => '6', 32 => '7', 64 => '8', 128 => '9', 
 		256 => '10', 512 => 'jack', 1024 => 'queen', 2048 => 'king', 4096 => 'ace'
 	);
-	private $suits = array(1 => 'diamonds', 2 => 'hearts', 4 => 'spade', 8 => 'clubs');
+	private $suits = array(
+		1 => 'diams', 
+		2 => 'hearts', 
+		4 => 'spades', 
+		8 => 'clubs'
+	);
 	private $ranks = array(
 		0 => 'high card',
-		1 => 'pair',
-		2 => '2 pairs',
-		3 => 'triple',
-		4 => 'street',
-		5 => 'flash',
-		6 => 'full house',
-		7 => 'four',
-		8 => 'street-flash',
-		9 => 'flash royal',
-		10 => 'poker'
+		1 => 'Пара',
+		2 => '2 пары',
+		3 => 'Тройка',
+		4 => 'Стрит',
+		5 => 'Флеш',
+		6 => 'Фулл-хаус',
+		7 => 'Каре',
+		8 => 'Стрит-флеш',
+		9 => 'Флеш-рояль',
+		10 => 'Покер'
 	);
 	
 	private function rankName($id) {
