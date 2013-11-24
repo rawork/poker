@@ -32,7 +32,7 @@ class Calculator {
 		8 => 'clubs'
 	);
 	private $ranks = array(
-		0 => 'high card',
+		0 => 'Старшая карта',
 		1 => 'Пара',
 		2 => '2 пары',
 		3 => 'Тройка',
