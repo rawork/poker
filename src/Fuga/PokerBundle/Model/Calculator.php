@@ -317,9 +317,9 @@ class Calculator {
 		$sameWeight = $this->sameWeight($suite);
 		foreach ($sameWeight as $suit) {
 			if ($this->isFour($suit)) {
-				if ($this->hasJoker) {
-					return $this->rankName(self::POKER);
-				}
+//				if ($this->hasJoker) {
+//					return $this->rankName(self::POKER);
+//				}
 				return $this->rankName(self::FOUR); 
 			} elseif ($this->isTriple($suit)) {
 				$triples[] = $suit;

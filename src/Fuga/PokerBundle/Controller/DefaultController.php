@@ -89,7 +89,7 @@ class DefaultController extends PublicController {
 		$calculator = new Calculator();
 		$gamers = array(); 
 		for ($i = 0; $i < 4; $i++) {
-			$gamers[] = array('suite' => $deck->give(4));
+			$gamers[] = array('money' => rand(400,500), 'hand' => $deck->give(4));
 		}
 		$suits = array(
 			1 => 'diams',
@@ -99,7 +99,7 @@ class DefaultController extends PublicController {
 		);
 		$flop = $deck->give(3);
 		foreach ($gamers as &$gamer) {
-			$suite = array_merge($gamer['suite'], $flop);
+			$suite = array_merge($gamer['hand'], $flop);
 			$gamer['rank'] = $calculator->checkRank($suite); 
 		}
 		unset($gamer);
