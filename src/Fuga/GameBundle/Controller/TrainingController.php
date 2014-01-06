@@ -67,7 +67,7 @@ class TrainingController extends PublicController {
 		return json_encode(array('ok' => true));
 	}
 	
-	public function nochangeAction() {
+	public function changeAction() {
 		$user = $this->get('security')->getCurrentUser();
 		if (!$user) 
 		{
@@ -84,8 +84,55 @@ class TrainingController extends PublicController {
 		
 		$trainingData = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
 		$training = unserialize($trainingData['state']);
+		$cards = is_array($_POST['cards']) ? $_POST['cards'] : array();
+		foreach ($cards as $cardNo) {
+			$newCards = $training->deck->give(1);
+			$training->gamer['cards'][$cardNo] = $newCards[0];
+		}
 		$training->board['state'] = 2;
-		$this->get('container')->addItem('training_training', 
+		$this->get('container')->updateItem('training_training', 
+			array('state'   => serialize($training)),
+			array('user_id' => $user['id'])
+		);
+		
+		return json_encode(array('ok' => true));
+	}
+	
+	public function nochangeAction() {
+		$user = $this->get('security')->getCurrentUser();
+		if (!$user) 
+		{
+			return json_encode(array('error' => true));
+		}
+		
+		$trainingData = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
+		$training = unserialize($trainingData['state']);
+		$training->board['state'] = 2;
+		$this->get('container')->updateItem('training_training', 
+			array('state'   => serialize($training)),
+			array('user_id' => $user['id'])
+		);
+		
+		return json_encode(array('ok' => true));
+	}
+	
+	public function foldAction() {
+		$user = $this->get('security')->getCurrentUser();
+		if (!$user) 
+		{
+			return json_encode(array('error' => true));
+		}
+		
+		$trainingData = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
+		$training = unserialize($trainingData['state']);
+		$bet = rand(5,10);
+		foreach ($training->bots as &$bot) {
+			$bot['chips'] -= $bet;
+			$training->board['bank'] += $bet; 
+		}
+		$training->gamer['cards'] = null;
+		$training->board['state'] = 4;
+		$this->get('container')->updateItem('training_training', 
 			array('state'   => serialize($training)),
 			array('user_id' => $user['id'])
 		);

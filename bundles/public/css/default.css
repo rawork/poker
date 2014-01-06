@@ -284,6 +284,10 @@ body {
 	float: left;
 }
 
+.gamer-cards {
+	height: 60px;
+}
+
 #gamer-cards .card {
 	cursor: pointer;
 }

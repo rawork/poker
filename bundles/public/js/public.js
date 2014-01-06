@@ -59,28 +59,6 @@ function chooseCard(event){
 	}
 }
 
-function onClickChange() {
-	alert('change');
-	return;
-	$.post('/training/change', {cards: cards},
-	function(data){
-		if (data.ok) {
-			window.location.reload();
-		}
-	}, "json");
-}
-
-function onClickNoChange() {
-	alert('nochange');
-	return;
-	$.post('/training/nochange', {},
-	function(data){
-		if (data.ok) {
-			window.location.reload();
-		}
-	}, "json");
-}
-
 function changeCard(event) {
 	var n = $('.card.active').length;
 	var target = event.target || event.srcElement;
@@ -98,9 +76,77 @@ function changeCard(event) {
 	}
 }
 
+function onClickChange() {
+	cards = [];
+	$('.card.active').each(function( index ) {
+		cards.push($( this ).attr('data-card-id'));
+	})
+	$.post('/training/change', {cards: cards},
+	function(data){
+		if (data.ok) {
+			window.location.reload();
+		}
+	}, "json");
+}
+
+function onClickNoChange() {
+	$.post('/training/nochange', {},
+	function(data){
+		if (data.ok) {
+			window.location.reload();
+		}
+	}, "json");
+}
+
+function makeMove() {
+	var chips = +($('#input_bet').val());
+	var target = event.target || event.srcElement;
+
+	while(target != this) { 
+		if ($(target).hasClass('btn')) { 
+			if ($(target).hasClass('btn-warning')) {
+				onClickVaBank();
+			} else if (chips > 0 && $(target).hasClass('btn-primary')) {
+				onClickBet();
+			} else if ($(target).hasClass('btn-success')) {
+				onClickCheck();
+			} else if ($(target).hasClass('btn-danger')) {
+				onClickFold();
+			}
+			break;
+		}
+		target = target.parentNode;
+	}
+}
+
+function onClickVaBank() {
+	console.log('vabank');
+	return;
+}
+
+function onClickBet() {
+	console.log('bet');
+	return;
+}
+
+function onClickCheck() {
+	console.log('check');
+	return;
+}
+
+function onClickFold() {
+	$.post('/training/fold', {},
+	function(data){
+		if (data.ok) {
+			window.location.reload();
+		}
+	}, "json");
+}
+
 function startTraining() {
 	$('#gamer-cards').on('click', chooseCard);
-	$('#gamer-change').on('click', changeCard);
+	$('.gamer-change').on('click', changeCard);
+	$('.game-buttons').on('click', makeMove);
 }
 
 $(document).ready(function(){

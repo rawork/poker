@@ -48,7 +48,7 @@
 		{if $k > 1 && $k < 5}
 		<div class="gamer-cards">
 			{foreach from=$gamer.cards  item=card}
-			<div class="card"></div> 
+			<div class="card">{if $board.state == 4}<img src="/bundles/public/img/cards/{$card.name}.png" />{/if}</div> 
 			{/foreach}
 			<div class="clearfix"></div>
 		</div>
@@ -57,8 +57,8 @@
 	{/foreach}
 	<div class="gamer">
 		<div class="gamer-cards" id="gamer-cards">
-			{foreach from=$gamer0.cards  item=card}
-			<div class="card"><img src="/bundles/public/img/cards/{$card.name}.png" /></div> 
+			{foreach from=$gamer0.cards key=k item=card}
+			<div class="card" data-card-id="{$k}"><img src="/bundles/public/img/cards/{$card.name}.png" /></div> 
 			{/foreach}
 			<div class="clearfix"></div>
 		</div>
@@ -79,7 +79,7 @@
 			<input class="btn btn-primary btn-xs" type="button" value="Чек">
 			<input class="btn btn-danger btn-xs" type="button" value="Пас">
 			&nbsp;&nbsp;&nbsp;&nbsp;
-			<input class="btn btn-warning btn-xs" type="button" value="Отошел">
+			<input class="btn btn-warning btn-xs" style="visibility: hidden;" type="button" value="Отошел">
 		</div>
 	</div>
 </div>
