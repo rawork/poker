@@ -1,384 +1,344 @@
 body {
-	background-image: url('../img/body_bg.png');
-	background-position: top left;
+	background-image: url(../img/bg.png);
 	background-repeat: repeat-x;
-	padding-bottom: 30px;
-	font-family: "Times New Roman";
+	background-position: top left;
+	padding-top: 23px;
 }
 
-h1 {
-	font-family: "Times New Roman";
-	font-size: 28px;
-	margin-top: 0px;
+.poker-line {
+	height: 3px;
+	background-image: url(../img/bg.png);
+	background-repeat: repeat-x;
+	background-position: top left;
 }
 
-h4 {
-	font-family: "Times New Roman";
-	font-size: 20px;
+.content {
+	padding: 20px 0;
 }
 
-.logo {
-	padding-bottom: 10px;
+.footer-menu {
+	padding: 50px 0 0 10px;
 }
 
-.index-foto {
-	padding-bottom: 20px;
+.footer-menu a {
+	text-transform: uppercase;
+	color: #666;
 }
 
-.well1 {
-	background-color: #f7f9f9;
-	padding: 10px 15px;
+.footer-menu a:hover {
+	color: #333;
 }
 
-.well1 p {
+.footer-logo {
+	padding: 20px 0;
+	text-align: center;
+}
+
+.footer-logo img {
+	height: 80px; 
+}
+
+.footer-login {
+	padding: 50px 10px 0;
+	text-align: right;
+}
+
+.footer-login a {
+	text-transform: uppercase;
+	color: #666;
+}
+
+.footer-login a:hover {
+	color: #333;
+}
+
+.game-exit {
+	padding-top: 10px;
+	text-align: right;
+}
+
+.game-exit a {
+	font-size: 16px;
+	border-bottom: 1px dashed #b2d000;
 	color: #000;
 }
 
-.well2 {
-	padding: 20px 15px;
-	font-size: 12px;
-	color: #6d6e71;
-	font-family: Tahoma, Geneva, sans-serif;
+.game-exit a:hover {
+	color: #a9a9a9;
+	text-decoration: none;
 }
 
-.well2 textarea {
-	margin-bottom: 5px;
-	width:100%;
-	height: 85px;
-	font-size: 12px;
-	border: 1px solid #ccc;
-	-webkit-border-radius: 3px;
-	   -moz-border-radius: 3px;
-	       -border-radius: 3px;
+.game-time {
+	font-family: "Times New Roman";
+	font-size: 45px;
+	text-align: center;
+	line-height: 45px;
+	padding-bottom: 150px;
 }
 
-ul.mainmenu {
-	margin: 0;
-	padding: 0;
+.gamer-time {
+	font-family: "Times New Roman";
+	font-size: 45px;
+	text-align: center;
+	line-height: 45px;
+	padding-bottom: 150px;
 }
 
-ul.mainmenu li {
-	list-style: none;
-	font-size: 12px;
-	line-height: 28px;
-	font-family: Tahoma, Geneva, sans-serif;
+.game-board {
+	height: 285px;
+	background-color: #b2d000;
+	border: 3px solid #fa4e0c;
+	-webkit-border-radius: 20px;
+	   -moz-border-radius: 20px;
+	        border-radius: 20px;
 }
 
-ul.mainmenu li a{
-	color: #6d6e71;
-}
-
-ul.mainmenu li a:hover {
-	text-decoration: underline;
-	color: #000;
-}
-
-ul.mainmenu li.active a {
-	text-decoration: underline;
-	color: #000;
-}
-
-div#advice {
-	position: absolute;
-	top: 40px;
-	right: 60px;
-}
-
-div#advice a {
-	font-size: 13px;
-	font-weight: normal;
-	font-family: Tahoma, Geneva, sans-serif;
-	color: #006eb9;
-	padding: 3px 21px 3px 9px;
-	line-height: 1.3;
-}
-
-div#advice a span {
-	text-align: left;
-	display: inline-block;
-	padding-top: 2px;
-}
-
-div#advice a img {
-	margin-right: 4px;
-}
-
-div.content {
-	padding-left: 20px;
-	padding-right: 20px; 
+.game-status {
 	
 }
 
-div.content p {
-	font-family: "Times New Roman";
-	font-size: 14px;
-}
-
-.col-md-4 {
-/*	padding-left: 0;
-	padding-right: 0;*/
-}
-
-.col-md-2 {
-	padding-left: 0;
-	padding-right: 0;
-}
-
-.col-md-3 {
-	padding-left: 0;
-	padding-right: 0;
-}
-
-div.partner {
-	font-family: "Times New Roman";
-	font-size: 16px;
-	font-weight: bold;
-	padding: 8px 0 3px;
-}
-
-div.site {
-	font-style: italic;
-	font-size: 12px;
+.gamer-avatar {
+	padding-right: 12px;
 	padding-bottom: 5px;
 }
 
-img.foto-small {
-	margin-right: 20px;
-	margin-bottom: 20px;
-	width: 64px;
-	height: 64px;
+.gamer-avatar img {
+	-webkit-border-radius: 27px;
+	   -moz-border-radius: 27px;
+	        border-radius: 27px;
 }
 
-div.wishlist {
-	padding: 20px 0 10px;
+.gamer-status {
+	font-size: 15px;
 }
 
-div.wishlist a.btn {
-	color: #000;
-	padding: 3px 50px 3px 9px;
-	line-height: 1.2;
-	font-family: Tahoma, Geneva, sans-serif;
+.gamer-status-ready {
+	color: #b2d000;
 }
 
-div.wishlist a.btn img {
-	margin: 5px 3px 5px 0;
+.gamer-status-noready {
+	color: #a9a9a9;
 }
 
-div.add-gift {
-	padding: 10px 0 10px;
+.gamer-name {
+	font-size: 15px;
 }
 
-div.add-gift a.btn {
-	color: #000;
-	padding: 3px 55px 3px 9px;
+.gamer-info {
+	margin-left: -20px;
+	font-size: 13px;
+	padding: 3px 0;
+}
+
+.gamer-info img {
+	margin: 0 5px;
+}
+
+.gamer-chips {
+	color: #4fafeb;
+}
+
+.gamer-bet {
+	color: #fb4e0c;
+}
+
+.game-main-bank {
+	height:280px;
+	width: 33%;
+	text-align: center;
+	padding-top: 70px;
+	float: left;
 	font-size: 16px;
-	line-height: 1.5;
-	font-family: Tahoma, Geneva, sans-serif;
+	line-height: 32px;
 }
 
-div.add-gift a.btn img {
-	margin: 5px 3px 5px 0;
-}
-
-div.comeback {
-	padding: 10px 0 10px;
-}
-
-div.comeback a.btn {
-	color: #000;
-	padding: 3px 70px 3px 9px;
+.game-min-bet {
+	height:280px;
+	width: 33%;
+	text-align: center;
+	padding-top: 110px;
+	float: left;
 	font-size: 16px;
-	line-height: 1.2;
-	font-family: Tahoma, Geneva, sans-serif;
+	line-height: 32px;
 }
 
-div.comeback a.btn img {
-	margin: 5px 3px 5px 0;
+.game-flop {
+	height: 280px;
+	text-align: center;
+	padding-top: 90px;
+	width: 33%;
+	float: left;
 }
 
-img.img-margin-top {
-	margin-top: 14px;
+.game-flop-card {
+	background-color: #fdb200;
+	border: 2px solid #fdb200;
+	-webkit-border-radius: 3px;
+	   -moz-border-radius: 3px;
+	        border-radius: 3px;
+	width: 72px;
+	height: 96px;
+	float: left;
+	margin: 2px;
 }
 
-.time {
-	font-size: 11px;
-	color: #ccc;
+.game-flop-card img {
+	width: 72px;
+	height: 96px;
 }
 
-div.catalog-item {
-	margin-top: 5px;
-	border-top: 1px solid #ccc;
-	font-family: Tahoma, Geneva, sans-serif;
-	font-size: 12px;
+#bank, #bets, #min_bet {
+	font-size: 28px;
 }
 
-div.catalog-item .title {
-	font-weight: bold;
-	margin-top: 5px;
-	margin-bottom: 5px;
+.game-buttons-container {
+	text-align: center;
+	position: absolute;
+	top: 120px;
+	left: 0;
 }
 
-div.catalog-item img {
-	margin-top: 10px;
+.game-arrow {
+	text-align: center;
+	z-index: 10;
+	margin-bottom: -4px;
 }
 
-.feedback {
-	margin-top: 10px;
-	margin-left: 60px;
-	border-top: 1px solid #ccc;
-	font-family: Tahoma, Geneva, sans-serif;
-	font-size: 12px;
+.game-buttons {
+	border: 3px solid #a9a9a9;
+	-webkit-border-radius: 20px;
+	   -moz-border-radius: 20px;
+	        border-radius: 20px;
+	padding: 10px 20px;
 }
 
-.feedback .title {
-	font-weight: bold;
-	margin-top: 5px;
-	margin-bottom: 5px;
+.game-buttons .btn {
+	width: 99px;
 }
 
-.feedback img {
-	margin-bottom: 5px;
+#input_bet {
+	margin-bottom: 0;
+	border: 2px solid #fdb200;
+	-webkit-border-radius: 3px;
+	   -moz-border-radius: 3px;
+	        border-radius: 3px;
+	width: 50px;
+	text-align: right;
 }
 
-.comment {
-	margin-left: 60px;
-	font-family: Tahoma, Geneva, sans-serif;
-	font-size: 12px;
+.gamer1 {
+	position: absolute;
+	top: -30px;
+	left: 40px;
+	width: 220px;
 }
 
-.required {
-	color: #f00;
+.gamer2 {
+	position: absolute;
+	top: -415px;
+	left: 40px;
+	width: 220px;
 }
 
-span.required {
-	color: #f00;
-	margin-left: -14px;
+.gamer3 {
+	position: absolute;
+	top: -415px;
+	left: 292px;
+	width: 220px;
 }
 
-div.modal {
-	font-family: Tahoma, Geneva, sans-serif;
+.gamer4 {
+	position: absolute;
+	top: -415px;
+	left: 545px;
+	width: 220px;
 }
 
-div.modal h4 {
-	font-family: Tahoma, Geneva, sans-serif;
+.gamer5 {
+	position: absolute;
+	top: -30px;
+	left: 545px;
+	width: 220px;
 }
 
-.btn-success {
-	background-image: -webkit-gradient(linear, left 0%, left 100%, from(#96c13d), to(#579040));
-	background-image: -webkit-linear-gradient(top, #96c13d, 0%, #579040, 100%);
-	background-image: -moz-linear-gradient(top, #96c13d 0%, #579040 100%);
-	background-image: linear-gradient(to bottom, #96c13d 0%, #579040 100%);
-	background-repeat: repeat-x;
-	border-color: #68ab4d;
-	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff5cb85c', endColorstr='#ff579040', GradientType=0);
+.gamer {
+	position: absolute;
+	top: -30px;
+	left: 290px;
+	width: 220px;
 }
 
-.btn-lg {
-	padding: 2px 16px 5px;
-	font-size: 24px;
-	line-height: 1.8;
-	border-radius: 6px;
+.gamer-container {
+	position: relative;
 }
 
-.btn-sm {
-	padding: 0 10px 0 0;
+.card {
+	width: 41px;
+	height: 56px;
+	border: 2px solid #fdb200;
+	-webkit-border-radius: 3px;
+	   -moz-border-radius: 3px;
+	        border-radius: 3px;
+	background-color: #fdb200;
+	margin: 2px;
+	float: left;
 }
 
-.help-block {
-	font-size: 12px;
+#gamer-cards .card {
+	cursor: pointer;
 }
 
-.modal-body {
-	max-height: 455px;
-	overflow-y: auto;
+.active {
+	border-color: #fb4e0c;
 }
 
-textarea#inputMessage {
-	height: 100px;
-}
-
-form {
-	font-family: Tahoma, Geneva, sans-serif;
-}
-
-#messageResult {
-	margin-top: 5px;
-	margin-bottom: 5px;
-}
-
-.pagination {
-	font-family: Tahoma, Geneva, sans-serif;
-}
-
-.form-group {
-	margin-bottom: 8px;
-}
-
-.comment .btn-sm {
-	padding: 2px 10px;
-}
-
-.comment .input-sm {
-	height: 24px;
-	padding: 2px 10px;
-	line-height: 1;
-}
-
-.comment .form-group {
-	margin-bottom: 5px;
-}
-
-.comment label {
-	font-weight: normal;
+.card img {
+	width: 41px;
+	height: 56px;
 }
 
 .btn {
-	font-family: Tahoma, Geneva, sans-serif;
+	-webkit-box-shadow: none;
+	box-shadow: none;
 }
 
-.label {
-	font-family: Tahoma, Geneva, sans-serif;
+.btn-warning {
+	color: #000;
+	text-shadow: none;
+	border-color: #fdb200;
+	background-color: #fdb200;
+	background-image: none;
 }
 
-iframe#upload_target {     
-	width: 0;
-	height: 0;
-	border: 0px solid #fff;
+.btn-success {
+	color: #000;
+	text-shadow: none;
+	border-color: #b2d000;
+	background-color: #b2d000;
+	background-image: none;
 }
 
-.vote-pad {
-	padding-bottom: 4px;
+.btn-primary {
+	color: #000;
+	text-shadow: none;
+	border-color: #4fafeb;
+	background-color: #4fafeb;
+	background-image: none;
 }
 
-.green-body {
-	background-color: #00923f;
+.btn-danger {
+	color: #000;
+	text-shadow: none;
+	border-color: #fb4e0c;
+	background-color: #fb4e0c;
+	background-image: none;
 }
 
-.blue-body {
-	background-color: #54b5e0;
-}
-
-#myModal .modal-body{
-	overflow-y: auto;
-	overflow-x: hidden;
-}
-
-#myModal2 .modal-body{
-	font-family: "Times New Roman";
-	font-size: 20px;
-	overflow: hidden;
-	text-align: center;
-	color: #fff;
-}
-
-#myModal2 .close {
-	color: #fff;
-}
-
-#myModal2 .modal-header {
-	border-bottom: 0;
-}
-
-#myModal2 .modal-dialog {
-	width: 400px;
+.joker-message {
+	padding: 10px;
+	background-color: #e1e1e1;
+	margin-bottom: 10px;
+	-webkit-border-radius: 15px;
+	   -moz-border-radius: 15px;
+	        border-radius: 15px;
 }

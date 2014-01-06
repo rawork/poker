@@ -4,9 +4,8 @@
 		<title>{$title}</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		{$meta}
-		<link rel="stylesheet" href="{$theme_ref}/bootstrap3/css/bootstrap.css" type="text/css" media="screen">
-		<link rel="stylesheet" href="{$theme_ref}/bootstrap3/css/bootstrap-theme.css" type="text/css" media="screen">
-		{*<link rel="stylesheet" href="{$theme_ref}/public/css/default.css" type="text/css" media="screen">*}
+		<link rel="stylesheet" href="{$theme_ref}/bootstrap2/css/bootstrap.css" type="text/css" media="screen">
+		<link rel="stylesheet" href="{$theme_ref}/public/css/default.css" type="text/css" media="screen">
 		<!--[if lt IE 9]>
 		{*<script type="text/javascript" src="{$theme_ref}/ie/html5shiv.js"></script>*}
 		<script type="text/javascript" src="{$theme_ref}/ie/respond.min.js"></script>
@@ -17,21 +16,40 @@
 	</head>
 	<body>
 		<div class="container">
-			<div class="row">
-				<div class="col-md-1">
+			<div class="row-fluid">
+				<div class="span2">
+					<img src="{$theme_ref}/public/img/logo.png">
+					<br><br>
+					<img src="{$theme_ref}/public/img/combinations.jpg">
+					<br><br><br>
 				</div>
-				<div class="col-md-10">
+				<div class="span10">
 					<div class="content">
-						<h1>{$h1}</h1>
 						{eval var=$mainbody}
 					</div>
 				</div>
-				<div class="col-md-1">
+			</div>
+		</div>
+		<div class="poker-line"></div>
+		<div class="container">
+			<div class="row-fluid">
+				<div class="span4 footer-menu">
+					<a href="">ПРАВИЛА</a> / 
+					<a href="">УЧАСТНИКИ</a> / 
+					<a href="">ПРИЗЫ</a> / 
+					<a href="">КЛУБ</a>
+				</div>
+				<div class="span4 footer-logo">
+					<img src="{$theme_ref}/public/img/logo.png">
+				</div>
+				<div class="span4 footer-login">
+					<a href="">АВТОРИЗАЦИЯ</a> / 
+					<a href="">РЕГИСТРАЦИЯ</a>
 				</div>
 			</div>
 		</div>
 		<script type="text/javascript" src="{$theme_ref}/jquery/jquery.js"></script>
-		<script type="text/javascript" src="{$theme_ref}/bootstrap3/js/bootstrap.js"></script>
+		<script type="text/javascript" src="{$theme_ref}/bootstrap2/js/bootstrap.js"></script>
 		<script type="text/javascript" src="{$theme_ref}/public/js/public.js"></script>
 	</body>
 </html>

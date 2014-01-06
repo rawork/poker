@@ -23,6 +23,7 @@
 				<div class="col-md-4">
 					<div class="content">
 						<h1>{$h1}</h1>
+						<a href="{raURL node=game}">Игра</a>
 						{$mainbody}
 					</div>
 				</div>
