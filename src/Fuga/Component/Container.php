@@ -117,6 +117,9 @@ class Container
 			if ($this->get('security')->isSuperuser()) {
 				$this->ownmodules = $this->modules;
 			} elseif ($user = $this->get('security')->getCurrentUser()) {
+				if (empty($user['rules'])) {
+					$user['rules'] = 0;
+				}
 				$this->ownmodules = $this->tempmodules;
 				if (!$user['is_admin']) {
 					unset($this->ownmodules['user'], $this->ownmodules['template'], $this->ownmodules['table']);

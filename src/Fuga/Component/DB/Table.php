@@ -356,30 +356,27 @@ class Table {
 	
 	function insertArray($entity) {
 		$values = array();
-		foreach ($entity as $key => $v) {
-			foreach ($this->fields as $field) {
-				if ($key && $field['name'] == $key) {
-					$fieldType = $this->getFieldType($field);
-					if ($entity[$field['name']] && ($field['type'] == 'image' || $field['type'] == 'file' || $field['type'] == 'template')) {
-						$dest = $this->get('util')->getNextFileName($v);
-						@copy(PRJ_DIR.$v, PRJ_DIR.$dest);
-						$values[$fieldType->getName()] = $dest;
-
-						if ($field['type'] == 'image' && isset($fieldType->params['sizes'])) {
-							$pathParts0 = pathinfo($v);
-							$pathParts = pathinfo($dest);
-							$sizes = explode(',', $fieldType->params['sizes']);
-							foreach ($sizes as $sizeData) {
-								$sizeParams = explode('|', $sizeData);
-								if (count($sizeParams) == 2) {
-									$source = $pathParts0['dirname'].'/'.$pathParts0['filename'].'_'.$sizeParams[0].'.'.$pathParts0['extension'];
-									$dest = $pathParts['dirname'].'/'.$pathParts['filename'].'_'.$sizeParams[0].'.'.$pathParts['extension'];
-									@copy(PRJ_DIR.$source, PRJ_DIR.$dest);
-								}
-							}
-						}
+		foreach ($this->fields as $field) {
+			foreach ($entity as $fieldName => $fieldValue) {
+				if (empty($fieldValue)) {
+					continue;
+				}
+				$fieldType = $this->getFieldType($field);
+				if ($fieldType->getName() == $fieldName) {
+					if ($field['type'] == 'template') {
+						$fileInfo = pathinfo($fieldValue);
+						$dest = $this->get('util')->getNextFileName($fileInfo['basename'], $fileInfo['dirname']);
+						@copy(PRJ_DIR.$fieldValue, PRJ_DIR.$fileInfo['dirname'].'/'.$dest);
+						$values[$fieldType->getName()] = $fileInfo['dirname'].'/'.$dest;
+					} elseif ($field['type'] == 'file') {
+						$fileInfo = pathinfo($fieldValue);
+						$values[$fieldType->getName()] = $this->get('filestorage')->save($fileInfo['basename'], PRJ_DIR.UPLOAD_REF.$fieldValue);
+					} elseif ($field['type'] == 'image') {
+						$fileInfo = pathinfo($fieldValue);
+						$this->get('imagestorage')->setOptions(array('sizes' => $fieldType->getParam('sizes')));
+						$values[$fieldType->getName()] = $this->get('imagestorage')->save($fileInfo['basename'], PRJ_DIR.UPLOAD_REF.$fieldValue);
 					} else {
-						$values[$fieldType->getName()] = $v;
+						$values[$fieldType->getName()] = $fieldValue;
 					}
 					break;
 				}
@@ -392,16 +389,16 @@ class Table {
 			$stmt->bindValue('id', $entity['id']);
 			$stmt->bindValue('table', $this->dbName());
 			$stmt->execute();
-			$photos = $stmt->fetchAll();
-			foreach ($photos as $photo) {
-				$filepath = $photo['file'];
+			$files = $stmt->fetchAll();
+			foreach ($files as $file) {
+				$filepath = $file['file'];
 				$dest = $this->get('util')->getNextFileName($filepath);
 				@copy(PRJ_DIR.$filepath,PRJ_DIR.$dest);
-				unset($photo['id']);
-				$photo['file'] 		= $dest;
-				$photo['created'] 	= date("Y-m-d H:i:s");
-				$photo['entity_id'] = $lastId;
-				$this->get('connection')->insert('system_files', $photo);
+				unset($file['id']);
+				$file['file'] 		= $dest;
+				$file['created'] 	= date("Y-m-d H:i:s");
+				$file['entity_id'] = $lastId;
+				$this->get('connection')->insert('system_files', $file);
 			}
 		}
 		return true;

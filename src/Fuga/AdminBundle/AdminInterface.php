@@ -46,7 +46,7 @@ class AdminInterface extends Controller {
 				);	
 			}
 		} else {
-			$this->get('security')->logout();
+			$this->get('router')->redirect('/');
 		}	
 	}
 
@@ -113,7 +113,7 @@ class AdminInterface extends Controller {
 			$this->restoreAction();
 		} else {
 			$params = array(
-				'user' => $this->get('util')->session('user'),
+				'user' => $this->get('security')->getCurrentUser(),
 				'locales' => $this->get('router')->getLocales(),
 				'currentLocale' => $this->get('router')->getParam('locale'),
 				'module' => $this->currentModuleName,

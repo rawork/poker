@@ -60,9 +60,9 @@ class DatetimeType extends Type {
 		} else {
 			$date_end = '';
 		}
-		return '<div class="form-inline">c '.$this->dateType_getInput(parent::getSearchName('beg'), $date_beg, false).
-				' по '.$this->dateType_getInput(parent::getSearchName('end'), $date_end, false).
-				' <a href="javascript:void(0)" onClick="emptyDateSearch(\''.parent::getSearchName().'\')">Обнулить</a>
+		return '<div class="input-group"><span class="input-group-addon">c</span>'.$this->dateType_getInput(parent::getSearchName('beg'), $date_beg, false).
+				'<span class="input-group-addon">по</span>'.$this->dateType_getInput(parent::getSearchName('end'), $date_end, false).
+				'<span class="input-group-addon"><a href="javascript:void(0)" onClick="emptyDateSearch(\''.parent::getSearchName().'\')">Обнулить</a></span>
 </div>';
 	}
 

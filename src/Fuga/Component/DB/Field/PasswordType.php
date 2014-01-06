@@ -16,6 +16,6 @@ class PasswordType extends Type {
 	public function getSQLValue($name = '') {
 		$text = $this->getValue($name);
 		
-		return empty($text) ? $text : md5($text);
+		return empty($text) ? ($this->dbValue ? $this->dbValue : $text) : md5($text);
 	}
 }

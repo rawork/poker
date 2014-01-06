@@ -34,15 +34,21 @@ class User {
 			),
 			'name' => array (
 				'name' => 'name',
-				'title' => 'ФИО',
+				'title' => 'Имя',
 				'type' => 'string',
-				'width' => '25%'
+				'width' => '15%'
+			),
+			'lastname' => array (
+				'name' => 'lastname',
+				'title' => 'Фамилия',
+				'type' => 'string',
+				'width' => '15%'
 			),
 			'email' => array (
 				'name' => 'email',
 				'title' => 'Эл. почта',
 				'type' => 'string',
-				'width' => '25%'
+				'width' => '20%'
 			),
 			'group_id' => array (
 				'name' => 'group_id',
@@ -51,7 +57,6 @@ class User {
 				'l_table' => 'user_group',
 				'l_field' => 'name',
 				'width' => '25%'
-
 			),
 			'is_admin' => array (
 				'name' => 'is_admin',
@@ -73,13 +78,21 @@ class User {
 		'name' => 'group',
 		'module' => 'user',
 		'title' => 'Группы пользователей',
-		'order_by' => 'name',
+		'order_by' => 'title',
 		'fieldset' => array (
-			'name' => array (
-				'name' => 'name',
+			'title' => array (
+				'name' => 'title',
 				'title' => 'Название',
 				'type' => 'string',
-				'width' => '25%',
+				'width' => '20%',
+			),
+			'name' => array (
+				'name' => 'name',
+				'title' => 'Системное имя',
+				'type' => 'string',
+				'width' => '15%',
+				'help' => 'англ. буквы без пробелов',
+				'search' => true
 			),
 			'rules' => array (
 				'name' => 'rules',
@@ -88,7 +101,7 @@ class User {
 				'l_table' => 'config_module',
 				'l_field' => 'title',
 				'search' => true,
-				'width' => '70%'
+				'width' => '60%'
 			)
 		));
 		

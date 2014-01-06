@@ -7,24 +7,28 @@ class SelectListType extends Type {
 	public function __construct(&$params, $entity = null) {
 		parent::__construct($params, $entity);
 	}
-
-	public function getSearchInput($name = '', $value = '') {
-		$value = $value ?: intval(parent::getSearchValue());
-		$name = $name ?: parent::getSearchName();
+	
+	private function getSelectInput($value, $name) {
+		$value = $value ?: intval($this->dbValue);
+		$name = $name?: $this->getName();
 		$table = $this->get('router')->getParam('module').'_'.$this->get('router')->getParam('table');
 		$id = $this->dbId ?: '0';
-		$inputId = strtr($name, '[]', '__');
+		$input_id = strtr($name, '[]', '__');
+		$empty = $value ? ' <a href="javascript:void(0)" onClick="emptySelect(\''.$input_id.'\')"><i class="icon-remove"></i></a>' : '';
 		$content = '
-<div class="input-append">
-<input class="input-xxlarge" id="'.$inputId.'_title"  type="text" value="'.$this->getStatic($value).'" readonly>
-<button class="btn btn-default" href="javascript:void(0)" type="button" onClick="showSelectPopup(\''.$inputId.'\',\''.$table.'\',\''.$name.'\', \''.$id.'\', \''.$this->getStatic($value).'\');">&hellip;</button>
-</div>
-<input type="hidden" name="'.$name.'" value="'.$value.'" id="'.$inputId.'">
+<div id="'.$input_id.'_title">'.$this->getStatic($value).$empty.'</div>
+<button class="btn btn-success" href="javascript:void(0)" type="button" onClick="showSelectPopup(\''.$input_id.'\',\''.$table.'\',\''.$name.'\', \''.$id.'\', \''.$this->getStatic($value).'\');">Выбрать</button>
+<input type="hidden" name="'.$name.'" value="'.$value.'" id="'.$input_id.'">
+<input type="hidden" name="'.$name.'_type" value="'.$this->getParam('link_type').'" id="'.$input_id.'_type">
 ';
 		
 		return $content;
 	}
-
+	
+	public function getSearchInput() {
+		return $this->getSelectInput( parent::getSearchValue(), parent::getSearchName());
+	}
+	
 	public function getSearchSQL() {
 		return $this->getSearchValue() ? ' FIND_IN_SET(\''.$this->getSearchValue().'\','.$this->getName().') ' : '';
 	}
@@ -67,10 +71,10 @@ class SelectListType extends Type {
 		$input_id = strtr($name, '[]', '__');
 		$table = $this->get('router')->getParam('module').'_'.$this->get('router')->getParam('table');
 		$content = '
-<div class="input-append">
-<input class="input-xxlarge" id="'.$input_id.'_title"  type="text" value="'.$this->getStatic($value).'" readonly>
-<button class="btn btn-default" type="button" onClick="showListPopup(\''.$input_id.'\',\''.$table.'\',\''.$this->getName().'\', \''.$value.'\');">&hellip;</button>
-</div>
+<div class="input-group">
+<input class="form-control" id="'.$input_id.'_title"  type="text" value="'.$this->getStatic($value).'" readonly>
+<span class="input-group-btn">
+<button class="btn btn-default" type="button" onClick="showListPopup(\''.$input_id.'\',\''.$table.'\',\''.$this->getName().'\', \''.$value.'\');">&hellip;</button></span></div>
 <input type="hidden" name="'.$name.'" value="'.$value.'" id="'.$input_id.'">
 ';
 		return $content;

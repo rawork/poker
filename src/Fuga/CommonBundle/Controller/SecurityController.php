@@ -6,10 +6,11 @@ class SecurityController extends Controller {
 	
 	public function loginAction() {
 		$message = null;
-		$login = $this->get('util')->post('_user');
-		$password = $this->get('util')->post('_password');
-		$is_remember = $this->get('util')->post('_remember_me');
-		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+		if ('POST' == $_SERVER['REQUEST_METHOD']) {
+			$login = $this->get('util')->post('_user');
+			$password = $this->get('util')->post('_password');
+			$is_remember = $this->get('util')->post('_remember_me');
+			
 			if (!$login || !$password){
 				$_SESSION['danger'] = 'Неверный Логин или Пароль';
 			} elseif ($this->get('security')->isServer()) {
@@ -17,6 +18,7 @@ class SecurityController extends Controller {
 					$_SESSION['danger'] = 'Неверный Логин или Пароль';
 				}
 			}
+			
 			$this->get('router')->reload();
 		} 
 		$message = $this->flash('danger');

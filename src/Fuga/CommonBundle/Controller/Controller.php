@@ -25,6 +25,11 @@ abstract class Controller {
 		return $this->get('templating')->render($template, $params, $silent);
 	}
 	
+	public function call($path, $params = array()) 
+	{
+		return $this->get('container')->callAction($path, $params);
+	}
+	
 	public function t($name) {
 		return $this->get('translator')->t($name);
 	}

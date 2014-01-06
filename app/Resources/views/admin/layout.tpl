@@ -64,7 +64,7 @@
 			{/foreach}
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
-				<li><a href="{raURL node=admin method=logout}" title="Выйти из Управление сайтом"><span class="glyphicon glyphicon-user"></span> Выйти</a></li>
+				<li><a href="{raURL node=admin method=logout}" title="Выйти из Управление сайтом"><span class="glyphicon glyphicon-user"></span> {$user.name} {$user.lastname}, выйти</a></li>
 			</ul>
 		</div><!-- /.navbar-collapse -->
 	</nav>
