@@ -37,7 +37,8 @@ function startGroupDelete() {
 
 function startDelete(id) {
 	if (confirm('Уверены, что хотите удалить запись?')) {
-		window.location = location.href + '/delete/' +id;
+		path = location.href.split('?');
+		window.location = path[0] + '/delete/' + id;
 	} else {
 		return false;
 	}
