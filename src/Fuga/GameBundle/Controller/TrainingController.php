@@ -4,6 +4,7 @@ namespace Fuga\GameBundle\Controller;
 
 use Fuga\CommonBundle\Controller\PublicController;
 use Fuga\GameBundle\Model\Training;
+use Fuga\GameBundle\Model\Calculator;
 
 class TrainingController extends PublicController {
 	
@@ -41,6 +42,12 @@ class TrainingController extends PublicController {
 			$training = unserialize($trainingData['state']);
 		}
 		
+		$fromtime = new \DateTime($training->board['fromtime']);
+		$now = new \DateTime();
+		$diff = $now->diff($fromtime);
+		$training->board['hour'] = intval($diff->format('%H'));
+		$training->board['minute'] = intval($diff->format('%i'));
+		$training->board['second'] = intval($diff->format('%s'));
 		$board = $training->board;
 		$gamers = $training->bots;
 		$gamer0 = $training->gamer;
@@ -84,12 +91,14 @@ class TrainingController extends PublicController {
 		
 		$trainingData = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
 		$training = unserialize($trainingData['state']);
-		$cards = is_array($_POST['cards']) ? $_POST['cards'] : array();
+		$cards = isset($_POST['cards']) ? $_POST['cards'] : array();
+		$this->get('log')->write(serialize($cards));
 		foreach ($cards as $cardNo) {
 			$newCards = $training->deck->give(1);
 			$training->gamer['cards'][$cardNo] = $newCards[0];
 		}
 		$training->board['state'] = 2;
+		$training->board['timerfunc'] = '';
 		$this->get('container')->updateItem('training_training', 
 			array('state'   => serialize($training)),
 			array('user_id' => $user['id'])
@@ -108,6 +117,7 @@ class TrainingController extends PublicController {
 		$trainingData = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
 		$training = unserialize($trainingData['state']);
 		$training->board['state'] = 2;
+		$training->board['timerfunc'] = '';
 		$this->get('container')->updateItem('training_training', 
 			array('state'   => serialize($training)),
 			array('user_id' => $user['id'])
@@ -132,6 +142,39 @@ class TrainingController extends PublicController {
 		}
 		$training->gamer['cards'] = null;
 		$training->board['state'] = 4;
+		$this->get('container')->updateItem('training_training', 
+			array('state'   => serialize($training)),
+			array('user_id' => $user['id'])
+		);
+		
+		return json_encode(array('ok' => true));
+	}
+	
+	public function betAction() {
+		$user = $this->get('security')->getCurrentUser();
+		
+		if (!$user) 
+		{
+			return json_encode(array('error' => true));
+		}
+		
+		$trainingData = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
+		$training = unserialize($trainingData['state']);
+		$bet = $this->get('util')->post('bet', true, 0);
+		$allin = $bet == $training->gamer['chips'];
+		$training->gamer['chips'] -= $bet;
+		$training->board['bank'] += $bet;
+		
+		foreach ($training->bots as &$bot) {
+			if ($allin) {
+				$bet = $bot['chips'];
+			}
+			$bot['chips'] -= $bet;
+			$training->board['bank'] += $bet; 
+		}
+		
+		$training->board['state'] += 1;
+		
 		$this->get('container')->updateItem('training_training', 
 			array('state'   => serialize($training)),
 			array('user_id' => $user['id'])

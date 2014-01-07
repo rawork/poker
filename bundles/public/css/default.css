@@ -53,7 +53,7 @@ body {
 }
 
 .game-exit {
-	padding-top: 10px;
+	padding-top: 43px;
 	text-align: right;
 }
 
@@ -72,19 +72,16 @@ body {
 	font-family: "Times New Roman";
 	font-size: 45px;
 	text-align: center;
-	line-height: 45px;
-	padding-bottom: 150px;
+	line-height: 100px;
 }
 
-.gamer-time {
-	font-family: "Times New Roman";
-	font-size: 45px;
-	text-align: center;
-	line-height: 45px;
-	padding-bottom: 150px;
+.game-board-container {
+	padding-left: 70px;
 }
 
 .game-board {
+	margin-top: 130px;
+	width: 800px;
 	height: 285px;
 	background-color: #b2d000;
 	border: 3px solid #fa4e0c;
@@ -93,8 +90,119 @@ body {
 	        border-radius: 20px;
 }
 
-.game-status {
-	
+.game-main-bank {
+	height:280px;
+	width: 33.333333333%;
+	text-align: center;
+	float: left;
+	padding-top: 100px;
+	font-size: 16px;
+	line-height: 32px;
+}
+
+.game-min-bet {
+	height:280px;
+	width: 33.333333333%;
+	text-align: center;
+	float: left;
+	padding-top: 100px;
+	font-size: 16px;
+	line-height: 32px;
+}
+
+.game-table {
+	height: 280px;
+	width: 33.333333333%;
+	text-align: center;
+	float: left;
+}
+
+.game-flop {
+	padding-top: 90px;
+	padding-left: 3px;
+}
+
+.game-flop .card {
+	background-color: #fdb200;
+	border: 3px solid #fdb200;
+	-webkit-border-radius: 3px;
+	   -moz-border-radius: 3px;
+	        border-radius: 3px;
+	width: 70px;
+	height: 94px;
+	float: left;
+	margin: 4px;
+}
+
+.game-flop .card img {
+	width: 70px;
+	height: 94px;
+}
+
+.game-change {
+	padding-top: 40px;
+}
+
+.game-timer {
+	font-size: 20px;
+	padding-top: 10px;
+	font-family: "Times New Roman";
+}
+
+.game-combinations {
+	padding-top: 215px;
+	padding-bottom: 20px;
+}
+
+#bank, #bets, #min_bet {
+	font-size: 28px;
+}
+
+.gamer1 {
+	position: absolute;
+	top: -30px;
+	left: 118px;
+	width: 220px;
+}
+
+.gamer2 {
+	position: absolute;
+	top: -415px;
+	left: 118px;
+	width: 220px;
+}
+
+.gamer3 {
+	position: absolute;
+	top: -415px;
+	left: 376px;
+	width: 220px;
+}
+
+.gamer4 {
+	position: absolute;
+	top: -415px;
+	left: 635px;
+	width: 220px;
+}
+
+.gamer5 {
+	position: absolute;
+	top: -30px;
+	left: 635px;
+	width: 220px;
+}
+
+.gamer {
+	position: absolute;
+	top: -30px;
+	left: 376px;
+	width: 220px;
+}
+
+.gamer-container {
+	position: relative;
+	text-align: left;
 }
 
 .gamer-avatar {
@@ -142,163 +250,33 @@ body {
 	color: #fb4e0c;
 }
 
-.game-main-bank {
-	height:280px;
-	width: 33%;
-	text-align: center;
-	padding-top: 70px;
-	float: left;
-	font-size: 16px;
-	line-height: 32px;
-}
-
-.game-min-bet {
-	height:280px;
-	width: 33%;
-	text-align: center;
-	padding-top: 110px;
-	float: left;
-	font-size: 16px;
-	line-height: 32px;
-}
-
-.game-flop {
-	height: 280px;
-	text-align: center;
-	padding-top: 90px;
-	width: 33%;
-	float: left;
-}
-
-.game-flop-card {
-	background-color: #fdb200;
-	border: 2px solid #fdb200;
-	-webkit-border-radius: 3px;
-	   -moz-border-radius: 3px;
-	        border-radius: 3px;
-	width: 72px;
-	height: 96px;
-	float: left;
-	margin: 2px;
-}
-
-.game-flop-card img {
-	width: 72px;
-	height: 96px;
-}
-
-#bank, #bets, #min_bet {
-	font-size: 28px;
-}
-
-.game-buttons-container {
-	text-align: center;
-	position: absolute;
-	top: 120px;
-	left: 0;
-}
-
-.game-arrow {
-	text-align: center;
-	z-index: 10;
-	margin-bottom: -4px;
-}
-
-.game-buttons {
-	border: 3px solid #a9a9a9;
-	-webkit-border-radius: 20px;
-	   -moz-border-radius: 20px;
-	        border-radius: 20px;
-	padding: 10px 20px;
-}
-
-.game-buttons .btn {
-	width: 99px;
-}
-
-#input_bet {
-	margin-bottom: 0;
-	border: 2px solid #fdb200;
-	-webkit-border-radius: 3px;
-	   -moz-border-radius: 3px;
-	        border-radius: 3px;
-	width: 50px;
-	text-align: right;
-}
-
-.gamer1 {
-	position: absolute;
-	top: -30px;
-	left: 40px;
-	width: 220px;
-}
-
-.gamer2 {
-	position: absolute;
-	top: -415px;
-	left: 40px;
-	width: 220px;
-}
-
-.gamer3 {
-	position: absolute;
-	top: -415px;
-	left: 292px;
-	width: 220px;
-}
-
-.gamer4 {
-	position: absolute;
-	top: -415px;
-	left: 545px;
-	width: 220px;
-}
-
-.gamer5 {
-	position: absolute;
-	top: -30px;
-	left: 545px;
-	width: 220px;
-}
-
-.gamer {
-	position: absolute;
-	top: -30px;
-	left: 290px;
-	width: 220px;
-}
-
-.gamer-container {
-	position: relative;
-}
-
-.card {
-	width: 41px;
-	height: 56px;
-	border: 2px solid #fdb200;
-	-webkit-border-radius: 3px;
-	   -moz-border-radius: 3px;
-	        border-radius: 3px;
-	background-color: #fdb200;
-	margin: 2px;
-	float: left;
-}
-
 .gamer-cards {
 	height: 60px;
+}
+
+.gamer-cards .card {
+	width: 39px;
+	height: 54px;
+	border: 3px solid #fdb200;
+	-webkit-border-radius: 3px;
+	   -moz-border-radius: 3px;
+	        border-radius: 3px;
+	background-color: #fdb200;
+	margin: 2px;
+	float: left;
+}
+
+.gamer-cards .card img {
+	width: 41px;
+	height: 54px;
 }
 
 #gamer-cards .card {
 	cursor: pointer;
 }
 
-.active {
+#gamer-cards .active {
 	border-color: #fb4e0c;
-}
-
-.card img {
-	width: 41px;
-	height: 56px;
 }
 
 .btn {
@@ -336,6 +314,85 @@ body {
 	border-color: #fb4e0c;
 	background-color: #fb4e0c;
 	background-image: none;
+}
+
+.btn-warning:hover, .btn-warning:focus, .btn-warning:active, .btn-warning.active {
+	border-color: #fd6c01;
+	background-color: #fd6c01;
+}
+
+.btn-success:hover, .btn-success:focus, .btn-success:active, .btn-success.active {
+	border-color: #60aa00;
+	background-color: #60aa00;
+}
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active {
+	border-color: #1276b5;
+	background-color: #1276b5;
+}
+
+.btn-danger:hover, .btn-danger:focus, .btn-danger:active, .btn-danger.active {
+	border-color: #dc1f00;
+	background-color: #dc1f00;
+}
+
+.btn-warning.disabled, .btn-warning[disabled] {
+	border-color: #c2c2c2;
+	background-color: #c2c2c2;
+	color: #000;
+}
+
+.btn-success.disabled, .btn-success[disabled] {
+	border-color: #c2c2c2;
+	background-color: #c2c2c2;
+	color: #000;
+}
+
+.btn-primary.disabled, .btn-primary[disabled] {
+	border-color: #c2c2c2;
+	background-color: #c2c2c2;
+	color: #000;
+}
+
+.btn-danger.disabled, .btn-danger[disabled] {
+	border-color: #c2c2c2;
+	background-color: #c2c2c2;
+	color: #000;
+}
+
+.game-buttons-container {
+	text-align: center;
+	position: absolute;
+	top: 120px;
+	left: 85px;
+}
+
+.game-arrow {
+	text-align: center;
+	z-index: 10;
+	margin-bottom: -5px;
+}
+
+.game-buttons {
+	border: 3px solid #a9a9a9;
+	-webkit-border-radius: 10px;
+	   -moz-border-radius: 10px;
+	        border-radius: 10px;
+	padding: 10px 20px;
+}
+
+.game-buttons .btn {
+	width: 99px;
+}
+
+#input_bet {
+	margin-bottom: 0;
+	border: 2px solid #fdb200;
+	-webkit-border-radius: 3px;
+	   -moz-border-radius: 3px;
+	        border-radius: 3px;
+	width: 50px;
+	text-align: right;
 }
 
 .joker-message {

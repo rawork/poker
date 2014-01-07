@@ -4,10 +4,11 @@ namespace Fuga\GameBundle\Model;
 
 class Training {
 	
-	const STATE_CHANGE = 1;
+	const STATE_CHANGE  = 1;
 	const STATE_PREFLOP = 2;
-	const STATE_FLOP = 3;
-	const STATE_WIN = 4;
+	const STATE_FLOP    = 3;
+	const STATE_WIN     = 4;
+	const STATE_BUY     = 5;
 	
 	public $deck;
 	public $bots;
@@ -56,10 +57,15 @@ class Training {
 			'fromtime' => date('Y-m-d H:i:s'),
 			'bank'     => 4,
 			'bets'     => 0,
+			'maxbet'   => 0,
 			'minbet'   => 1,
-			'hour'     => -1,
-			'minute'   => -1,
-			'second'   => -1,
+			'allin'   => 0,
+			'hour'     => 0,
+			'minute'   => 0,
+			'second'   => 0,
+			'timerminute'   => 0,
+			'timersecond'   => 30,
+			'timerfunc'   => 'onClickNoChange',
 			'flop'     => $this->deck->give(3),
 			'status' => 1,
 			'state'  => 1,
