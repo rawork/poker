@@ -279,6 +279,47 @@ body {
 	border-color: #fb4e0c;
 }
 
+.game-winner {
+	position: absolute;
+	width: 193px;
+	text-align: center;
+	font-size: 16px;
+}
+
+.winner1 {
+	top: -55px;
+	left: 118px;
+}
+
+.winner2 {
+	top: -250px;
+	left: 118px;
+}
+
+.winner3 {
+	top: -250px;
+	left: 376px;
+}
+
+.winner4 {
+	top: -250px;
+	left: 635px;
+}
+
+.winner5 {
+	top: -55px;
+	left: 635px;
+}
+
+.winner6 {
+	top: -55px;
+	left: 376px;
+}
+
+.winner {
+	display: none;
+}
+
 .btn {
 	-webkit-box-shadow: none;
 	box-shadow: none;
@@ -464,10 +505,22 @@ body {
 	font-weight: bold;
 }
 
+.question-footer a {
+	margin-left: 15px;
+	font-weight: bold;
+}
+
 .question-timer {
 	padding-top: 5px;
 	font-size: 11px;
 	font-weight: bold;
+}
+
+.question-times {
+	padding-top: 5px;
+	font-size: 11px;
+	font-weight: bold;
+	text-align: right;
 }
 
 .joker-message {

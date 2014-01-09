@@ -8,6 +8,13 @@
 	</ul>	
 </div>
 <div class="question-footer">
-	<input class="btn btn-warning" value="ОТВЕТИТЬ" />
+	<input class="btn btn-warning" value="ОТВЕТИТЬ" /> {if $buying}<a href="javascript:void(0)">без ответа</a>{/if} 
+	{if $buying}
+	<div class="row-fluid">
+		<div class="span4 question-timer">Время на ответ: <span id="question-timer"></span></div>
+		<div class="span8 question-times">Попытка <span id="question-times">{$times}</span> из <span id="question-max-times">3</span></div>
+	</div>
+	{else}
 	<div class="question-timer">Время на ответ: <span id="question-timer"></span></div>
+	{/if}
 </div>

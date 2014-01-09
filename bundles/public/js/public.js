@@ -14,13 +14,25 @@ function chooseAnswer(event){
 	}
 }
 
+function showBuy() {
+	showQuestion(true);
+}
+
+function nextGame() {
+	$.post('/training/next', {},
+	function(data){
+		if (data.ok) {
+			window.location.reload();
+		}
+	}, "json");
+}
+
 function showQuestion(buying) {
 	buying = buying || false; 
 	console.log('showQuestion.start');
 	$.post('/training/question', {buying: buying},
 	function(data){
 		if (data.ok) {
-			console.log(data);
 			$('#game-question').html(data.content);
 			$('#game-question').removeClass('closed');
 			$('.question-footer .btn').on('click', clickAnswer);
@@ -123,8 +135,8 @@ function makeMove() {
 				onClickCheck();
 			} else if ($(target).attr('data-move') == 'fold') {
 				onClickFold();
-			} else if ($(target).attr('data-move') == 'update') {
-				onClickUpdate();
+			} else if ($(target).attr('data-move') == 'new') {
+				onClickNew();
 			}
 			break;
 		}
@@ -160,8 +172,8 @@ function onClickCheck() {
 	makeBet(bet);
 }
 
-function onClickUpdate() {
-	$.post('/training/update', {},
+function onClickNew() {
+	$.post('/training/new', {},
 	function(data){
 		if (data.ok) {
 			window.location.reload();
@@ -253,8 +265,6 @@ function startTime() {
 function startTimer() {
 	var timerName = timerNode || 'game-timer';
 	
-	console.log($.cookie());
-	console.log(timerName);
 	if (!$.cookie('timerevent')) {
 		$('#' + timerName).empty();
 		return;
@@ -262,13 +272,13 @@ function startTimer() {
 	
     var minutes = +($.cookie('timerminute'));
     var seconds = +($.cookie('timersecond')) - 1;
-	
+	 
 	if (seconds == 0 && minutes == 0) {
-		removeTimer();
-		$('#'+timer).empty();
+		$('#'+ timerName).html( "00:00" );
 		window[$.cookie('timerevent')]();
+		removeTimer();
 		return;
-	} 
+	}
 	if (seconds == 0) {
 		minutes = minutes - 1;
 		seconds = 59;
@@ -276,11 +286,12 @@ function startTimer() {
 	
 	$.cookie('timerminute', minutes);
     $.cookie('timersecond', seconds);
-
+	
 	if (minutes < 10) minutes = "0" + minutes;
     if (seconds < 10) seconds = "0" + seconds;
 	
 	$('#'+ timerName).html( minutes + ":" + seconds );
+	
 	eventtimerId = setTimeout(startTimer, 1000);
 }
 

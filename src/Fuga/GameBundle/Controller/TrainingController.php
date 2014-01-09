@@ -58,7 +58,33 @@ class TrainingController extends PublicController {
 		return $this->render('training/index.tpl', compact('board', 'gamers', 'gamer0', 'question'));
 	}
 	
-	public function updateAction() {
+	public function nextAction() {
+		$user = $this->get('security')->getCurrentUser();
+		if (!$user) 
+		{
+			return json_encode(array('error' => true));
+		}
+		
+		$trainingData = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
+		$training = unserialize($trainingData['state']);
+		foreach ($training->bots as &$bot) {
+			
+		}
+		
+		$training->board['state'] = 1;
+		$training->board['timerevent'] = '';
+		$training->board['timerminute'] = 0;
+		$training->board['timersecond'] = 13;
+		
+		$this->get('container')->updateItem('training_training', 
+			array('state'   => serialize($training)),
+			array('user_id' => $user['id'])
+		);
+		
+		return json_encode(array('ok' => true));
+	}
+	
+	public function newAction() {
 		$user = $this->get('security')->getCurrentUser();
 		if (!$user) {
 			return json_encode(array('error' => true));
@@ -73,9 +99,9 @@ class TrainingController extends PublicController {
 			'user_id' => $user['id'],
 			'state'   => serialize($training),
 		));
-		setcookie('timerevent');
-		setcookie('timerminute');
-		setcookie('timersecond');
+		setcookie('timerevent', '', time()-3600, '/training');
+		setcookie('timerminute', '', time()-3600, '/training');
+		setcookie('timersecond', '', time()-3600, '/training');
 		
 		return json_encode(array('ok' => true));
 	}
@@ -171,6 +197,9 @@ class TrainingController extends PublicController {
 			array('state'   => serialize($training)),
 			array('user_id' => $user['id'])
 		);
+		setcookie('timerevent', '', time()-3600, '/training');
+		setcookie('timerminute', '', time()-3600, '/training');
+		setcookie('timersecond', '', time()-3600, '/training');
 		
 		return json_encode(array('ok' => true));
 	}
@@ -227,6 +256,12 @@ class TrainingController extends PublicController {
 		}
 		
 		$training->board['state'] += 1;
+		
+		if (4 == $training->board['state']) {
+			$training->board['timerevent'] = 'showBuy';
+			$training->board['timerminute'] = 2;
+			$training->board['timersecond'] = 0;
+		}
 		
 		$this->get('container')->updateItem('training_training', 
 			array('state'   => serialize($training)),

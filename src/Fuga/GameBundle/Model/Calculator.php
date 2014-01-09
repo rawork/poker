@@ -7,10 +7,10 @@ class Calculator {
 	const HIGH_CARD		= 0;
 	const PAIR			= 1;
 	const TWO_PAIRS		= 2;
-	const TRIPLE		= 3;
+	const TRIPLE		    = 3;
 	const STREET		= 4;
 	const FLASH			= 5;
-	const FULL_HOUSE	= 6;
+	const FULL_HOUSE	    = 6;
 	const FOUR			= 7;
 	const STREET_FLASH  = 8;
 	const FLASH_ROYAL   = 9;
@@ -19,11 +19,23 @@ class Calculator {
 	private $rank = 0;
 	private $joker = 8192;
 	private $jokerWeight = 0;
+	private $jokerTempWeight = 0;
 	private $hasJoker;
 	private $usedJoker;
 	private $weights = array(
-		1 => '2', 2 => '3', 4 => '4', 8 => '5', 16 => '6', 32 => '7', 64 => '8', 128 => '9', 
-		256 => '10', 512 => 'jack', 1024 => 'queen', 2048 => 'king', 4096 => 'ace'
+		1    => '2', 
+		2    => '3', 
+		4    => '4', 
+		8    => '5', 
+		16   => '6', 
+		32   => '7', 
+		64   => '8', 
+		128  => '9', 
+		256  => '10', 
+		512  => 'jack', 
+		1024 => 'queen', 
+		2048 => 'king', 
+		4096 => 'ace'
 	);
 	private $suits = array(
 		1 => 'diams', 
@@ -45,7 +57,7 @@ class Calculator {
 		10 => 'Покер'
 	);
 	
-	private function rankName($id) {
+	public function rankName($id) {
 		return $this->ranks[$id];
 	}
 	
@@ -86,6 +98,7 @@ class Calculator {
 	private function isRoyal(array $suite) {
 		$sum = 0;
 		foreach ($suite as $card) {
+			
 			$sum += $card['weight'];
 		}
 		if ($this->hasJoker){
@@ -303,9 +316,9 @@ class Calculator {
 		$this->usedJoker = false;
 		$sameSuite = $this->sameSuit($suite);
 		foreach ($sameSuite as $suit) {
-			if ($this->isFlash($suit)) {
-				if ($this->isStreet($suit)) {
-					if ($this->isRoyal($suit)) {
+			if ($cards = $this->isFlash($suit)) {
+				if ($cards = $this->isStreet($suit)) {
+					if ($cards = $this->isRoyal($suit)) {
 						return $this->rankName(self::FLASH_ROYAL); 
 					}
 					return $this->rankName(self::STREET_FLASH);

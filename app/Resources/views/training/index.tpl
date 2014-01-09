@@ -87,6 +87,7 @@
 			<input class="btn btn-warning" data-move="update" type="button" value="Заново">
 		</div>
 	</div>
+	<div class="game-winner winner{$board.winner}">Победитель</div>
 </div>
 <div class="game-combinations"><img src="{$theme_ref}/public/img/combinations2.jpg"></div>
 <div {if $board.state != 11}class="closed"{/if} id="game-question">{$question}</div>
