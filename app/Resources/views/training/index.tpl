@@ -78,28 +78,33 @@
 		<div class="game-buttons">
 			Введите сумму:
 			<input type="text" id="input_bet" value="{$board.minbet}">
-			<input class="btn btn-warning btn-xs" data-move="vabank" type="button" value="Ва-банк">
+			<input class="btn btn-warning" data-move="vabank" type="button" value="Ва-банк">
 			&nbsp;&nbsp;&nbsp;&nbsp;
-			<input class="btn btn-success btn-xs" data-move="bet" type="button" value="Ставка">
-			<input class="btn btn-primary btn-xs" data-move="check" type="button" value="Чек">
-			<input class="btn btn-danger btn-xs" data-move="fold" type="button" value="Пас">
+			<input class="btn btn-success" data-move="bet" type="button" value="Ставка">
+			<input class="btn btn-primary" data-move="check" type="button" value="Чек">
+			<input class="btn btn-danger" data-move="fold" type="button" value="Пас">
 			&nbsp;&nbsp;&nbsp;&nbsp;
-			<input class="btn btn-warning btn-xs" data-move="update" type="button" value="Заново">
+			<input class="btn btn-warning" data-move="update" type="button" value="Заново">
 		</div>
 	</div>
 </div>
 <div class="game-combinations"><img src="{$theme_ref}/public/img/combinations2.jpg"></div>
+<div {if $board.state != 11}class="closed"{/if} id="game-question">{$question}</div>
 <script type="text/javascript">
+	// common game parameters
 	var gamestate = {$board.state};
 	var gamemaxbet = {$board.maxbet};
-	var gamerbet = {$gamer0.bet};
 	var gameallin = {$board.allin};
+	var gamerbet = {$gamer0.bet};
+	// game timer
 	var gamehour = {$board.hour};
 	var gameminute = {$board.minute};
 	var gamesecond = {$board.second};
+	// move timer
 	var timerminute = {$board.timerminute};
 	var timersecond = {$board.timersecond};
-	var timerfunc = '{$board.timerfunc}';
+	var timerevent = '{$board.timerevent}';
+	// training start
 	var gametraining = true;
 </script>
 

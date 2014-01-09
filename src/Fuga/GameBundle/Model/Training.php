@@ -5,6 +5,7 @@ namespace Fuga\GameBundle\Model;
 class Training {
 	
 	const STATE_CHANGE  = 1;
+	const STATE_QUESTION= 11;
 	const STATE_PREFLOP = 2;
 	const STATE_FLOP    = 3;
 	const STATE_WIN     = 4;
@@ -32,6 +33,8 @@ class Training {
 			'state'   => 0,
 			'seat'    => 1,
 			'cards'   => $this->deck->give(4),
+			'change'  => null,
+			'question' => null,
 		);
 	}
 	
@@ -64,8 +67,8 @@ class Training {
 			'minute'   => 0,
 			'second'   => 0,
 			'timerminute'   => 0,
-			'timersecond'   => 30,
-			'timerfunc'   => 'onClickNoChange',
+			'timersecond'   => 13,
+			'timerevent'   => 'onClickNoChange',
 			'flop'     => $this->deck->give(3),
 			'status' => 1,
 			'state'  => 1,

@@ -1,50 +1,58 @@
-function startTime() {
-    var hours = gamehour;
-    var minutes = gameminute;
-    var seconds = gamesecond + 1;
-	if (seconds == 60) {
-		minutes = minutes + 1;
-		seconds = 0;
+var timerNode = null;
+var eventtimerId = null;
+
+function chooseAnswer(event){
+	var target = event.target || event.srcElement;
+
+	while(target != this) {
+		if (target.nodeName == 'LI') {
+			$('.question-answer i.active').removeClass('active');
+			$(target).children('i').addClass('active');
+			break;
+		}
+		target = target.parentNode;
 	}
-	if (minutes == 60) {
-		hours = hours + 1;
-		minutes = 0;
-	}
-	gamehour = hours;
-    gameminute = minutes;
-    gamesecond = seconds;
-    if (hours < 10) hours = "0" + hours;
-    if (minutes < 10) minutes = "0" + minutes;
-    if (seconds < 10) seconds = "0" + seconds;
-    $('#game-time').html('Тренировка ' + hours + ":" + minutes + ":" + seconds);
-    setTimeout(startTime, 1000);
 }
 
-function startTimer() {
-	if (timerfunc === '') {
-		return;
-	}
-	
-    var minutes = timerminute;
-    var seconds = timersecond - 1;
-	
-	if (seconds == 0 && minutes == 0) {
-		$('#game-timer').empty();
-		window[timerfunc]();
-		return;
-	} 
-	
-	if (seconds == 0) {
-		minutes = minutes - 1;
-		seconds = 59;
-	}
-	
-    timerminute = minutes;
-    timersecond = seconds;
-    if (minutes < 10) minutes = "0" + minutes;
-    if (seconds < 10) seconds = "0" + seconds;
-    $('#game-timer').html( minutes + ":" + seconds );
-	setTimeout(startTimer, 1000);
+function showQuestion(buying) {
+	buying = buying || false; 
+	console.log('showQuestion.start');
+	$.post('/training/question', {buying: buying},
+	function(data){
+		if (data.ok) {
+			console.log(data);
+			$('#game-question').html(data.content);
+			$('#game-question').removeClass('closed');
+			$('.question-footer .btn').on('click', clickAnswer);
+			$('.question-answer').on('click', chooseAnswer);
+			$.cookie('timerevent', data.timerevent);
+			$.cookie('timerminute', data.timerminute);
+			$.cookie('timersecond', data.timersecond);
+			timerNode = 'question-timer';
+			startTimer();
+		}
+	}, "json");
+}
+
+function clickAnswer(event) {
+	var n = $('.question-answer i.active').attr('data-answer-id');
+	removeTimer();
+	$.post('/training/answer', {answer: n},
+	function(data){
+		if (data.ok) {
+			window.location.reload();
+		}
+	}, "json");
+}
+
+function clickNoAnswer(event) {
+	removeTimer();
+	$.post('/training/answer', {answer: 0},
+	function(data){
+		if (data.ok) {
+			window.location.reload();
+		}
+	}, "json");
 }
 
 function chooseCard(event){
@@ -82,13 +90,13 @@ function changeCard(event) {
 function onClickChange() {
 	cards = [];
 	$('.card.active').each(function( index ) {
-		console.log($( this ).attr('data-card-id'))
 		cards.push($( this ).attr('data-card-id'));
 	});
+	removeTimer();
 	$.post('/training/change', {cards: cards},
 	function(data){
 		if (data.ok) {
-			window.location.reload();
+			showQuestion();
 		}
 	}, "json");
 }
@@ -190,27 +198,112 @@ function enableButtons() {
 		default:
 			$('.game-buttons input').prop('disabled', true);
 	}
-}
-
-function startTraining() {
-	if (gamestate == 1) {
-		$('.gamer-cards .card').css('cursor', 'pointer');
-		$('#gamer-cards').on('click', chooseCard);
-	} else {
-		$('.gamer-cards .card').css('cursor', 'default');
-		$('#gamer-cards').off('click', chooseCard);
-	}
-	$('.game-change').on('click', changeCard);
-	$('.game-buttons').on('click', makeMove);
-	enableButtons();
+	$('.game-buttons input[data-move=update]').prop('disabled', false);
 }
 
 $(document).ready(function(){
+	setCookie();
 	startTime();
-	startTimer();
 	
 	if (gametraining) {
 		startTraining();
 	}
 	
 });
+
+function setCookie() {
+	if (!$.cookie('gamehour') 
+		|| (gamehour == 0 && gameminute == 0 && gamesecond == 0)) {
+		$.cookie('gamehour', gamehour);
+		$.cookie('gameminute', gameminute);
+		$.cookie('gamesecond', gamesecond);
+	}
+	
+	if (!$.cookie('timerevent') && timerevent) {
+		$.cookie('timerevent', timerevent);
+		$.cookie('timerminute', timerminute);
+		$.cookie('timersecond', timersecond);
+	}
+}
+
+function startTime() {
+    var hours = +($.cookie('gamehour'));
+    var minutes = +($.cookie('gameminute'));
+    var seconds = +($.cookie('gamesecond')) + 1;
+	
+	if (seconds == 60) {
+		minutes = minutes + 1;
+		seconds = 0;
+	}
+	if (minutes == 60) {
+		hours = hours + 1;
+		minutes = 0;
+	}
+	$.cookie('gamehour', hours);
+	$.cookie('gameminute', minutes);
+    $.cookie('gamesecond', seconds);
+
+	if (hours < 10) hours = "0" + hours;
+    if (minutes < 10) minutes = "0" + minutes;
+    if (seconds < 10) seconds = "0" + seconds;
+    $('#game-time').html('Тренировка ' + hours + ":" + minutes + ":" + seconds);
+    setTimeout(startTime, 1000);
+}
+
+function startTimer() {
+	var timerName = timerNode || 'game-timer';
+	
+	console.log($.cookie());
+	console.log(timerName);
+	if (!$.cookie('timerevent')) {
+		$('#' + timerName).empty();
+		return;
+	}
+	
+    var minutes = +($.cookie('timerminute'));
+    var seconds = +($.cookie('timersecond')) - 1;
+	
+	if (seconds == 0 && minutes == 0) {
+		removeTimer();
+		$('#'+timer).empty();
+		window[$.cookie('timerevent')]();
+		return;
+	} 
+	if (seconds == 0) {
+		minutes = minutes - 1;
+		seconds = 59;
+	}
+	
+	$.cookie('timerminute', minutes);
+    $.cookie('timersecond', seconds);
+
+	if (minutes < 10) minutes = "0" + minutes;
+    if (seconds < 10) seconds = "0" + seconds;
+	
+	$('#'+ timerName).html( minutes + ":" + seconds );
+	eventtimerId = setTimeout(startTimer, 1000);
+}
+
+function startTraining() {
+	if (gamestate == 1) {
+		$('.gamer-cards .card').css('cursor', 'pointer');
+		$('#gamer-cards').on('click', chooseCard);
+		startTimer();
+	} else if (gamestate == 11) {
+		$('.question-footer .btn').on('click', clickAnswer);
+		$('.question-answer').on('click', chooseAnswer);
+		timerNode = 'question-timer';
+		startTimer();
+	}
+	$('.game-change').on('click', changeCard);
+	$('.game-buttons').on('click', makeMove);
+	enableButtons();
+		
+}
+
+function removeTimer() {
+	clearTimeout(eventtimerId);
+	$.removeCookie('timerevent');
+	$.removeCookie('timerminute');
+	$.removeCookie('timersecond');
+}

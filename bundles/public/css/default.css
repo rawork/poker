@@ -52,6 +52,10 @@ body {
 	color: #333;
 }
 
+.closed {
+	display: none;
+}
+
 .game-exit {
 	padding-top: 43px;
 	text-align: right;
@@ -271,10 +275,6 @@ body {
 	height: 54px;
 }
 
-#gamer-cards .card {
-	cursor: pointer;
-}
-
 #gamer-cards .active {
 	border-color: #fb4e0c;
 }
@@ -393,6 +393,81 @@ body {
 	        border-radius: 3px;
 	width: 50px;
 	text-align: right;
+}
+
+#game-question {
+	padding: 20px;
+	background-color: #fff;
+	border: 3px solid #b2d000; 
+	-webkit-border-radius: 20px;
+	   -moz-border-radius: 20px;
+	        border-radius: 20px;
+	position: fixed;
+	width: 286px;
+	height: 370px;
+	top:150px;
+	margin-left: -143px; 
+	left:50%;
+	
+}
+
+.question-body {
+	height: 320px;
+}
+
+.question-body .title {
+	font-size: 18px;
+	font-weight: bold;
+	
+}
+
+.question-answer {
+	margin: 15px 0;
+	padding: 0;
+	list-style: none;
+	
+}
+
+.question-answer li {
+	padding: 0 0 15px 30px;
+}
+
+.question-answer li i {
+	cursor: pointer;
+	margin-left: -30px;
+	float: left;
+	background: #c2c2c2;
+	height: 20px;
+	width: 20px;
+	-webkit-border-radius: 3px;
+	   -moz-border-radius: 3px;
+	        border-radius: 3px;
+	
+}
+
+.question-body li i.active {
+	background: #fb4e0c;
+	height: 20px;
+	width: 20px;
+	-webkit-border-radius: 3px;
+	   -moz-border-radius: 3px;
+	        border-radius: 3px;
+	
+}
+
+.question-footer {
+	text-align: center;
+}
+
+.question-footer .btn {
+	width: 90px;
+	font-weight: bold;
+}
+
+.question-timer {
+	padding-top: 5px;
+	font-size: 11px;
+	font-weight: bold;
 }
 
 .joker-message {
