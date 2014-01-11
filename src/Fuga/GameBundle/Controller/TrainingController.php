@@ -4,7 +4,7 @@ namespace Fuga\GameBundle\Controller;
 
 use Fuga\CommonBundle\Controller\PublicController;
 use Fuga\GameBundle\Model\Training;
-use Fuga\GameBundle\Model\Calculator;
+use Fuga\GameBundle\Model\Combination;
 
 class TrainingController extends PublicController {
 	
@@ -13,6 +13,7 @@ class TrainingController extends PublicController {
 	}
 	
 	public function indexAction() {
+		
 		$user = $this->get('security')->getCurrentUser();
 		if (!$user) 
 		{

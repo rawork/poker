@@ -210,18 +210,34 @@ function enableButtons() {
 		default:
 			$('.game-buttons input').prop('disabled', true);
 	}
-	$('.game-buttons input[data-move=update]').prop('disabled', false);
+	$('.game-buttons input[data-move=new]').prop('disabled', false);
 }
 
 $(document).ready(function(){
-	setCookie();
-	startTime();
-	
 	if (gametraining) {
 		startTraining();
 	}
 	
 });
+
+function startTraining() {
+	setCookie();
+	startTime();
+	if (gamestate == 1) {
+		$('.gamer-cards .card').css('cursor', 'pointer');
+		$('#gamer-cards').on('click', chooseCard);
+		startTimer();
+	} else if (gamestate == 11) {
+		$('.question-footer .btn').on('click', clickAnswer);
+		$('.question-answer').on('click', chooseAnswer);
+		timerNode = 'question-timer';
+		startTimer();
+	}
+	$('.game-change').on('click', changeCard);
+	$('.game-buttons').on('click', makeMove);
+	enableButtons();
+		
+}
 
 function setCookie() {
 	if (!$.cookie('gamehour') 
@@ -293,23 +309,6 @@ function startTimer() {
 	$('#'+ timerName).html( minutes + ":" + seconds );
 	
 	eventtimerId = setTimeout(startTimer, 1000);
-}
-
-function startTraining() {
-	if (gamestate == 1) {
-		$('.gamer-cards .card').css('cursor', 'pointer');
-		$('#gamer-cards').on('click', chooseCard);
-		startTimer();
-	} else if (gamestate == 11) {
-		$('.question-footer .btn').on('click', clickAnswer);
-		$('.question-answer').on('click', chooseAnswer);
-		timerNode = 'question-timer';
-		startTimer();
-	}
-	$('.game-change').on('click', changeCard);
-	$('.game-buttons').on('click', makeMove);
-	enableButtons();
-		
 }
 
 function removeTimer() {

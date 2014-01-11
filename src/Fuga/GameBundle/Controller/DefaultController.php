@@ -3,7 +3,7 @@
 namespace Fuga\GameBundle\Controller;
 
 use Fuga\CommonBundle\Controller\PublicController;
-use Fuga\GameBundle\Model\Calculator;
+use Fuga\GameBundle\Model\Combination;
 use Fuga\GameBundle\Model\Deck;
 
 class DefaultController extends PublicController {
@@ -152,15 +152,15 @@ class DefaultController extends PublicController {
 //			array('name' => '2 clubs', 'suit' => 8, 'weight' => 1),
 //			array('name' => '2 diamonds', 'suit' => 1, 'weight' => 1),
 //		);
-//		$suite = array(
-//			array('name' => 'ace hearts', 'suit' => 2, 'weight' => 4096),
-//			array('name' => '8 spade', 'suit' => 4, 'weight' => 64),
-//			array('name' => 'queen diamonds', 'suit' => 1, 'weight' => 1024),
-//			array('name' => 'jack diamonds', 'suit' => 1, 'weight' => 512),
-//			array('name' => '2 hearts', 'suit' => 2, 'weight' => 1),
-//			array('name' => '9 diamonds', 'suit' => 1, 'weight' => 128),
-//			array('name' => '10 diamonds', 'suit' => 1, 'weight' => 256),
-//		);
+		$suite = array(
+			array('name' => 'jack_diams', 'suit' => 1, 'weight' => 512),
+			array('name' => 'ace_hearts', 'suit' => 2, 'weight' => 4096),
+			array('name' => '2_hearts', 'suit' => 2, 'weight' => 1),
+			array('name' => 'queen_diams', 'suit' => 1, 'weight' => 1024),
+			array('name' => '9_diams', 'suit' => 1, 'weight' => 128),
+			array('name' => 'joker', 'suit' => 8, 'weight' => 8192),
+			array('name' => '10_diams', 'suit' => 1, 'weight' => 256),
+		);
 //		$suite = array(
 //			array('name' => '2 diamonds', 'suit' => 1, 'weight' => 1),
 //			array('name' => 'king diamonds', 'suit' => 1, 'weight' => 2048),
@@ -179,7 +179,13 @@ class DefaultController extends PublicController {
 //			array('name' => '9 diamonds', 'suit' => 1, 'weight' => 128),
 //			array('name' => '10 diamonds', 'suit' => 1, 'weight' => 256),
 //		);		
-		$calculator = new Calculator();
+		$combination = new Combination();
+		$cards = $combination->get($suite);
+		var_dump($suite);
+		var_dump($cards);
+		if (is_array($cards)) {
+			var_dump($combination->rankName($cards['rank']));
+		}
 	}
 	
 	public function startgameAction() {

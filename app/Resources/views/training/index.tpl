@@ -84,7 +84,7 @@
 			<input class="btn btn-primary" data-move="check" type="button" value="Чек">
 			<input class="btn btn-danger" data-move="fold" type="button" value="Пас">
 			&nbsp;&nbsp;&nbsp;&nbsp;
-			<input class="btn btn-warning" data-move="update" type="button" value="Заново">
+			<input class="btn btn-warning" data-move="new" type="button" value="Заново">
 		</div>
 	</div>
 	<div class="game-winner winner{$board.winner}">Победитель</div>

@@ -2,26 +2,24 @@
 
 namespace Fuga\GameBundle\Model;
 
-class Calculator {
+class Combination {
 	
 	const HIGH_CARD		= 0;
 	const PAIR			= 1;
 	const TWO_PAIRS		= 2;
-	const TRIPLE		    = 3;
+	const TRIPLE		= 3;
 	const STREET		= 4;
 	const FLASH			= 5;
-	const FULL_HOUSE	    = 6;
+	const FULL_HOUSE	= 6;
 	const FOUR			= 7;
 	const STREET_FLASH  = 8;
 	const FLASH_ROYAL   = 9;
 	const POKER			= 10;
 	
-	private $rank = 0;
-	private $joker = 8192;
-	private $jokerWeight = 0;
-	private $jokerTempWeight = 0;
+	private $jokerWeight = 8192;
+	private $aceWeight   = 4096;
+	private $fiveWeight  = 8;
 	private $hasJoker;
-	private $usedJoker;
 	private $weights = array(
 		1    => '2', 
 		2    => '3', 
@@ -44,18 +42,25 @@ class Calculator {
 		8 => 'clubs'
 	);
 	private $ranks = array(
-		0 => 'Старшая карта',
-		1 => 'Пара',
-		2 => '2 пары',
-		3 => 'Тройка',
-		4 => 'Стрит',
-		5 => 'Флеш',
-		6 => 'Фулл-хаус',
-		7 => 'Каре',
-		8 => 'Стрит-флеш',
-		9 => 'Флеш-рояль',
+		0  => 'Старшая карта',
+		1  => 'Пара',
+		2  => '2 пары',
+		3  => 'Тройка',
+		4  => 'Стрит',
+		5  => 'Флеш',
+		6  => 'Фулл-хаус',
+		7  => 'Каре',
+		8  => 'Стрит-флеш',
+		9  => 'Флеш-рояль',
 		10 => 'Покер'
 	);
+	
+	static public function sortByWeight($a, $b) {
+        if ($a['weight'] == $b['weight']) {
+            return 0;
+        }
+        return ($a['weight'] < $b['weight']) ? +1 : -1;
+	}
 	
 	public function rankName($id) {
 		return $this->ranks[$id];
@@ -96,95 +101,148 @@ class Calculator {
 	}
 	
 	private function isRoyal(array $suite) {
-		$sum = 0;
+		$cards = array(
+			'rank'   => self::FLASH_ROYAL,
+			'weight' => 0,
+			'cards'  => array(),
+		);
+		
 		foreach ($suite as $card) {
-			
-			$sum += $card['weight'];
-		}
-		if ($this->hasJoker){
-			$sum += $this->joker;
+			$cards['weight'] += $card['weight']; 
+			$cards['cards'][] = $card;
 		}
 		
-		return $this->hasJoker ? 7936+4096 <= $sum : 7936 <= $sum;
+		return 7936 == $cards['weight'] ? $cards : false;
 	}
 	
 	private function isStreet(array $suite) {
+		if (count($suite) < 4) {
+			return false;
+		}
+		
+		$cards = array(
+			'rank'   => self::STREET_FLASH,
+			'weight' => 0,
+			'cards'  => array(),
+		);
 		$hasJoker = $this->hasJoker;
-		$hasAce   = false;
-		$street = array();
-		if (count($suite) >= 4) {
-			$weights = array();
-			foreach($suite as $card) {
-				$weights[] = $card['weight'];
+		$weights = array();
+		$newSuite = array();
+		
+		if ($suite[0]['weight'] == $this->jokerWeight) {
+			array_shift($suite);
+		}
+		
+		foreach($suite as $card) {
+			if (isset($weights[$card['weight']])) {
+				continue;
 			}
-			array_unique($weights);
-			rsort($weights);
-			if ($weights[0] == 8192) {
-				array_shift($weights);
+			$weights[$card['weight']] = true;
+			$newSuite[] = $card;
+		}
+		unset($weights);
+		
+		$aceCard = $newSuite[0]['weight'] == $this->aceWeight ? $newSuite[0] : false;
+		$i = 0;
+		
+		foreach ($newSuite as $card) {
+			$quantity = count($cards['cards']);
+			if ($quantity == 0) {
+				$cards['weight'] += $card['weight'];
+				$cards['cards'][] = $card;
+				continue;
 			}
-			$hasAce =  $weights[0] == 4096;
-			foreach ($weights as $weight) {
-				if (count($street) == 0 || ($street[count($street)-1] >> 1) === $weight) {
-					$street[] = $weight;
-					continue;
-				} elseif ($hasJoker && ($street[count($street)-1] >> 2) == $weight) {
-					$street[] = $street[count($street)-1] >> 1;
-					$street[] = $weight;
-					$hasJoker = false;
-				} elseif (count($street) >= 5 || (count($street) == 4 && $hasJoker) ) {
-					break;
-				} else {
-					$street = array();
-					$street[] = $weight;
-					$hasJoker = $this->hasJoker;
-				}
+
+			if (($cards['cards'][$quantity-1]['weight'] >> 1) === $card['weight']) {
+				$cards['weight'] += $card['weight'];
+				$cards['cards'][] = $card;
+			} elseif ($hasJoker && ($cards['cards'][$quantity-1]['weight'] >> 2) === $card['weight']) {
+				$cards['weight'] += $cards['cards'][$quantity-1]['weight'] >> 1;
+				$cards['cards'][] = array(
+					'name' => $this->weights[$cards['cards'][$quantity-1]['weight'] >> 1].'_'.$this->suits[$cards['cards'][$quantity-1]['suit']],
+					'suit' => $cards['cards'][$quantity-1]['suit'],
+					'weight' => $cards['cards'][$quantity-1]['weight'] >> 1
+				);
+				$cards['weight'] += $card['weight'];
+				$cards['cards'][] = $card;
+				$hasJoker = false;
+			} else {
+				$cards['weight'] = $card['weight'];
+				$cards['cards'] = array($card);
+				$i = 1;
 			}
-			while (count($street) < 5) {
-				if ($street[count($street)-1] != 1) {
-					$hasAce = false;
-				}
-				if (!$hasJoker && !$hasAce) {
-					break;
-				}
-				if ($street[count($street)-1] == 1 && $hasAce) {
-					array_push($street, 0);
-					$hasAce = false;
-					continue;
-				}
-				if ($hasJoker) {
-					array_unshift($street, $street[0] << 1);
-					$hasJoker = false;
-					continue;
-				}
-				
-				if ($street[0] == 2048 && $hasJoker) {
-					array_unshift($street, 4096);
-					
-				} 
+			
+			if ($quantity == 5) {
+				break;
 			}
 		}
 		
-		return count($street) >= 5;
+		if (count($cards['cards']) == 4 && $cards['cards'][0]['weight'] == $this->fiveWeight && $aceCard) {
+			$cards['cards'][] = $aceCard;
+		}
+		
+		if (count($cards['cards']) < 5) {
+			return false;
+		}
+		
+		return $cards;
 	}
 	
-	private function isSingle(array $suite) {
-		return 1 == count($suite);
-	}
-	
-	private function isPair(array $suite) {
-		return 2 == count($suite);
-	}
-	
-	private function isTriple(array $suite) {
-		return 3 == count($suite);
+	private function isFlash(array $suite) {
+		if (count($suite) < 4) {
+			return false;
+		}
+		
+		$cards = array(
+			'rank'   => self::FLASH,
+			'weight' => 0,
+			'cards'  => array(),
+		);
+		$hasJoker = $this->hasJoker;
+		$highCard = $this->aceWeight;
+		
+		foreach ($suite as $card) {
+			if ($hasJoker) {
+				if ($card['weight'] < $highCard) {
+					$hasJoker = false;
+					$cards['weight'] += $highCard;
+					$cards['cards'][] = array(
+						'name' => $this->weights[$highCard].'_'.$this->suits[$card['suit']], 
+						'suit' => $card['suit'], 
+						'weight' => $highCard
+					);
+				} else {
+					$highCard = $highCard >> 1;
+				}
+			}
+			$cards['weight'] += $card['weight'];
+			$cards['cards'][] = $card;
+			if (count($cards['cards']) == 5) {
+				break;
+			}
+		}
+		
+		if (count($cards['cards']) < 5) {
+			return false;
+		}
+		
+		return $cards;
 	}
 	
 	private function isFour(array $suite) {
 		return 4 == count($suite) || (3 == count($suite) && $this->hasJoker);
 	}
 	
-	private function isFlash(array $suite) {
-		return 5 <= count($suite) || (4 == count($suite) && $this->hasJoker);
+	private function isTriple(array $suite) {
+		return 3 == count($suite);
+	}
+	
+	private function isPair(array $suite) {
+		return 2 == count($suite);
+	}
+	
+	private function isSingle(array $suite) {
+		return 1 == count($suite);
 	}
 	
 	private function isFullHouse(array $triples, array $pairs) {
@@ -254,7 +312,7 @@ class Calculator {
 	private function hasJoker($suite) {
 		$hasJoker = false;
 		foreach ($suite as $card) {
-			if ($this->joker == $card['weight']) {
+			if ($this->jokerWeight == $card['weight']) {
 				$hasJoker = true;
 				break;
 			}
@@ -308,26 +366,36 @@ class Calculator {
 		
 	}
 
-	public function checkRank($suite) {
+	public function get($suite) {
+		$cards = array();
+		usort($suite, array('self', 'sortByWeight'));
+		$this->hasJoker = $this->hasJoker($suite);
 		$singles = array();
 		$pairs   = array();
 		$triples = array();
-		$this->hasJoker = $this->hasJoker($suite);
-		$this->usedJoker = false;
+		
 		$sameSuite = $this->sameSuit($suite);
 		foreach ($sameSuite as $suit) {
-			if ($cards = $this->isFlash($suit)) {
-				if ($cards = $this->isStreet($suit)) {
-					if ($cards = $this->isRoyal($suit)) {
-						return $this->rankName(self::FLASH_ROYAL); 
+			if ($cardsFlash = $this->isFlash($suit)) {
+				if ($cardsStreet = $this->isStreet($suite)) {
+					if ($cardsRoyal = $this->isRoyal($cardsStreet['cards'])) {
+						if ($cardsStreet['weight'] == $cardsRoyal['weight']) {
+							return $cardsRoyal;
+						}
 					}
-					return $this->rankName(self::STREET_FLASH);
+					
+					if ($cardsStreet['weight'] == $cardsFlash['weight']) {
+						return $cardsStreet;
+					}
+					
 				}
-				return $this->rankName(self::FLASH);
+				
+				return $cardsFlash;
 			}
 		}
 		
 		$sameWeight = $this->sameWeight($suite);
+		
 		foreach ($sameWeight as $suit) {
 			if ($this->isFour($suit)) {
 //				if ($this->hasJoker) {
@@ -358,7 +426,34 @@ class Calculator {
 			return $this->rankName(self::HIGH_CARD);
 		}
 		
-		return false;
+		return $cards ?: false;
+	}
+	
+	public function compare(array $suites) {
+		$cards = array();
+		$i = 0;
+		
+		while ($suite = array_shift($suites)) {
+			
+			if (1 == ++$i) {
+				$cards = $suite;
+				return;
+			}
+				
+			if ($cards['rank'] < $suite['rank']) 
+			{
+				$cards = $suite;
+				continue;
+			} elseif ($cards['rank'] == $suite['rank']) {
+				if ($cards['weight'] == $suite['weight']) 
+				{
+					$cards = $suite;
+					continue;
+				}
+			}
+		}
+		
+		return $cards;
 	}
 	
 }
