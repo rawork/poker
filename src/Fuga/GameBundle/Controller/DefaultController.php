@@ -107,85 +107,22 @@ class DefaultController extends PublicController {
 	}
 	
 	public function calcAction() {
-//		$suite = array(
-//			array('name' => 'ace hearts', 'suit' => 2, 'weight' => 4096),
-//			array('name' => '4 diamonds', 'suit' => 1, 'weight' => 4),
-//			array('name' => 'queen spade', 'suit' => 4, 'weight' => 1024),
-//			array('name' => '3 diamonds', 'suit' => 1, 'weight' => 2),
-//			array('name' => '8 hearts', 'suit' => 2, 'weight' => 64),
-//			array('name' => 'king clubs', 'suit' => 8, 'weight' => 2048),
-//			array('name' => '2 diamonds', 'suit' => 1, 'weight' => 1),
-//		);
-//		$suite = array(
-//			array('name' => 'ace hearts', 'suit' => 2, 'weight' => 4096),
-//			array('name' => 'king spade', 'suit' => 4, 'weight' => 2048),
-//			array('name' => '10 diamonds', 'suit' => 1, 'weight' => 256),
-//			array('name' => '9 diamonds', 'suit' => 1, 'weight' => 128),
-//			array('name' => 'joker', 'suit' => 0, 'weight' => 8192),
-//			array('name' => '5 clubs', 'suit' => 8, 'weight' => 8),
-//			array('name' => '2 diamonds', 'suit' => 1, 'weight' => 1),
-//		);
-//		$suite = array(
-//			array('name' => 'ace hearts', 'suit' => 2, 'weight' => 4096),
-//			array('name' => '4 diamonds', 'suit' => 1, 'weight' => 4),
-//			array('name' => '2 clubs', 'suit' => 8, 'weight' => 1),
-//			array('name' => '9 diamonds', 'suit' => 1, 'weight' => 128),
-//			array('name' => '10 hearts', 'suit' => 2, 'weight' => 256),
-//			array('name' => 'ace clubs', 'suit' => 8, 'weight' => 4096),
-//			array('name' => '2 diamonds', 'suit' => 1, 'weight' => 1),
-//		);
-//		$suite = array(
-//			array('name' => 'ace hearts', 'suit' => 2, 'weight' => 4096),
-//			array('name' => '4 diamonds', 'suit' => 1, 'weight' => 4),
-//			array('name' => 'joker', 'suit' => 0, 'weight' => 8192),
-//			array('name' => '3 diamonds', 'suit' => 1, 'weight' => 2),
-//			array('name' => '4 hearts', 'suit' => 2, 'weight' => 4),
-//			array('name' => '2 clubs', 'suit' => 8, 'weight' => 1),
-//			array('name' => '2 diamonds', 'suit' => 1, 'weight' => 1),
-//		);
-//		$suite = array(
-//			array('name' => 'ace hearts', 'suit' => 2, 'weight' => 4096),
-//			array('name' => '4 diamonds', 'suit' => 1, 'weight' => 4),
-//			array('name' => 'joker', 'suit' => 0, 'weight' => 8192),
-//			array('name' => '2 spade', 'suit' => 4, 'weight' => 1),
-//			array('name' => '2 hearts', 'suit' => 2, 'weight' => 1),
-//			array('name' => '2 clubs', 'suit' => 8, 'weight' => 1),
-//			array('name' => '2 diamonds', 'suit' => 1, 'weight' => 1),
-//		);
 		$suite = array(
+			array('name' => '7_diams', 'suit' => 1, 'weight' => 32),
+			array('name' => '9_clubs', 'suit' => 8, 'weight' => 64),
 			array('name' => 'jack_diams', 'suit' => 1, 'weight' => 512),
-			array('name' => 'ace_hearts', 'suit' => 2, 'weight' => 4096),
-			array('name' => '2_hearts', 'suit' => 2, 'weight' => 1),
-			array('name' => 'queen_diams', 'suit' => 1, 'weight' => 1024),
-			array('name' => '9_diams', 'suit' => 1, 'weight' => 128),
-			array('name' => 'joker', 'suit' => 8, 'weight' => 8192),
-			array('name' => '10_diams', 'suit' => 1, 'weight' => 256),
+			array('name' => 'jack_clubs', 'suit' => 8, 'weight' => 512),
+			array('name' => '5_diams', 'suit' => 1, 'weight' => 8),
+			array('name' => 'joker', 'suit' => 16, 'weight' => 8192),
+			array('name' => '6_hearts', 'suit' => 2, 'weight' => 16),
 		);
-//		$suite = array(
-//			array('name' => '2 diamonds', 'suit' => 1, 'weight' => 1),
-//			array('name' => 'king diamonds', 'suit' => 1, 'weight' => 2048),
-//			array('name' => 'joker', 'suit' => 0, 'weight' => 8192),
-//			array('name' => 'jack diamonds', 'suit' => 1, 'weight' => 512),
-//			array('name' => '2 hearts', 'suit' => 2, 'weight' => 1),
-//			array('name' => '9 diamonds', 'suit' => 1, 'weight' => 128),
-//			array('name' => '10 diamonds', 'suit' => 1, 'weight' => 256),
-//		);
-//		$suite = array(
-//			array('name' => 'queen diamonds', 'suit' => 1, 'weight' => 1024),
-//			array('name' => 'king diamonds', 'suit' => 1, 'weight' => 2048),
-//			array('name' => 'joker', 'suit' => 0, 'weight' => 8192),
-//			array('name' => 'jack diamonds', 'suit' => 1, 'weight' => 512),
-//			array('name' => '2 hearts', 'suit' => 2, 'weight' => 1),
-//			array('name' => '9 diamonds', 'suit' => 1, 'weight' => 128),
-//			array('name' => '10 diamonds', 'suit' => 1, 'weight' => 256),
-//		);		
 		$combination = new Combination();
 		$cards = $combination->get($suite);
-		var_dump($suite);
-		var_dump($cards);
 		if (is_array($cards)) {
-			var_dump($combination->rankName($cards['rank']));
+			$rank = $combination->rankName($cards['rank']);
 		}
+		
+		return $this->render('game/test.tpl', compact('suite', 'cards', 'rank'));
 	}
 	
 	public function startgameAction() {
