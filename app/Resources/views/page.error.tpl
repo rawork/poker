@@ -9,7 +9,7 @@
 </head>
 <body>
     <div class="error">
-		<div><a href="/"><img src="{$theme_ref}/public/img/logo_{$locale}.png"></a></div>
+		<div><a href="/"><img src="{$theme_ref}/public/img/logo.png"></a></div>
 		<br>
 		<h1>{$status_code}</h1>
 		<div class="error-text">{$status_text}.<br><a href="{$prj_ref}/">Перейти на главную страницу</a></div>

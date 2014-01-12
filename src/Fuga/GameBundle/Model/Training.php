@@ -18,62 +18,43 @@ class Training {
 	
 	public function __construct() {
 		$this->deck = new Deck();
-		$this->createBots();
 	}
 	
 	public function createGamer($gamer) {
-		$this->gamer = array(
-			'id'      => 100,
-			'avatar'  => $gamer['avatar_value']['extra']['main']['path'],
-			'name'    => $gamer['name'],
-			'lastname'=> $gamer['lastname'],
-			'chips'   => 99,
-			'bet'     => 0,
-			'status'  => 1,
-			'state'   => 0,
-			'seat'    => 1,
-			'cards'   => $this->deck->give(4),
-			'change'  => null,
-			'question' => null,
-		);
+		$this->gamer = new TrainingGamer($gamer);
+		$this->gamer->cards = $this->deck->give(4);
+		$this->gamer->position = $this->getPosition(6, 6);
 	}
 	
-	private function createBots() {
-		for ($i = 2; $i < 5; $i++) {
-			$this->bots[$i] = array(
-				'id'      => $i,
-				'avatar'  => '/bundles/public/img/bot.jpg',
-				'name'    => 'Компьютер',
-				'lastname'=> '',
-				'chips'   => 99,
-				'bet'     => 0,
-				'status'  => 1,
-				'state'   => 0,
-				'seat'    => $i,
-				'cards'   => $this->deck->give(4),
-			);
+	public function createBots($n = 4) {
+		for ($i = 1; $i <= $n; $i++) {
+			$bot = new Bot($i);
+			$bot->cards = $this->deck->give(4);
+			$bot->position = $this->getPosition($i, $n);
+			$this->bots[] = $bot;
 		}
 	}
 	
-	public function createBoard() {
-		$this->board = array(
-			'fromtime' => date('Y-m-d H:i:s'),
-			'bank'     => 4,
-			'bets'     => 0,
-			'maxbet'   => 0,
-			'minbet'   => 1,
-			'allin'    => 0,
-			'winner'   => 0,
-			'hour'     => 0,
-			'minute'   => 0,
-			'second'   => 0,
-			'timerminute'   => 0,
-			'timersecond'   => 13,
-			'timerevent'   => 'onClickNoChange',
-			'flop'     => $this->deck->give(3),
-			'status' => 1,
-			'state'  => 1,
-		);
+	public function createBoard($user_id) {
+		$this->board = new Board($user_id);
+		$this->board->flop = $this->deck->give(3);
+		$this->board->bank = 4;
+	}
+	
+	public function getPosition($seat, $quantity) {
+		if ($seat == 6) {
+			return 0;
+		}
+		
+		switch ($quantity) {
+			case 1:
+				return 2;
+			case 2:
+			case 3:
+				return $seat + 1;
+			default:
+				return $seat;
+		}
 	}
 	
 }

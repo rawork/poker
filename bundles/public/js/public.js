@@ -14,10 +14,6 @@ function chooseAnswer(event){
 	}
 }
 
-function showBuy() {
-	showQuestion(true);
-}
-
 function nextGame() {
 	$.post('/training/next', {},
 	function(data){
@@ -25,6 +21,12 @@ function nextGame() {
 			window.location.reload();
 		}
 	}, "json");
+}
+
+function showBuy() {
+	console.log('showBuy.start');
+	return;
+	showQuestion(true);
 }
 
 function showQuestion(buying) {
@@ -37,7 +39,7 @@ function showQuestion(buying) {
 			$('#game-question').removeClass('closed');
 			$('.question-footer .btn').on('click', clickAnswer);
 			$('.question-answer').on('click', chooseAnswer);
-			$.cookie('timerevent', data.timerevent);
+			$.cookie('timerhandler', data.timerhandler);
 			$.cookie('timerminute', data.timerminute);
 			$.cookie('timersecond', data.timersecond);
 			timerNode = 'question-timer';
@@ -217,11 +219,9 @@ $(document).ready(function(){
 	if (gametraining) {
 		startTraining();
 	}
-	
 });
 
 function startTraining() {
-	setCookie();
 	startTime();
 	if (gamestate == 1) {
 		$('.gamer-cards .card').css('cursor', 'pointer');
@@ -237,21 +237,6 @@ function startTraining() {
 	$('.game-buttons').on('click', makeMove);
 	enableButtons();
 		
-}
-
-function setCookie() {
-	if (!$.cookie('gamehour') 
-		|| (gamehour == 0 && gameminute == 0 && gamesecond == 0)) {
-		$.cookie('gamehour', gamehour);
-		$.cookie('gameminute', gameminute);
-		$.cookie('gamesecond', gamesecond);
-	}
-	
-	if (!$.cookie('timerevent') && timerevent) {
-		$.cookie('timerevent', timerevent);
-		$.cookie('timerminute', timerminute);
-		$.cookie('timersecond', timersecond);
-	}
 }
 
 function startTime() {
@@ -281,18 +266,20 @@ function startTime() {
 function startTimer() {
 	var timerName = timerNode || 'game-timer';
 	
-	if (!$.cookie('timerevent')) {
+	if (!$.cookie('timerhandler')) {
 		$('#' + timerName).empty();
 		return;
 	}
 	
     var minutes = +($.cookie('timerminute'));
     var seconds = +($.cookie('timersecond')) - 1;
-	 
-	if (seconds == 0 && minutes == 0) {
+	
+	if (seconds < 0 || (seconds <= 0 && minutes <= 0)) {
 		$('#'+ timerName).html( "00:00" );
-		window[$.cookie('timerevent')]();
+		var timerhandler = $.cookie('timerhandler');
+		console.log(timerhandler);
 		removeTimer();
+		window[timerhandler]();
 		return;
 	}
 	if (seconds == 0) {
@@ -313,7 +300,7 @@ function startTimer() {
 
 function removeTimer() {
 	clearTimeout(eventtimerId);
-	$.removeCookie('timerevent');
+	$.removeCookie('timerhandler');
 	$.removeCookie('timerminute');
 	$.removeCookie('timersecond');
 }

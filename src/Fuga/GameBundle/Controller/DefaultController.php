@@ -109,12 +109,12 @@ class DefaultController extends PublicController {
 	public function calcAction() {
 		$suite = array(
 			array('name' => '7_diams', 'suit' => 1, 'weight' => 32),
-			array('name' => '9_clubs', 'suit' => 8, 'weight' => 64),
-			array('name' => 'jack_diams', 'suit' => 1, 'weight' => 512),
 			array('name' => 'jack_clubs', 'suit' => 8, 'weight' => 512),
-			array('name' => '5_diams', 'suit' => 1, 'weight' => 8),
+			array('name' => 'jack_diams', 'suit' => 1, 'weight' => 512),
+			array('name' => '2_clubs', 'suit' => 8, 'weight' => 1),
+			array('name' => 'king_hearts', 'suit' => 2, 'weight' => 2048),
+			array('name' => 'king_diams', 'suit' => 1, 'weight' => 2048),
 			array('name' => 'joker', 'suit' => 16, 'weight' => 8192),
-			array('name' => '6_hearts', 'suit' => 2, 'weight' => 16),
 		);
 		$combination = new Combination();
 		$cards = $combination->get($suite);

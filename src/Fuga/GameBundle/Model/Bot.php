@@ -1,0 +1,59 @@
+<?php
+
+namespace Fuga\GameBundle\Model;
+
+class Bot {
+	
+	private $data;
+	
+	public function __construct($id, array $options = array()) {
+		$this->data = array(
+			'id'      => $id,
+			'avatar'  => '/bundles/public/img/bot.jpg',
+			'name'    => 'Компьютер '.$id,
+			'lastname'=> '',
+			'chips'   => isset($options['chips']) ? $options['chips'] : 99,
+			'bet'     => 0,
+			'status'  => 1,
+			'state'   => 0,
+			'seat'    => isset($options['seat']) ? $options['seat'] : $id,
+			'cards'   => array(),
+		);
+	}
+	
+	public function bet(integer $bet) {
+		$this->data['chips'] -= $bet;
+		$this->data['bet'] += $bet;
+	}
+	
+	public function takeBet() {
+		$bet = $this->data['bet'];
+		$this->data['bet'] = 0;
+		return $bet;
+	}
+	
+	public function __set($name, $value) 
+    {
+        $this->data[$name] = $value;
+    }
+
+    public function __get($name) 
+    {
+        if (array_key_exists($name, $this->data)) {
+            return $this->data[$name];
+        }
+
+        return null;
+    }
+
+    public function __isset($name) 
+    {
+        return isset($this->data[$name]);
+    }
+
+    public function __unset($name) 
+    {
+        unset($this->data[$name]);
+    }
+	
+}
