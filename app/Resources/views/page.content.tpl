@@ -17,39 +17,82 @@
 	<body>
 		<div class="container">
 			<div class="row-fluid">
-				<div class="span2">
-					<img src="{$theme_ref}/public/img/logo.png">
-					<br><br>
-					<img src="{$theme_ref}/public/img/combinations.jpg">
-					<br><br><br>
+				<div class="span2"><a href="/"><img class="logo" src="/bundles/public/img/logo.png"></a></div>
+				<div class="span7">
+					<ul class="mainmenu">
+						{foreach from=$links item=link name=link}
+						<li class="item{$smarty.foreach.link.index+1}"><a{if $curnode.id == $link.id} class="active"{/if} href="{$link.ref}">{$link.title}</a></li>
+						{/foreach}
+					</ul>
+					<div class="clearfix"></div>
 				</div>
-				<div class="span10">
-					<div class="content">
-						{eval var=$mainbody}
-					</div>
+				<div class="span3 text-right">
+					<ul class="login-menu">
+						<li><a href="/account">АВТОРИЗАЦИЯ</a> / </li>
+						<li><a href="/account/register">РЕГИСТРАЦИЯ</a></li>
+					</ul>
 				</div>
 			</div>
 		</div>
 		<div class="poker-line"></div>
 		<div class="container">
+			<h1>{$h1}</h1>
+			{$maincontent}
+		</div>
+		{if 1 == 2}
+		<div class="splash">
+			<div class="container">
+				<div class="index-buttons">
+					<a class="btn btn-warning btn-large" href="/game">Игровой<small>зал</small></a>
+					<a class="btn btn-success btn-large" href="/training">Тренировочный<small>зал</small></a>
+				</div>
+			</div>
+		</div>
+		{/if}
+		<div class="container gamers-container">
+			{if $curnode.name == 'rules'}<hr class="red-line">
+			{raMethod path=Fuga:Public:News:lenta}{/if}
+			{if $curnode.name != 'members'}<hr class="red-line">
 			<div class="row-fluid">
-				<div class="span4 footer-menu">
-					<a href="">ПРАВИЛА</a> / 
-					<a href="">УЧАСТНИКИ</a> / 
-					<a href="">ПРИЗЫ</a> / 
-					<a href="">КЛУБ</a>
+				<div class="span12 text-center">
+					<h3>УЧАСТНИКИ КЛУБА:</h3>
+					<ul class="index-gamers">
+						<li><a href=""><img src="/bundles/public/img/avatar2.jpg"></a></li>
+						<li><a href=""><img src="/bundles/public/img/avatar2.jpg"></a></li>
+						<li><a href=""><img src="/bundles/public/img/avatar2.jpg"></a></li>
+						<li><a href=""><img src="/bundles/public/img/avatar2.jpg"></a></li>
+						<li><a href=""><img src="/bundles/public/img/avatar2.jpg"></a></li>
+						<li><a href=""><img src="/bundles/public/img/avatar2.jpg"></a></li>
+						<li><a href=""><img src="/bundles/public/img/avatar2.jpg"></a></li>
+					</ul>
+					<a class="btn btn-success btn-large" href="/members">УЧАСТНИКИ<small>клуба</small></a>
+					<br><br><br>
 				</div>
-				<div class="span4 footer-logo">
-					<img src="{$theme_ref}/public/img/logo.png">
+			</div>
+			{/if}
+		</div>
+		<div class="poker-line"></div>
+		<div class="container">
+			<div class="row-fluid">
+				<div class="span5">
+					<ul class="footer-menu">
+						{foreach from=$links item=link name=link}
+						<li>{if $smarty.foreach.link.index > 0} / {/if}<a href="{$link.ref}">{$link.title}</a></li>
+						{/foreach}
+					</ul>
 				</div>
-				<div class="span4 footer-login">
-					<a href="">АВТОРИЗАЦИЯ</a> / 
-					<a href="">РЕГИСТРАЦИЯ</a>
+				<div class="span2 text-center">
+					<img class="footer-logo" src="{$theme_ref}/public/img/logo.png">
+				</div>
+				<div class="span5 footer-right">
+					<ul class="login-menu">
+						<li><a href="/account">АВТОРИЗАЦИЯ</a> /</li>
+						<li><a href="/account/register">РЕГИСТРАЦИЯ</a></li>
+					</ul>
 				</div>
 			</div>
 		</div>
 		<script type="text/javascript" src="{$theme_ref}/jquery/jquery.js"></script>
-		<script type="text/javascript" src="{$theme_ref}/bootstrap2/js/bootstrap.js"></script>
-		<script type="text/javascript" src="{$theme_ref}/public/js/public.js"></script>
+		<script type="text/javascript" src="{$theme_ref}/bootstrap2/js/bootstrap.min.js"></script>
 	</body>
 </html>

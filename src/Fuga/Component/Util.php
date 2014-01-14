@@ -75,7 +75,7 @@ class Util {
 				'ua' => array(),
 			);
 			$month = array(
-				'ru' => array('January' => 'января', 'February' => 'февраля', 'March' => 'марта', 'April' => 'апреля', 'May' => 'мая', 'June' => 'июня', 'July' => 'июля', 'August' => 'августа', 'September' => 'сентября', 'October' => 'октября', 'November'  => 'ноября', 'December' => 'декабря'),
+				'ru' => array('January' => 'Январь', 'February' => 'Февраль', 'March' => 'Март', 'April' => 'Апрель', 'May' => 'Май', 'June' => 'Июнь', 'July' => 'Июль', 'August' => 'Август', 'September' => 'Сентябрь', 'October' => 'Октябрь', 'November'  => 'Ноябрь', 'December' => 'Декабрь'),
 				'ua' => array(),
 			);
 			$sweekday = array(

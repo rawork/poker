@@ -1,1 +1,1 @@
-{$node.content}
+{eval var=$node.content}

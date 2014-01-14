@@ -16,15 +16,14 @@ class PageController extends Controller {
 	}
 	
 	public function staticAction() {
-		$content = ' ';
 		if ($this->get('router')->getParam('action') == 'index') {
-			$content .= $this->render('page/static.tpl', array('node' => $this->getManager('Fuga:Common:Page')->getCurrentNode()));
+			return $this->render('page/static.tpl', array('node' => $this->getManager('Fuga:Common:Page')->getCurrentNode()));
 		}
 		
-		return $content;
+		return '';
 	}
 	
-	public function getContent() {
+	public function dinamicAction() {
 		$node = $this->getManager('Fuga:Common:Page')->getCurrentNode();
 		if ($node['module_id']) {
 			try {
@@ -121,7 +120,7 @@ class PageController extends Controller {
 
 	public function indexAction() {
 		if ($this->get('router')->isXmlHttpRequest()) {
-			return $this->getContent();
+			return $this->dinamicAction();
 		}
 		
 		$node = $this->getManager('Fuga:Common:Page')->getCurrentNode();
@@ -144,7 +143,7 @@ class PageController extends Controller {
 			'locale'   => $this->get('router')->getParam('locale'),
 		);
 		$this->get('templating')->assign($params);
-		$this->get('templating')->assign(array('mainbody' => $this->staticAction().$this->getContent()));
+		$this->get('templating')->assign(array('maincontent' => $this->staticAction().$this->dinamicAction()));
 		$content = $this->render(
 				$this->getManager('Fuga:Common:Template')->getByNode($node['name']), 
 				$this->get('container')->getVars()

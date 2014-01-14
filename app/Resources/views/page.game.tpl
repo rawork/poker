@@ -6,6 +6,7 @@
 		{$meta}
 		<link rel="stylesheet" href="{$theme_ref}/bootstrap2/css/bootstrap.css" type="text/css" media="screen">
 		<link rel="stylesheet" href="{$theme_ref}/public/css/default.css" type="text/css" media="screen">
+		<link rel="stylesheet" href="{$theme_ref}/public/css/game.css" type="text/css" media="screen">
 		<!--[if lt IE 9]>
 		{*<script type="text/javascript" src="{$theme_ref}/ie/html5shiv.js"></script>*}
 		<script type="text/javascript" src="{$theme_ref}/ie/respond.min.js"></script>
@@ -16,23 +17,26 @@
 	</head>
 	<body>
 		<div class="container">
-			{eval var=$mainbody}
+			{$maincontent}
 		</div>
 		<div class="poker-line"></div>
 		<div class="container">
 			<div class="row-fluid">
-				<div class="span4 footer-menu">
-					<a href="">ПРАВИЛА</a> / 
-					<a href="">УЧАСТНИКИ</a> / 
-					<a href="">ПРИЗЫ</a> / 
-					<a href="">КЛУБ</a>
+				<div class="span5">
+					<ul class="footer-menu">
+						{foreach from=$links item=link name=link}
+						<li>{if $smarty.foreach.link.index > 0} / {/if}<a href="{$link.ref}">{$link.title}</a></li>
+						{/foreach}
+					</ul>
 				</div>
-				<div class="span4 footer-logo">
-					<img src="{$theme_ref}/public/img/logo.png">
+				<div class="span2 text-center">
+					<img class="footer-logo" src="{$theme_ref}/public/img/logo.png">
 				</div>
-				<div class="span4 footer-login">
-					<a href="">АВТОРИЗАЦИЯ</a> / 
-					<a href="">РЕГИСТРАЦИЯ</a>
+				<div class="span5 footer-right">
+					<ul class="login-menu">
+						<li><a href="/account">АВТОРИЗАЦИЯ</a> /</li>
+						<li><a href="/account/register">РЕГИСТРАЦИЯ</a></li>
+					</ul>
 				</div>
 			</div>
 		</div>
