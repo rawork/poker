@@ -12,7 +12,7 @@ class Bot {
 			'avatar'  => '/bundles/public/img/bot.jpg',
 			'name'    => 'Компьютер '.$id,
 			'lastname'=> '',
-			'chips'   => isset($options['chips']) ? $options['chips'] : 99,
+			'chips'   => isset($options['chips']) ? $options['chips'] : 100,
 			'bet'     => 0,
 			'status'  => 1,
 			'state'   => 0,
@@ -21,14 +21,14 @@ class Bot {
 		);
 	}
 	
-	public function bet(integer $bet) {
-		$this->data['chips'] -= $bet;
-		$this->data['bet'] += $bet;
+	public function bet($bet) {
+		$this->chips -= $bet;
+		$this->bet += $bet;
 	}
 	
 	public function takeBet() {
-		$bet = $this->data['bet'];
-		$this->data['bet'] = 0;
+		$bet = $this->bet;
+		$this->bet = 0;
 		return $bet;
 	}
 	

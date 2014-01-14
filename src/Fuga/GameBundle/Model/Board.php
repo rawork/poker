@@ -10,7 +10,7 @@ class Board {
 	public function __construct($id) {
 		$this->data = array(
 			'user_id'  => $id,
-			'fromtime' => new \DateTime(),
+			'fromtime' => null,
 			'bank'     => 0,
 			'bets'     => 0,
 			'maxbet'   => 0,
@@ -18,28 +18,27 @@ class Board {
 			'allin'    => 0,
 			'winner'   => array(),
 			'flop'     => array(),
-			'status'   => 1,
-			'state'    => 1,
+			'state'    => 0,
 		);
 	}
 	
-	public function acceptBet(integer $bet) {
-		$this->data['bets'] += $bet;
+	public function acceptBet($bet) {
+		$this->bets += $bet;
 	}
 	
-	public function confirmBets(integer $bet) {
-		$this->data['bank'] += $this->data['bets'];
-		$this->data['bets'] = 0;
+	public function confirmBets() {
+		$this->bank += $this->bets;
+		$this->bets = 0;
 	}
 	
 	public function takeBank() {
-		$chips = $this->data['bank'];
-		$this->data['bank'] = 0;
+		$chips = $this->bank;
+		$this->bank = 0;
 		return $chips;
 	}
 	
 	public function raiseMinBet() {
-		$this->data['minbet'] += $this->step;
+		$this->minbet += $this->step;
 	}
 
 	public function __set($name, $value) 
@@ -65,10 +64,5 @@ class Board {
     {
         unset($this->data[$name]);
     }
-	
-	// TODO Реализовать сохранение в бд
-	public function save() {
-		
-	}
 	
 }

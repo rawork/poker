@@ -53,7 +53,7 @@ class DefaultController extends PublicController {
 			if ($gamer['cards']) {
 				$gamer['cards'] = unserialize($gamer['cards']);
 			} else {
-				$gamer['cards'] = $deck->give(4);
+				$gamer['cards'] = $deck->take(4);
 				$this->get('container')->updateItem('account_gamer', 
 					array('cards' => serialize($gamer['cards'])),
 					array('id' => $gamer['id'])
@@ -75,7 +75,7 @@ class DefaultController extends PublicController {
 		if ($gamer0['cards']) {
 			$gamer0['cards'] = unserialize($gamer0['cards']);
 		} else {
-			$gamer0['cards'] = $deck->give(4);
+			$gamer0['cards'] = $deck->take(4);
 			$this->get('container')->updateItem('account_gamer', 
 				array('cards' => serialize($gamer0['cards'])),
 				array('id' => $gamer0['id'])
@@ -90,7 +90,7 @@ class DefaultController extends PublicController {
 		if ($board['flop']) {
 			$board['flop'] = unserialize($board['flop']);
 		} else {
-			$board['flop'] = $deck->give(3);
+			$board['flop'] = $deck->take(3);
 			$this->get('container')->updateItem('game_board', 
 				array('flop' => serialize($board['flop'])),
 				array('id' => $board['id'])

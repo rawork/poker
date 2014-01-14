@@ -1,7 +1,7 @@
 var timerNode = null;
 var eventtimerId = null;
 
-function chooseAnswer(event){
+function onChooseAnswer(event){
 	var target = event.target || event.srcElement;
 
 	while(target != this) {
@@ -37,8 +37,8 @@ function showQuestion(buying) {
 		if (data.ok) {
 			$('#game-question').html(data.content);
 			$('#game-question').removeClass('closed');
-			$('.question-footer .btn').on('click', clickAnswer);
-			$('.question-answer').on('click', chooseAnswer);
+			$('.question-footer .btn').on('click', onClickAnswer);
+			$('.question-answer').on('click', onChooseAnswer);
 			$.cookie('timerhandler', data.timerhandler);
 			$.cookie('timerminute', data.timerminute);
 			$.cookie('timersecond', data.timersecond);
@@ -48,7 +48,7 @@ function showQuestion(buying) {
 	}, "json");
 }
 
-function clickAnswer(event) {
+function onClickAnswer(event) {
 	var n = $('.question-answer i.active').attr('data-answer-id');
 	removeTimer();
 	$.post('/training/answer', {answer: n},
@@ -175,6 +175,7 @@ function onClickCheck() {
 }
 
 function onClickNew() {
+	console.log('onClickNew');
 	$.post('/training/new', {},
 	function(data){
 		if (data.ok) {
@@ -223,13 +224,15 @@ $(document).ready(function(){
 
 function startTraining() {
 	startTime();
-	if (gamestate == 1) {
+	if (gamestate == 0) {
+		$('#game-start .btn').on('click', onClickNew);
+	} else if (gamestate == 1) {
 		$('.gamer-cards .card').css('cursor', 'pointer');
 		$('#gamer-cards').on('click', chooseCard);
 		startTimer();
 	} else if (gamestate == 11) {
-		$('.question-footer .btn').on('click', clickAnswer);
-		$('.question-answer').on('click', chooseAnswer);
+		$('.question-footer .btn').on('click', onClickAnswer);
+		$('.question-answer').on('click', onChooseAnswer);
 		timerNode = 'question-timer';
 		startTimer();
 	}

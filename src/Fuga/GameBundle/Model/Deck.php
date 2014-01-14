@@ -64,10 +64,10 @@ class Deck {
 	private $deck;
 	
 	public function __construct() {
-		$this->make(true);
+		$this->make();
 	}
 	
-	public function make($shuffle = false) {
+	public function make($shuffle = true) {
 		$this->deck = $this->defaultdeck;
 		if ($shuffle) {
 			$this->shuffle($this->deck);
@@ -76,7 +76,7 @@ class Deck {
 		return $this->deck;
 	}
 	
-	public function give($quantity) {
+	public function take($quantity) {
 		$suite = array();
 		for ($i = 0; $i < $quantity; $i++) {
 			$suite[] = array_shift($this->deck);

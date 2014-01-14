@@ -23,44 +23,31 @@ class TrainingController extends PublicController {
 		$gamer = $this->get('container')->getItem('account_gamer', 'user_id='.$user['id']);
 		
 		if (!$gamer || 
-			(!$this->get('security')->isGroup('admin') && !$this->get('security')->isGroup('gamer'))) 
-		{
+			(!$this->get('security')->isGroup('admin') && !$this->get('security')->isGroup('gamer'))) {
 			return 'Вы не являетесь игроком. Войдите на сайт с логином и паролем игрока<br>'.$this->call('Fuga:Public:Account:login');
 		}
 		
-		$trainingData = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
+		$data = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
 
-		if (!$trainingData) 
-		{
-			$training = new Training();
-			$training->createGamer($gamer);
-			$training->createBots(3);
-			$training->createBoard($gamer['user_id']);
+		if (!$data) {
+			$training = new Training($gamer);
 			$this->get('container')->addItem('training_training', array(
 				'user_id' => $user['id'],
 				'state' => serialize($training)
 			));
-			$fromtime = $training->board->fromtime;
-			$now = new \DateTime();
-			$diff = $now->diff($fromtime);
-			setcookie('gamehour', intval($diff->format('%H')), time()+86400, '/');
-			setcookie('gameminute', intval($diff->format('%i')), time()+86400, '/');
-			setcookie('gamesecond', intval($diff->format('%s')), time()+86400, '/');
-			setcookie('timerhandler', 'onClickNoChange', time()+86400, '/');
-			setcookie('timerminute', 0, time()+86400, '/');
-			setcookie('timersecond', 14, time()+86400, '/');
 		} else {
-			$training = unserialize($trainingData['state']);
+			$training = unserialize($data['state']);
 		}
 		
-		$board = $training->board;
-		$gamers = $training->bots;
-		$gamer0 = $training->gamer;
 		$question = $training->gamer->question 
 				? $this->render('training/question.tpl', array('question' => $training->gamer->question)) 
 				: null;
 		
-		return $this->render('training/index.tpl', compact('board', 'gamers', 'gamer0', 'question'));
+		$start = $training->board->state == 0 
+				? $this->render('training/start.tpl') 
+				: null;
+		
+		return $this->render('training/index.tpl', compact('training', 'question', 'start'));
 	}
 	
 	public function nextAction() {
@@ -72,15 +59,7 @@ class TrainingController extends PublicController {
 		
 		$trainingData = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
 		$training = unserialize($trainingData['state']);
-		foreach ($training->bots as &$bot) {
-			
-		}
-		
-		$training->board['state'] = 1;
-		setcookie('timerhandler', 'onClickNoChange', time()+86400, '/');
-		setcookie('timerminute', 0, time()+86400, '/');
-		setcookie('timersecond', 14, time()+86400, '/');
-		
+		$training->next();
 		$this->get('container')->updateItem('training_training', 
 			array('state'   => serialize($training)),
 			array('user_id' => $user['id'])
@@ -97,23 +76,12 @@ class TrainingController extends PublicController {
 		
 		$this->get('container')->deleteItem('training_training', 'user_id='.$user['id']);
 		$gamer = $this->get('container')->getItem('account_gamer', 'user_id='.$user['id']);
-		$training = new Training();
-		$training->createGamer($gamer);
-		$training->createBots(3);
-		$training->createBoard($gamer['user_id']);
+		$training = new Training($gamer);
+		$training->start();
 		$this->get('container')->addItem('training_training', array(
 			'user_id' => $user['id'],
 			'state'   => serialize($training),
 		));
-		$fromtime = $training->board->fromtime;
-		$now = new \DateTime();
-		$diff = $now->diff($fromtime);
-		setcookie('gamehour', intval($diff->format('%H')), time()+86400, '/');
-		setcookie('gameminute', intval($diff->format('%i')), time()+86400, '/');
-		setcookie('gamesecond', intval($diff->format('%s')), time()+86400, '/');
-		setcookie('timerhandler', 'onClickNoChange', time()+86400, '/');
-		setcookie('timerminute', 0, time()+86400, '/');
-		setcookie('timersecond', 14, time()+86400, '/');
 		
 		return json_encode(array('ok' => true));
 	}
@@ -143,25 +111,9 @@ class TrainingController extends PublicController {
 			return json_encode(array('error' => true));
 		}
 		
-		$answerNo = $this->get('util')->post('answer', true, 0); 
 		$trainingData = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
 		$training = unserialize($trainingData['state']);
-		if ($answerNo == $training->gamer->question['answer']) {
-			foreach ($training->gamer->change as $cardNo) {
-				$newCards = $training->deck->give(1);
-				$cards = $training->gamer->cards;
-				$cards[$cardNo] = $newCards[0];
-				$training->gamer->cards = $cards;
-			}
-		} else {
-			$training->gamer->chips -= $training->board->minbet;
-		}
-		$training->gamer->change = null;
-		$training->gamer->question = null;
-		$training->board->state = Training::STATE_PREFLOP;
-		setcookie('timerhandler', '', time()-3600, '/');
-		setcookie('timerminute', 0, time()-3600, '/');
-		setcookie('timersecond', 0, time()-3600, '/');
+		$training->makeChange($this->get('util')->post('answer', true, 0));
 		$this->get('container')->updateItem('training_training', 
 			array('state'   => serialize($training)),
 			array('user_id' => $user['id'])
@@ -180,9 +132,7 @@ class TrainingController extends PublicController {
 		$trainingData = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
 		$training = unserialize($trainingData['state']);
 		$questions = $this->get('container')->getItems('training_poll', 'id<>0');
-		$training->gamer->change = isset($_POST['cards']) ? $_POST['cards'] : array(); 
-		$training->gamer->question = $questions[array_rand($questions)];
-		$training->board->state = Training::STATE_QUESTION;
+		$training->setChange(isset($_POST['cards']) ? $_POST['cards'] : array(), $questions[array_rand($questions)]); 
 		$this->get('container')->updateItem('training_training', 
 			array('state'   => serialize($training)),
 			array('user_id' => $user['id'])
@@ -200,10 +150,7 @@ class TrainingController extends PublicController {
 		
 		$trainingData = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
 		$training = unserialize($trainingData['state']);
-		$training->board->state = Training::STATE_PREFLOP;
-		setcookie('timerhandler', '', time()-3600, '/');
-		setcookie('timerminute', 0, time()-3600, '/');
-		setcookie('timersecond', 0, time()-3600, '/');
+		$training->nochange();
 		$this->get('container')->updateItem('training_training', 
 			array('state'   => serialize($training)),
 			array('user_id' => $user['id'])
