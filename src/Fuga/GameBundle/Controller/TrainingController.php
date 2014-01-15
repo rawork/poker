@@ -30,7 +30,7 @@ class TrainingController extends PublicController {
 		$data = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
 
 		if (!$data) {
-			$training = new Training($gamer);
+			$training = new Training($gamer, $this->get('log'));
 			$this->get('container')->addItem('training_training', array(
 				'user_id' => $user['id'],
 				'state' => serialize($training)
@@ -50,6 +50,24 @@ class TrainingController extends PublicController {
 		return $this->render('training/index.tpl', compact('training', 'question', 'start'));
 	}
 	
+	public function newAction() {
+		$user = $this->get('security')->getCurrentUser();
+		if (!$user) {
+			return json_encode(array('error' => true));
+		}
+		
+		$this->get('container')->deleteItem('training_training', 'user_id='.$user['id']);
+		$gamer = $this->get('container')->getItem('account_gamer', 'user_id='.$user['id']);
+		$training = new Training($gamer, $this->get('log'));
+		$training->start();
+		$this->get('container')->addItem('training_training', array(
+			'user_id' => $user['id'],
+			'state'   => serialize($training),
+		));
+		
+		return json_encode(array('ok' => true));
+	}
+	
 	public function nextAction() {
 		$user = $this->get('security')->getCurrentUser();
 		if (!$user) 
@@ -64,24 +82,6 @@ class TrainingController extends PublicController {
 			array('state'   => serialize($training)),
 			array('user_id' => $user['id'])
 		);
-		
-		return json_encode(array('ok' => true));
-	}
-	
-	public function newAction() {
-		$user = $this->get('security')->getCurrentUser();
-		if (!$user) {
-			return json_encode(array('error' => true));
-		}
-		
-		$this->get('container')->deleteItem('training_training', 'user_id='.$user['id']);
-		$gamer = $this->get('container')->getItem('account_gamer', 'user_id='.$user['id']);
-		$training = new Training($gamer);
-		$training->start();
-		$this->get('container')->addItem('training_training', array(
-			'user_id' => $user['id'],
-			'state'   => serialize($training),
-		));
 		
 		return json_encode(array('ok' => true));
 	}
@@ -168,17 +168,7 @@ class TrainingController extends PublicController {
 		
 		$trainingData = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
 		$training = unserialize($trainingData['state']);
-		$bet = rand(5,10);
-		foreach ($training->bots as &$bot) {
-			$bot['chips'] -= $bet;
-			$training->board['bank'] += $bet; 
-		}
-		$training->gamer->cards = null;
-		$training->board->state = Training::STATE_WIN;
-		setcookie('timerhandler', 'showBuy', time()+86400, '/');
-		setcookie('timerminute', 0, time()+86400, '/');
-		setcookie('timersecond', 15, time()+86400, '/');
-		// TODO Добавить подсчет победителя среди ботов
+		$training->fold();
 		
 		$this->get('container')->updateItem('training_training', 
 			array('state'   => serialize($training)),
@@ -198,40 +188,7 @@ class TrainingController extends PublicController {
 		
 		$trainingData = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
 		$training = unserialize($trainingData['state']);
-		$bet = $this->get('util')->post('bet', true, 0);
-		$allin = ($bet == $training->gamer->chips);
-		$training->gamer->chips -= $bet;
-		$training->board->bank += $bet;
-		
-		foreach ($training->bots as $bot) {
-			if ($allin) {
-				$bet = $bot->chips;
-			}
-			$bot->chips -= $bet;
-			$training->board->bank += $bet; 
-		}
-		
-		$training->board->state += 1;
-		
-		if (4 == $training->board->state) {
-			$combination = new Combination();
-			$suites = array();
-			foreach ($training->bots as $bot) {
-				$cards = $combination->get(array_merge($bot->cards, $training->board->flop));
-				$cards['position'] = $bot->position;
-				$cards['name'] = $combination->rankName($cards['rank']);
-				$suites[] = $cards;
-			}
-			$cards = $combination->get(array_merge($training->gamer->cards, $training->board->flop));
-			$cards['position'] = $training->gamer->position;
-			$cards['name'] = $combination->rankName($cards['rank']);
-			$suites[] = $cards;
-			$winners = $combination->compare($suites);
-			$training->board->winner = $winners;
-			setcookie('timerhandler', 'showBuy', time()+86400, '/');
-			setcookie('timerminute', 0, time()+86400, '/');
-			setcookie('timersecond', 15, time()+86400, '/');
-		}
+		$training->bet($this->get('util')->post('chips', true, 0));
 		
 		$this->get('container')->updateItem('training_training', 
 			array('state'   => serialize($training)),
@@ -239,6 +196,51 @@ class TrainingController extends PublicController {
 		);
 		
 		return json_encode(array('ok' => true));
+	}
+	
+	public function showdownAction() {
+		$user = $this->get('security')->getCurrentUser();
+		
+		if (!$user) 
+		{
+			return json_encode(array('error' => true));
+		}
+		
+		$trainingData = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
+		$training = unserialize($trainingData['state']);
+		$training->showdown();
+		
+		$this->get('container')->updateItem('training_training', 
+			array('state'   => serialize($training)),
+			array('user_id' => $user['id'])
+		);
+		
+		return json_encode(array('ok' => true));
+	}
+	
+	public function winAction() {
+		$user = $this->get('security')->getCurrentUser();
+		
+		if (!$user) 
+		{
+			return json_encode(array('error' => true));
+		}
+		
+		$trainingData = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
+		$training = unserialize($trainingData['state']);
+		$training->win();
+		
+		$this->get('container')->updateItem('training_training', 
+			array('state'   => serialize($training)),
+			array('user_id' => $user['id'])
+		);
+		
+		return json_encode(array('ok' => true));
+	}
+	
+		
+	public function endAction() {
+		
 	}
 	
 	public function buyAction () {

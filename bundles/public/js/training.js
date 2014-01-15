@@ -184,10 +184,8 @@ function onClickNew() {
 	}, "json");
 }
 
-function makeBet(bet) {
-	var chips = +($('#chips').text());
-	
-	$.post('/training/bet', {bet: bet},
+function makeBet(chips) {
+	$.post('/training/bet', {chips: chips},
 	function(data){
 		if (data.ok) {
 			window.location.reload();
@@ -197,6 +195,24 @@ function makeBet(bet) {
 
 function onClickFold() {
 	$.post('/training/fold', {},
+	function(data){
+		if (data.ok) {
+			window.location.reload();
+		}
+	}, "json");
+}
+
+function distributeWin() {
+	$.post('/training/win', {},
+	function(data){
+		if (data.ok) {
+			window.location.reload();
+		}
+	}, "json");
+}
+
+function nextGame() {
+	$.post('/training/next', {},
 	function(data){
 		if (data.ok) {
 			window.location.reload();
@@ -227,19 +243,17 @@ function startTraining() {
 	if (gamestate == 0) {
 		$('#game-start .btn').on('click', onClickNew);
 	} else if (gamestate == 1) {
+		$('.game-change').on('click', changeCard);
 		$('.gamer-cards .card').css('cursor', 'pointer');
 		$('#gamer-cards').on('click', chooseCard);
-		startTimer();
 	} else if (gamestate == 11) {
 		$('.question-footer .btn').on('click', onClickAnswer);
 		$('.question-answer').on('click', onChooseAnswer);
 		timerNode = 'question-timer';
-		startTimer();
 	}
-	$('.game-change').on('click', changeCard);
 	$('.game-buttons').on('click', makeMove);
 	enableButtons();
-		
+	startTimer();	
 }
 
 function startTime() {
@@ -273,9 +287,15 @@ function startTimer() {
 		$('#' + timerName).empty();
 		return;
 	}
-	
     var minutes = +($.cookie('timerminute'));
-    var seconds = +($.cookie('timersecond')) - 1;
+    var seconds = +($.cookie('timersecond'));
+	
+	if (seconds == 0 && minutes > 0) {
+		minutes -= 1;
+		seconds = 59;
+	} else {
+		seconds -= 1;
+	}
 	
 	if (seconds < 0 || (seconds <= 0 && minutes <= 0)) {
 		$('#'+ timerName).html( "00:00" );
@@ -284,10 +304,6 @@ function startTimer() {
 		removeTimer();
 		window[timerhandler]();
 		return;
-	}
-	if (seconds == 0) {
-		minutes = minutes - 1;
-		seconds = 59;
 	}
 	
 	$.cookie('timerminute', minutes);

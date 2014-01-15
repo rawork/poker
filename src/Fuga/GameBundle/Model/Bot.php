@@ -15,8 +15,8 @@ class Bot {
 			'chips'   => isset($options['chips']) ? $options['chips'] : 100,
 			'bet'     => 0,
 			'status'  => 1,
-			'state'   => 0,
 			'seat'    => isset($options['seat']) ? $options['seat'] : $id,
+			'positon' => $id,
 			'cards'   => array(),
 		);
 	}
