@@ -100,7 +100,7 @@
 	<div class="game-winner winner{$combination.position}">Победитель - {$combination.name}</div>
 	{/foreach}
 </div>
-<div class="game-combinations"><img src="{$theme_ref}/public/img/combinations2.jpg"></div>
+<div class="game-combinations"><img src="{$theme_ref}/public/img/combinations3.jpg"></div>
 <div {if $training->board->state != 11}class="closed"{/if} id="game-question">{$question}</div>
 <div {if $training->board->state != 0}class="closed"{/if} id="game-start">{$start}</div>
 <script type="text/javascript">
@@ -109,6 +109,7 @@
 	var gamemaxbet = {$training->board->maxbet};
 	var gameallin = {$training->board->allin};
 	var gamerbet = {$training->gamer->bet};
+	var gamewinner = $.parseJSON($winner);
 
 	// training start
 	var gametraining = true;

@@ -86,6 +86,10 @@ body {
 	margin: 2px;
 }
 
+.game-flop .active {
+	border-color: #fb4e0c;
+}
+
 .game-flop .card img {
 	width: 70px;
 	height: 97px;
