@@ -261,6 +261,11 @@ function startTime() {
     var minutes = +($.cookie('gameminute'));
     var seconds = +($.cookie('gamesecond')) + 1;
 	
+	if (!seconds) {
+		$('#game-time').html('Тренировка');
+		return;
+	}
+	
 	if (seconds == 60) {
 		minutes = minutes + 1;
 		seconds = 0;
