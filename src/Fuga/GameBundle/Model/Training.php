@@ -24,7 +24,7 @@ class Training {
 		$this->log = $log;
 		$this->deck = new Deck();
 		$this->createGamer($gamer);
-		$this->createBots();
+		$this->createBots(5);
 		$this->createBoard($gamer['user_id']);
 		$this->setTime();
 	}

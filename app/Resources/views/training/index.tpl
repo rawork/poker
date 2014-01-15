@@ -18,10 +18,12 @@
 				<div class="game-flop">	
 					{foreach from=$training->board->flop item=card}
 					<div class="card" data-card-name="{$card.name}">
-						{if $training->board->state > 2}<img src="/bundles/public/img/cards/{$card.name}.png" />{/if}
+						{if $training->board->state > 2}<img src="/bundles/public/img/cards/{$card.name}.png" />
+						{else}
+						<img src="/bundles/public/img/shirt.png" />
+						{/if}
 					</div>
 					{/foreach}
-					<div class="clearfix"></div>
 				</div>
 				{/if}	
 				<div class="game-timer" id="game-timer"></div>
@@ -39,9 +41,13 @@
 		{if $gamer->position == 1 || $gamer->position == 5}
 		<div class="gamer-cards">
 			{foreach from=$gamer->cards item=card}
-			<div class="card" data-card-name="{$card.name}">{if $training->board->state == 4}<img src="/bundles/public/img/cards/{$card.name}.png" />{/if}</div> 
+			<div class="card" data-card-name="{$card.name}">
+				{if $training->board->state == 4}<img src="/bundles/public/img/cards/{$card.name}.png" />
+				{else}
+				<img src="/bundles/public/img/shirt.png" />
+				{/if}
+			</div> 
 			{/foreach}
-			<div class="clearfix"></div>
 		</div>
 		{/if}
 		<div class="pull-left gamer-avatar"><img src="{$gamer->avatar}" /></div>
@@ -52,9 +58,13 @@
 		{if $gamer->position > 1 && $gamer->position < 5}
 		<div class="gamer-cards">
 			{foreach from=$gamer->cards item=card}
-			<div class="card" data-card-name="{$card.name}">{if $training->board->state == 4}<img src="/bundles/public/img/cards/{$card.name}.png" />{/if}</div> 
+			<div class="card" data-card-name="{$card.name}">
+				{if $training->board->state == 4}<img src="/bundles/public/img/cards/{$card.name}.png" />
+				{else}
+				<img src="/bundles/public/img/shirt.png" />
+				{/if}
+			</div> 
 			{/foreach}
-			<div class="clearfix"></div>
 		</div>
 		{/if}
 	</div>
