@@ -109,7 +109,7 @@
 	var gamemaxbet = {$training->board->maxbet};
 	var gameallin = {$training->board->allin};
 	var gamerbet = {$training->gamer->bet};
-	var gamewinner = $.parseJSON($winner);
+	//var gamewinner = $.parseJSON({$winner});
 
 	// training start
 	var gametraining = true;
