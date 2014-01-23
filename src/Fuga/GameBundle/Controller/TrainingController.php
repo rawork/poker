@@ -33,7 +33,7 @@ class TrainingController extends PublicController {
 			$training = new Training($gamer, $this->get('log'));
 			$this->get('container')->addItem('training_training', array(
 				'user_id' => $user['id'],
-				'state' => serialize($training)
+				'state' => serialize($training),
 			));
 		} else {
 			$training = unserialize($data['state']);

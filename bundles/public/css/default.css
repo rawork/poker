@@ -180,15 +180,25 @@ img.footer-logo {
 	margin: 25px 0;
 }
 
-.footer-right {
-	padding: 0 30px 0 0;
+.header-right {
+	padding: 50px 0 0;
 	text-align: right;
+}
+
+.footer-right {
+	padding: 50px 30px 0 0;
+	text-align: right;
+}
+
+.login-widget {
+	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans';
+	text-transform: uppercase;
 }
 
 ul.login-menu {
 	display: inline-block;
 	list-style: none;
-	margin: 55px 0 0;
+	margin: 0;
 }
 
 ul.login-menu li {
@@ -205,13 +215,14 @@ ul.login-menu li {
 	color: #333;
 }
 
-hr {
+hr.red-line {
 	margin: 20px 40px;
 	border-top: 0;
 	border-bottom: 1px solid #fb4e0c;
 }
 
 .btn {
+	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
 	-webkit-box-shadow: none;
 	box-shadow: none;
 }
@@ -300,7 +311,6 @@ hr {
 	margin-right: 4px;
 	padding: 11px 28px 6px;
 	text-transform: uppercase;
-	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
 	font-size: 18px;
 }
 
@@ -308,6 +318,33 @@ hr {
 	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans';
 	font-size: 15px;
 	text-transform: none;
+}
+
+.alert {
+	padding: 8px 35px 8px 0;
+	margin-bottom: 20px;
+	text-shadow: none;
+	background-color: transparent;
+	border: 0;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+}
+
+.alert, .alert h4 {
+	color: #c09853;
+}
+
+.alert-danger, .alert-error {
+	color: #fb4e0c;
+	background-color: transparent;
+	border-color: transparent;
+}
+
+.alert-success {
+	color: #b2d000;
+	background-color: transparent;
+	border-color: transparent;
 }
 
 .prize {
@@ -367,4 +404,234 @@ hr {
 .accordion-inner {
 	padding-left: 30px;
 	border: 0;
+}
+
+
+
+.user-card {
+	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
+	padding-top: 10px;
+	padding-bottom: 45px;
+}
+
+.user-center {
+	padding-left: 30px;
+}
+
+.user-avatar {
+	border-radius: 100px;
+}
+
+.user-info {
+	padding: 20px 0 0 20px;
+	list-style: none;
+	line-height: 20px;
+}
+
+.user-info li {
+	margin-bottom: 15px;
+}
+
+.user-info li img {
+	margin-right: 5px;
+}
+
+.user-name {
+	font-size: 34px;
+	color: #b2d000;
+	line-height: 45px;
+	margin-bottom: 15px;
+}
+
+.user-like {
+
+}
+
+.user-like img {
+	
+	margin-left: 10px;
+	margin-right: 5px;
+}
+
+.user-data {
+	margin: 20px 0 0;
+	list-style: none;
+	color: #b2d000;
+}
+
+.user-data li {
+	margin-bottom: 15px;
+}
+
+.user-data li span {
+	display: inline-block;
+	width: 100px;
+	color: #000;
+}
+
+.user-progress {
+	margin-top: 20px;
+	border: 2px solid #fdb201;
+	border-radius: 20px;
+	list-style: none;
+	padding: 20px 20px 15px;
+	width: 220px;
+}
+
+.user-progress li {
+	margin-bottom: 5px;
+}
+
+.user-progress li img {
+	margin-right: 5px;
+}
+
+.user-link {
+	color: #000;
+	font-size: 16px;
+	border-bottom: 1px solid #b2d000;
+}
+
+.user-link:hover {
+	color: #b2d000;
+	font-size: 16px;
+	border-bottom: 0;
+	text-decoration: none;
+}
+
+.register-card {
+	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
+	font-size: 18px;
+}
+
+.register-title {
+	margin-bottom: 10px;
+}
+
+.register-title span {
+	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans';
+}
+
+.register-field {
+	margin-bottom: 10px;
+}
+
+.register-field select {
+    font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
+    padding: 4px 25px;
+    width: 430px;
+	height: 49px;
+	font-size: 16px;
+	line-height: 16px; 
+	margin: 0 0 10px;
+    -webkit-border-radius: 25px;
+    -moz-border-radius: 25px;
+    border-radius: 25px;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    background: #ffffff;
+    color:#333;
+    border: 3px solid #b2d000;
+    outline:none;
+    display: inline-block;
+    -webkit-appearance:none;
+    -moz-appearance:none;
+    appearance:none;
+    cursor:pointer;
+}
+
+/* Targetting Webkit browsers only. FF will show the dropdown arrow with so much padding. */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    select {padding-right:18px}
+}
+
+.register-field label {position:relative}
+.register-field label:after {
+    content: '>';
+    font: 18px 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold'; 
+    color: #000;
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    transform: rotate(90deg);
+    right: 60px; 
+	top: 15px;
+    padding:0 0 2px;
+    position:absolute;
+    pointer-events:none;
+}
+.register-field label:before {
+    content:'';
+    right:6px; top:0px;
+    width:20px; height:20px;
+    background:#fff;
+    position:absolute;
+    pointer-events:none;
+    display:block;
+}
+
+.register-field input[type=text], .register-field input[type=password] {
+	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
+	width: 375px;
+	border: 3px solid #b2d000;
+	border-radius: 25px;
+	height: 35px;
+	padding: 4px 25px;
+	font-size: 16px;
+	line-height: 16px;
+}
+
+.register-avatar {
+	position: relative;
+	overflow:hidden;
+	width:200px;
+	height:200px;
+	cursor:pointer;
+	background:url(input-file.gif) no-repeat;
+	border:3px solid #b2d000;
+	border-radius: 100px;
+	text-align: center;
+}
+
+.register-avatar span {
+	padding-top: 72px;
+	padding-left: 50px;
+	width: 100px;
+	display: block;
+}
+
+.register-avatar input[type=file] {
+	position: absolute;
+	left: 0;
+	top: 0;
+	opacity:0;
+	filter:alpha(opacity:0);
+	font-size:199px;
+	height: 200px;
+	background-color: #f0f0f0;
+	cursor:pointer;
+	padding:0px;
+	margin:0px;
+	margin-left:-450px;
+}
+
+.register-button {
+	margin: 25px 0 45px;
+}
+
+.register-button a {
+	margin: 0 0 0 25px;
+}
+
+.text-blue {
+	color: #4fafeb;
+}
+
+.text-red {
+	color: #fa4e0b;
+}
+
+.text-green {
+	color: #b2d000;
 }

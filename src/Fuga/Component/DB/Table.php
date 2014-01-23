@@ -345,13 +345,22 @@ class Table {
 	}
 	
 	public function insert($values) {
+		if (!array_key_exists('created', $values)) {
+			$values['created'] = date('Y-m-d H:i:s');
+		}
+		
+		if (!array_key_exists('updated', $values)) {
+			$values['updated'] = '0000-00-00 00:00:00';
+		}
+		
 		if ($this->get('connection')->insert($this->dbName(), $values)) {
 			$lastId = $this->get('connection')->lastInsertId();
 			$this->updateNested();
+			
 			return $lastId;
-		} else {
-			return false;
 		}
+		
+		return false;
 	}
 	
 	function insertArray($entity) {

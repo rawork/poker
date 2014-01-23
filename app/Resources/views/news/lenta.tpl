@@ -8,3 +8,4 @@
 	</div>{/if}
 	{/foreach}
 </div>
+<div class="text-center"><a class="btn btn-success btn-large" href="/club">ОБСУДИТЬ<small>в клубе</small></a></div>

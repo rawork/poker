@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>ПОКЕРНЫЙ КЛУБ АНКОРа. {$title}</title>
+		<title>{$title}</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		{$meta}
 		<link rel="stylesheet" href="{$theme_ref}/bootstrap2/css/bootstrap.css" type="text/css" media="screen">
@@ -21,16 +21,13 @@
 				<div class="span7">
 					<ul class="mainmenu">
 						{foreach from=$links item=link name=link}
-						<li class="item{$smarty.foreach.link.index+1}"><a href="{$link.ref}">{$link.title}</li>
+						<li class="item{$smarty.foreach.link.index+1}"><a href="{$link.ref}">{$link.title}</a></li>
 						{/foreach}
 					</ul>
 					<div class="clearfix"></div>
 				</div>
-				<div class="span3 text-right">
-					<ul class="login-menu">
-						<li><a href="/account">АВТОРИЗАЦИЯ</a> / </li>
-						<li><a href="/account/register">РЕГИСТРАЦИЯ</a></li>
-					</ul>
+				<div class="span3 header-right">
+					{raMethod path=Fuga:Public:Account:widget}
 				</div>
 			</div>
 		</div>
@@ -77,10 +74,7 @@
 					<img class="footer-logo" src="{$theme_ref}/public/img/logo.png">
 				</div>
 				<div class="span5 footer-right">
-					<ul class="login-menu">
-						<li><a href="/account">АВТОРИЗАЦИЯ</a> /</li>
-						<li><a href="/account/register">РЕГИСТРАЦИЯ</a></li>
-					</ul>
+					{raMethod path=Fuga:Public:Account:widget}
 				</div>
 			</div>
 		</div>

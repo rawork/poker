@@ -167,6 +167,7 @@ body {
 }
 
 .gamer-avatar img {
+	width: 55px;
 	-webkit-border-radius: 27px;
 	   -moz-border-radius: 27px;
 	        border-radius: 27px;

@@ -253,7 +253,7 @@ class Util {
 
 	public function session($key, $is_num = false, $default = ''){
 		if (isset($_SESSION[$key])) {
-			return $is_num ? intval($_SESSION[$key]) : (is_array($_SESSION[$key]) ? $_SESSION[$key] : addslashes($_SESSION[$key]));
+			return $is_num ? intval($_SESSION[$key]) : (is_array($_SESSION[$key]) ? $_SESSION[$key] : $_SESSION[$key]);
 		} else {
 			return $default;
 		}
@@ -261,7 +261,7 @@ class Util {
 
 	public function cookie($key, $is_num = false, $default = ''){
 		if (isset($_COOKIE[$key])) {
-			return $is_num ? intval($_COOKIE[$key]) : (is_array($_COOKIE[$key]) ? $_COOKIE[$key] : addslashes($_COOKIE[$key]));
+			return $is_num ? intval($_COOKIE[$key]) : (is_array($_COOKIE[$key]) ? $_COOKIE[$key] : $_COOKIE[$key]);
 		} else {
 			return $default;
 		}

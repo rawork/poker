@@ -26,11 +26,8 @@
 					</ul>
 					<div class="clearfix"></div>
 				</div>
-				<div class="span3 text-right">
-					<ul class="login-menu">
-						<li><a href="/account">АВТОРИЗАЦИЯ</a> / </li>
-						<li><a href="/account/register">РЕГИСТРАЦИЯ</a></li>
-					</ul>
+				<div class="span3 header-right">
+					{raMethod path=Fuga:Public:Account:widget}
 				</div>
 			</div>
 		</div>
@@ -52,7 +49,7 @@
 		<div class="container gamers-container">
 			{if $curnode.name == 'rules'}<hr class="red-line">
 			{raMethod path=Fuga:Public:News:lenta}{/if}
-			{if $curnode.name != 'members'}<hr class="red-line">
+			{if $curnode.name == 'prizes' || $curnode.name == 'rules'}<hr class="red-line">
 			<div class="row-fluid">
 				<div class="span12 text-center">
 					<h3>УЧАСТНИКИ КЛУБА:</h3>
@@ -71,6 +68,16 @@
 			</div>
 			{/if}
 		</div>
+		{if $curnode.name == 'account'}
+		<div class="splash">
+			<div class="container">
+				<div class="index-buttons">
+					<a class="btn btn-warning btn-large" href="/game">Игровой<small>зал</small></a>
+					<a class="btn btn-success btn-large" href="/training">Тренировочный<small>зал</small></a>
+				</div>
+			</div>
+		</div>	
+		{/if}
 		<div class="poker-line"></div>
 		<div class="container">
 			<div class="row-fluid">
@@ -85,10 +92,7 @@
 					<img class="footer-logo" src="{$theme_ref}/public/img/logo.png">
 				</div>
 				<div class="span5 footer-right">
-					<ul class="login-menu">
-						<li><a href="/account">АВТОРИЗАЦИЯ</a> /</li>
-						<li><a href="/account/register">РЕГИСТРАЦИЯ</a></li>
-					</ul>
+					{raMethod path=Fuga:Public:Account:widget}
 				</div>
 			</div>
 		</div>
