@@ -34,8 +34,8 @@
 				</div>
 				<div class="span5 footer-right">
 					<ul class="login-menu">
-						<li><a href="/account">АВТОРИЗАЦИЯ</a> /</li>
-						<li><a href="/account/register">РЕГИСТРАЦИЯ</a></li>
+						<li><a href="/members/cabinet">ВХОД</a> /</li>
+						<li><a href="/members/register">РЕГИСТРАЦИЯ</a></li>
 					</ul>
 				</div>
 			</div>

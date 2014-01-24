@@ -91,7 +91,7 @@ class Util {
 		return $dstr;
 	}
 
-	public function valid_email($email) {
+	public function isEmail($email) {
 		return preg_match('/^[a-z0-9]+([-_\.]?[a-z0-9])*@[a-z0-9]+([-_\.]?[a-z0-9])+\.[a-z]{2,4}$/i', $email);
 	}
 

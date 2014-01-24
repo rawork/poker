@@ -12,14 +12,25 @@ class AccountController extends PublicController {
 	
 	public function indexAction() {
 		$user = $this->get('security')->getCurrentUser();
+		$members = $this->get('container')->getitems('account_member', '1=1');
+		$this->get('container')->setVar('title', 'Участники клуба');
+		$this->get('container')->setVar('h1', 'Участники клуба');
+		
+		return $this->render('account/index.tpl', compact('user', 'members'));
+	}
+	
+	public function cabinetAction() {
+		$user = $this->get('security')->getCurrentUser();
 		if (!$user) {
 			return $this->call('Fuga:Public:Account:login');
 		}
 		
-		$group = $this->get('container')->getItem('user_group', $user['id']);
-		$account = $this->get('container')->getItem('account_gamer', 'user_id='.$user['id']);
+		$group = $this->get('container')->getItem('user_group', $user['group_id']);
+		$account = $this->get('container')->getItem('account_member', 'user_id='.$user['id']);
+		$this->get('container')->setVar('title', 'Личный кабинет');
+		$this->get('container')->setVar('h1', 'Личный кабинет');
 		
-		return $this->render('account/index.tpl', compact('account', 'user', 'group'));
+		return $this->render('account/cabinet.tpl', compact('account', 'user', 'group'));
 	}
 	
 	public function loginAction() {
@@ -37,7 +48,7 @@ class AccountController extends PublicController {
 				}
 			}
 			
-			$url = !empty($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '/account';
+			$url = !empty($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '/members/cabinet';
 			$this->get('router')->redirect($url);
 		}
 		$message = $this->flash('danger');
@@ -49,8 +60,8 @@ class AccountController extends PublicController {
 	
 	public function logoutAction() {
 		$this->get('security')->logout();
-		if (empty($_SERVER['HTTP_REFERER']) || preg_match('/^'.PRJ_REF.'\/account\/logout/', $_SERVER['HTTP_REFERER'])) {
-			$uri = PRJ_REF.'/account';
+		if (empty($_SERVER['HTTP_REFERER']) || preg_match('/^'.PRJ_REF.'\/members\/logout/', $_SERVER['HTTP_REFERER'])) {
+			$uri = PRJ_REF.'/members';
 		} else {
 			$uri = $_SERVER['HTTP_REFERER'];
 		}
@@ -60,13 +71,13 @@ class AccountController extends PublicController {
 	public function registerAction() {
 		$user = $this->get('security')->getCurrentUser();
 		if ($user) {
-			$this->get('router')->redirect('/account');
+			$this->get('router')->redirect('/members');
 		}
 		
 		if ('POST' == $_SERVER['REQUEST_METHOD']) {
 			$user = array();
 			$user['group_id'] = $this->get('util')->post('group_id');
-			$user['login']    = $user['email'] = $this->get('util')->post('login');
+			$user['login']    = $this->get('util')->post('login');
 			$user['password'] = $this->get('util')->post('password');
 			$user['name']     = $this->get('util')->post('name');
 			$user['lastname'] = $this->get('util')->post('lastname');
@@ -90,6 +101,11 @@ class AccountController extends PublicController {
 			}
 			if (empty($user['login'])) {
 				$errors[] = 'Не заполнен логин';
+			} elseif (!$this->get('util')->isEmail($user['login'])) {
+				$errors[] = 'Логин не является e-mail';
+			}
+			if ($user['login'] && 0 < $this->get('container')->count('user_user', 'login="'.$user['login']."'")) {
+				$errors[] = 'Такой логин уже занят. Попробуйте <a href="/members/forget">восстановить пароль</a> или обратиться к администратору клуба';
 			}
 			if (empty($user['password'])) {
 				$errors[] = 'Не заполнен пароль';
@@ -97,7 +113,6 @@ class AccountController extends PublicController {
 			if ($user['password'] != $this->get('util')->post('password_again')) {
 				$errors[] = 'Не совпадает проверочный пароль';
 			}
-			$errors[] = 'Просто ошибка';
 			
 			if ($errors) {
 				$_SESSION['danger'] = implode('<br>', $errors);
@@ -105,27 +120,28 @@ class AccountController extends PublicController {
 				$_SESSION['account'] = json_encode($account);
 				$this->get('router')->reload();
 			} else {
-				$user['password'] = md5($user['password']);
-				$user['is_active'] = 1;
-				$user['created']  = date('Y-m-d H:i:s');
-				$user['updated']  = '0000-00-00 00:00:00';
-				$user_id = $this->get('container')->addItem('user_user', $user);
-				if ($user_id) {
-					$account['user_id'] = $user_id;
-					$account['created']  = date('Y-m-d H:i:s');
-					$account['updated']  = '0000-00-00 00:00:00';
-					$this->get('container')->addItem('account_gamer', $account);
+				$userId = $this->get('container')->getTable('user_user')->insertGlobals();
+				$this->get('container')->updateItem('user_user',
+						array('is_active' => 1, 'email' => $user['login']),
+						array('id' => $userId)
+				);
+				if ($userId) {
+					$accountId = $this->get('container')->getTable('account_member')->insertGlobals();
+					$this->get('container')->updateItem('account_member',
+						array('user_id' => $userId),
+						array('id' => $accountId)
+					);
 				}
 					
 				$this->get('mailer')->send(
-					'Напоминание пароля на сайте клуба Чертова дюжина',
+					'Вы зарегистрировались на сайте клуба Чертова дюжина',
 					$this->render('mail/register.tpl', compact('user', 'account')),
-					$user['email']
+					$user['login']
 				);
 				unset($_SESSION['register']);
 				unset($_SESSION['account']);
 				
-				$this->get('router')->redirect('/account');
+				$this->get('router')->redirect('/members/cabinet');
 			}
 		}
 		
@@ -193,6 +209,11 @@ class AccountController extends PublicController {
 		$this->get('container')->setVar('h1', 'Редактирование анкеты');
 		
 		return $this->render('account/edit.tpl', compact('user'));
+	}
+	
+	public function testAction() {
+		$fh = fopen($_SERVER['DOCUMENT_ROOT']).'/'.'q.txt';
+		 
 	}
 	
 }

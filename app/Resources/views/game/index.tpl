@@ -1,7 +1,7 @@
 <div class="row-fluid">
 	<div class="span4"></div>
 	<div class="span4 game-time" id="game-time"></div>
-	<div class="span4 game-exit"><a href="/account/logout">выйти из игры</a></div>
+	<div class="span4 game-exit"><a href="/members/logout">выйти из игры</a></div>
 </div>
 <div class="game-board">
 	<div class="row-fluid">

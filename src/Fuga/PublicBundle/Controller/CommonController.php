@@ -56,7 +56,7 @@ class CommonController extends Controller {
 	
 	public function subscriberesultAction() {
 		parse_str($this->get('util')->post('formdata'));
-		if (!$this->get('util')->valid_email($email)) {
+		if (!$this->get('util')->isEmail($email)) {
 			$message = array(
 				'message' => 'Неправильный E-mail',
 				'success' => false

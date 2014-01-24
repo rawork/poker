@@ -79,8 +79,7 @@ class SecurityHandler {
 		unset($_SESSION['user']);
 		unset($_SESSION['locale']);
 		unset($_SESSION['ukey']);
-		unset($_COOKIE['userkey']);
-		setcookie('userkey', '', 1, '/');
+		setcookie('userkey', '', time()-86400, '/');
 		session_destroy();
 	}
 

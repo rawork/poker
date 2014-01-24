@@ -51,13 +51,14 @@
 		</div>
 		<div class="register-title">Загрузка аватара</div>
 		<div class="register-avatar">
-			<span>Загрузите свою фотографию</span>
+			<a class="remove-icon text-right" href="javascript:;">&times;</a>
+			<span class="file-label">Загрузите свою фотографию</span>
 			<input type="file" name="avatar">
 		</div>
 	</div>
 </div>
 <div class="register-button text-center">
 	<button class="btn btn-warning btn-large" type="submit">Отправить<small>данные</small></button> 
-	<a class="user-link" href="/account">Войти на сайт</a>
+	<a class="user-link" href="/members/cabinet">Войти на сайт</a>
 </div>
 </form>

@@ -17,12 +17,12 @@ class DefaultController extends PublicController {
 		if (!$user) {
 			return $this->call('Fuga:Public:Account:login');
 		}
-		$gamer0 = $this->get('container')->getItem('account_gamer', 'user_id='.$user['id']);
+		$gamer0 = $this->get('container')->getItem('account_member', 'user_id='.$user['id']);
 		if (!$gamer0) {
 			return 'Вы не являетесь DEMO игроком. Войдите на сайт с логином demo и паролем demo<br>'.$this->call('Fuga:Public:Account:login');
 		}
 		$board = $this->get('container')->getItem('game_board', $gamer0['board_id']);
-		$gamers0 = $this->get('container')->getItems('account_gamer', 'id<>'.$gamer0['id'].' AND board_id='.$board['id']);
+		$gamers0 = $this->get('container')->getItems('account_member', 'id<>'.$gamer0['id'].' AND board_id='.$board['id']);
 		//  TODO Для тестов игру запускаем автоматически, потом надо запускать по готовности игроков.
 		if ($board['fromtime'] != '0000-00-00 00:00:00') {
 			$fromtime = new \DateTime($board['fromtime']);
@@ -54,7 +54,7 @@ class DefaultController extends PublicController {
 				$gamer['cards'] = unserialize($gamer['cards']);
 			} else {
 				$gamer['cards'] = $deck->take(4);
-				$this->get('container')->updateItem('account_gamer', 
+				$this->get('container')->updateItem('account_member', 
 					array('cards' => serialize($gamer['cards'])),
 					array('id' => $gamer['id'])
 				);
@@ -76,7 +76,7 @@ class DefaultController extends PublicController {
 			$gamer0['cards'] = unserialize($gamer0['cards']);
 		} else {
 			$gamer0['cards'] = $deck->take(4);
-			$this->get('container')->updateItem('account_gamer', 
+			$this->get('container')->updateItem('account_member', 
 				array('cards' => serialize($gamer0['cards'])),
 				array('id' => $gamer0['id'])
 			);

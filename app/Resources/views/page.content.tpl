@@ -98,5 +98,6 @@
 		</div>
 		<script type="text/javascript" src="{$theme_ref}/jquery/jquery.js"></script>
 		<script type="text/javascript" src="{$theme_ref}/bootstrap2/js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="{$theme_ref}/public/js/public.js"></script>
 	</body>
 </html>

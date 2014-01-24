@@ -20,7 +20,7 @@ class TrainingController extends PublicController {
 			return $this->call('Fuga:Public:Account:login');
 		}
 		
-		$gamer = $this->get('container')->getItem('account_gamer', 'user_id='.$user['id']);
+		$gamer = $this->get('container')->getItem('account_member', 'user_id='.$user['id']);
 		
 		if (!$gamer || 
 			(!$this->get('security')->isGroup('admin') && !$this->get('security')->isGroup('gamer'))) {
@@ -57,7 +57,7 @@ class TrainingController extends PublicController {
 		}
 		
 		$this->get('container')->deleteItem('training_training', 'user_id='.$user['id']);
-		$gamer = $this->get('container')->getItem('account_gamer', 'user_id='.$user['id']);
+		$gamer = $this->get('container')->getItem('account_member', 'user_id='.$user['id']);
 		$training = new Training($gamer, $this->get('log'));
 		$training->start();
 		$this->get('container')->addItem('training_training', array(
