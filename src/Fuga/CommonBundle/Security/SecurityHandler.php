@@ -36,12 +36,13 @@ class SecurityHandler {
 					'name' => 'dev',
 					'email'    => DEV_EMAIL,
 					'group_id' => 1,
+					'group_id_title' => 'Администратор', 
 					'is_admin' => 1,
 					'is_active' => 1,
 				);
 			} else {
 				$sql = "
-					SELECT u.*, g.rules FROM user_user u 
+					SELECT u.*, g.rules, g.title as group_id_title FROM user_user u 
 					JOIN user_group g ON u.group_id=g.id 
 					WHERE u.login = :login OR u.email = :login LIMIT 1";
 				$stmt = $this->container->get('connection')->prepare($sql);

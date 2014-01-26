@@ -11,8 +11,8 @@ class ClubController extends PublicController {
 	}
 	
 	public function indexAction() {
-
+		$user = $this->get('security')->getCurrentUser();
 		
-		return $this->render('club/index.tpl', compact('items'));
+		return $this->render('club/index.tpl', compact('items', 'user'));
 	}
 }

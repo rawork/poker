@@ -12,7 +12,7 @@ class AccountController extends PublicController {
 	
 	public function indexAction() {
 		$user = $this->get('security')->getCurrentUser();
-		$members = $this->get('container')->getitems('account_member', '1=1');
+		$members = $this->get('container')->getitems('account_member', '1=1', null, 1);
 		$this->get('container')->setVar('title', 'Участники клуба');
 		$this->get('container')->setVar('h1', 'Участники клуба');
 		

@@ -664,8 +664,395 @@ hr.red-line {
 .register-button a {
 	margin: 0 0 0 25px;
 }
+.member {
+	padding: 0 0 20px;
+	margin-bottom: 20px;
+	border-bottom: 1px solid #000;
+}
 
+.member-common {
+	float: left;
+	width: 439px;
+	height: 105px;
+	font-size: 18px;
+	line-height: 32px;
+}
 
+.member-common img.avatar {
+	margin-right: 35px;
+	width: 100px;
+	border-radius: 51px;
+	float: left;
+}
+
+.member-info {
+	float: left;
+	border-left: 1px solid #000;
+	padding: 6px 15px;
+	display: inline-block;
+	width: 132px;
+	height: 95px;
+}
+
+.member-info ul {
+	padding: 0;
+	margin: 0;
+}
+
+.member-info li {
+	list-style: none;
+	margin: 0 0 10px;
+	padding: 0;
+}
+
+.member-progress {
+	float: left;
+	border-left: 1px solid #000;
+	padding: 0 15px;
+	text-align: center;
+	width: 160px;
+	height: 105px;
+}
+
+.member-progress ul {
+	margin: 5px 0 0;
+	padding: 0;
+}
+
+.member-progress li {
+	list-style: none;
+	display: inline-block;
+	margin: 0 0 3px 0;
+	white-space: nowrap;
+}
+
+.member-progress li.single {
+	margin: 38px 0 0 0;
+}
+
+.member-vote {
+	float: left;
+	border-left: 1px solid #000;
+	padding: 0 0 0 15px;
+	width: 100px;
+	height: 105px;
+}
+
+.member-vote .btn {
+	margin-top: 20px;
+}
+
+.member-card {
+	top: 150px;
+	left: 50%;
+	width: 800px;
+	height: 590px;
+	position: fixed;
+	margin-left: -400px;
+	padding: 15px 15px 15px 60px;
+	background-color: #fff;
+	box-shadow: 0 0 60px rgba(0,0,0,0.5);
+}
+
+.member-card a.close {
+	font-size: 80px;
+	font-weight: normal;
+	color: #333;
+}
+
+.member-card h2 {
+	margin-top: 30px;
+	margin-bottom: 20px;
+	font-size: 51px;
+	font-family: 'Times New Roman';
+	font-weight: normal;
+}
+
+.member-card-info {
+	margin-left: 30px;
+	padding: 0;
+	list-style: none;
+	line-height: 20px;
+	font-size: 16px;
+}
+
+.member-card-info li {
+	margin-bottom: 15px;
+}
+
+.member-card-info li img {
+	margin-right: 5px;
+}
+
+.member-card-name {
+	font-size: 34px;
+	color: #b2d000;
+	line-height: 45px;
+	margin-bottom: 15px;
+}
+
+.member-card-like {
+	margin: 20px 0 50px 30px;
+	font-size: 16px;
+}
+
+.member-card-like img {
+	margin-left: 10px;
+	margin-right: 5px;
+}
+
+.member-card-data {
+	font-size: 16px;
+	margin: 20px 0 0;
+	list-style: none;
+	color: #b2d000;
+}
+
+.member-card-data li {
+	margin-bottom: 15px;
+}
+
+.member-card-data li span {
+	display: inline-block;
+	width: 100px;
+	color: #000;
+}
+
+.member-card-progress {
+	margin-left: 0;
+	margin-top: 20px;
+	border: 2px solid #fdb201;
+	border-radius: 20px;
+	list-style: none;
+	padding: 20px 20px 15px 0;
+	width: 405px;
+	height: 135px
+}
+
+.member-card-progress li {
+	width: 170px;
+	height: 40px;
+	float: left;
+	margin-bottom: 5px;
+	margin-left: 30px;
+}
+
+.member-card-progress li img {
+	margin-right: 5px;
+}
+
+.club-chat {
+	margin-top: 30px;
+	border-bottom: 1px solid #000;
+}
+
+.club-avatar img {
+	width: 100px;
+	border-radius: 51px;
+}
+
+.club-name {
+	margin-top: 15px;
+	margin-bottom: 30px;
+	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
+	color: #b2d000;
+	font-size: 16px;
+}
+
+.club-name span {
+	display: block;
+	margin-bottom: 5px;
+}
+
+.club-arrow2-container {
+	position: relative;
+}
+
+.club-arrow2-container .arrow2 {
+	position: absolute;
+	top: 42px;
+	left: -12px;
+	background-color: #fff;
+	background-image: url(../img/arrow_green.png);
+	background-position: top left;
+	background-repeat:  no-repeat;
+	z-index: 10;
+
+}
+
+.club-add-message {
+	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
+	font-size: 16px;
+	margin-bottom: 30px;
+}
+
+.club-add-message .text {
+	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
+	border: 3px solid #b2d000;
+	border-radius: 25px;
+	height: 100px;
+	padding: 25px 30px;
+	font-size: 16px;
+	line-height: 16px;
+	margin: 15px 0;
+}
+
+.club-add-message .text:focus {
+	box-shadow: none;
+	transition: none;
+}
+
+.club-add-message a {
+	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
+	font-size: 16px;
+	line-height: 30px;
+	text-transform: uppercase;
+	color: #000;
+	border-bottom: 1px dashed #4eafea;
+}
+
+.club-add-message a:hover {
+	text-decoration: none;
+	color: #4eafea;
+	border-bottom: 0;
+}
+
+.club-arrow-container {
+	position: relative;
+}
+
+.club-arrow-container .arrow {
+	position: absolute;
+	top: 42px;
+	left: -12px;
+	background-color: #fff;
+	border-top: 9px solid #fff;
+	border-bottom: 9px solid #fff;
+	border-right: 12px solid #f1f1f1;
+	border-left: 0;
+
+}
+
+.club-message {
+	border-radius: 25px;
+	background-color: #f1f1f1;
+	margin-bottom: 20px;
+	padding: 30px 30px 20px;
+}
+
+.club-message .text {
+	margin-bottom: 20px;
+}
+
+.club-message .date {
+	line-height: 30px;
+}
+
+.club-message .slogan {
+	line-height: 30px;
+}
+
+.club-add-comment {
+	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
+	font-size: 16px;
+	margin-bottom: 30px;
+	margin-left: 30px;
+}
+
+.club-add-comment input[type=text] {
+	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
+	border: 3px solid #b2d000;
+	border-radius: 25px;
+	height: 50px;
+	padding: 4px 25px;
+	font-size: 16px;
+	line-height: 16px;
+	margin: 15px 0;
+}
+
+.club-add-comment a {
+	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
+	font-size: 16px;
+	line-height: 30px;
+	text-transform: uppercase;
+	color: #000;
+	border-bottom: 1px dashed #4eafea;
+}
+
+.club-add-comment a:hover {
+	text-decoration: none;
+	color: #4eafea;
+	border-bottom: 0;
+}
+
+.club-comment {
+	margin-left: 15px;
+	margin-bottom: 30px;
+	border-top: 1px solid #b2d000;
+	padding: 30px 0 0 15px;
+}
+
+.club-comment-name {
+	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
+	margin: 0 0 10px;
+	font-size: 16px;
+}
+
+.club-comment-name span {
+	color: #b2d000;
+}
+
+.club-comment .text {
+	margin-bottom: 20px;
+}
+
+.club-comment .date {
+	line-height: 30px;
+	color: #fdb200;
+}
+
+.club-comment .slogan {
+	line-height: 30px;
+	color: #fdb200;
+}
+
+.club-show-link {
+	text-align: center;
+	margin-bottom: 25px;
+	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
+	font-size: 16px;
+}
+
+.club-show-link a {
+	color: #000;
+	border-bottom: 1px dashed #b2d000;
+}
+
+.club-show-link a:hover {
+	color: #b2d000;
+	border-bottom: 0;
+	text-decoration: none;
+}
+
+.club-hide-link {
+	position: relative;
+	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
+	font-size: 16px;
+}
+
+.club-hide-link a {
+	top: -50px;
+	left: -160px;
+	position: absolute;
+	color: #000;
+	border-bottom: 1px dashed #b2d000;
+}
+
+.club-hide-link a:hover {
+	color: #b2d000;
+	border-bottom: 0;
+	text-decoration: none;
+}
 
 .text-blue {
 	color: #4fafeb;
@@ -677,4 +1064,29 @@ hr.red-line {
 
 .text-green {
 	color: #b2d000;
+}
+
+.pagination {
+	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
+	font-size: 18px;
+}
+
+.pagination a {
+	margin: 0 5px;
+	font-size: 18px;
+	color: #000;
+	border-bottom: 1px solid #b2d000; 
+}
+
+.pagination a:hover {
+	text-decoration: none;
+	font-size: 18px;
+	color: #000;
+	border-bottom: 1px solid #b2d000; 
+}
+
+.pagination a.active {
+	font-size: 24px;
+	color: #b2d000;
+	border-bottom: 0;
 }
