@@ -32,12 +32,13 @@ class DatetimeType extends Type {
 	}
 
 	public function getSQLValue($name = '') {
-		if (trim($this->getValue($name))) {
-			$date = \DateTime::createFromFormat('d.m.Y H:i:s', $this->getValue($name));
-			return $date->format('Y-m-d H:i:s');
-		} else {
+		if (empty($this->getValue($name)) || $this->getValue($name) == '00.00.0000 00:00:00') {
 			return "0000-00-00 00:00:00";
-		}
+		}	
+		
+		$date = \DateTime::createFromFormat('d.m.Y H:i:s', $this->getValue($name));
+
+		return $date->format('Y-m-d H:i:s');
 	}
 
 	public function getStatic() {

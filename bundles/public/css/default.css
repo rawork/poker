@@ -225,6 +225,7 @@ hr.red-line {
 	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
 	-webkit-box-shadow: none;
 	box-shadow: none;
+	font-size: 16px;
 }
 
 .btn-warning {
@@ -871,12 +872,14 @@ hr.red-line {
 .club-arrow2-container .arrow2 {
 	position: absolute;
 	top: 42px;
-	left: -12px;
+	left: -9px;
 	background-color: #fff;
 	background-image: url(../img/arrow_green.png);
 	background-position: top left;
 	background-repeat:  no-repeat;
 	z-index: 10;
+	width: 12px;
+	height: 18px;
 
 }
 
@@ -887,19 +890,20 @@ hr.red-line {
 }
 
 .club-add-message .text {
-	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
 	border: 3px solid #b2d000;
 	border-radius: 25px;
 	height: 100px;
 	padding: 25px 30px;
 	font-size: 16px;
-	line-height: 16px;
-	margin: 15px 0;
+	line-height: 20px;
+	margin: 0 0 15px;
+	overflow-y: scroll;
 }
 
 .club-add-message .text:focus {
 	box-shadow: none;
 	transition: none;
+	outline: none;
 }
 
 .club-add-message a {
@@ -909,6 +913,7 @@ hr.red-line {
 	text-transform: uppercase;
 	color: #000;
 	border-bottom: 1px dashed #4eafea;
+	margin-left: 30px;
 }
 
 .club-add-message a:hover {

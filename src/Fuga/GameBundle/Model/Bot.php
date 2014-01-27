@@ -9,7 +9,7 @@ class Bot {
 	public function __construct($id, array $options = array()) {
 		$this->data = array(
 			'id'      => $id,
-			'avatar'  => '/bundles/public/img/bot.jpg',
+			'avatar'  => '/bundles/public/img/avatar_computer.png',
 			'name'    => 'Компьютер '.$id,
 			'lastname'=> '',
 			'chips'   => isset($options['chips']) ? $options['chips'] : 100,

@@ -1,6 +1,6 @@
 <div class="row-fluid user-card">
 	<div class="span3">
-		<div class="user-avatar"><img src="{$account.avatar_value.extra.main.path}"></div>
+		<div class="user-avatar"><img src="{if $account.avatar}{$account.avatar_value.extra.main.path}{else}/bundles/public/img/avatar_empty.png{/if}"></div>
 		<ul class="user-info">
 			<li><img src="/bundles/public/img/chip.png"> Фишки: <span class="text-blue">{$account.chips}</span></li>
 			<li><img src="/bundles/public/img/goblet.png"> Призы: <span class="text-red">{$account.prizes}</span></li>

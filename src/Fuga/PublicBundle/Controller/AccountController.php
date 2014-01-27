@@ -12,11 +12,24 @@ class AccountController extends PublicController {
 	
 	public function indexAction() {
 		$user = $this->get('security')->getCurrentUser();
-		$members = $this->get('container')->getitems('account_member', '1=1', null, 1);
+		$page = $this->get('util')->request('page', true, 1);
+        $paginator = $this->get('paginator');
+        $paginator->paginate(
+				$this->get('container')->getTable('account_member'),
+				$this->get('router')->generateUrl($this->get('router')->getParam('node')).'?page=###',
+				'1=1',
+				$this->getParam('per_page'),
+				$page
+		);
+		$paginator->setTemplate('public');
+		$members = $this->get('container')->getitems('account_member', '1=1', 'lastname,name', $paginator->limit);
+		foreach ($members as &$member) {
+			$member['group'] = $this->get('container')->getItem('user_group', $member['user_id_value']['item']['group_id']);
+		}
 		$this->get('container')->setVar('title', 'Участники клуба');
 		$this->get('container')->setVar('h1', 'Участники клуба');
 		
-		return $this->render('account/index.tpl', compact('user', 'members'));
+		return $this->render('account/index.tpl', compact('user', 'members', 'paginator'));
 	}
 	
 	public function cabinetAction() {
