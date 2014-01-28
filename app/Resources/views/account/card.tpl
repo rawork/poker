@@ -19,6 +19,7 @@
 		<ul class="member-card-data">
 			<li><span>Статус: </span>{$group.title}</li>
 			<li><span>СБЕ: </span>{$account.sbe}</li>
+			<li><span>Город: </span>{$account.city}</li>
 			<li><span>Должность: </span>{$account.position}</li>
 			<li><span>Девиз: </span>{$account.slogan}</li>
 		</ul>

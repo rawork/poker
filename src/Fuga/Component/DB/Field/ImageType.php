@@ -32,7 +32,7 @@ class ImageType extends FileType {
 	public function getSQLValue($inputName = '') {
 		$this->get('imagestorage')->setOptions(array('sizes' => $this->getParam('sizes')));
 		$inputName = $inputName ? $inputName : $this->getName();
-		$fileName = $this->get('util')->post($inputName.'_oldValue');
+		$fileName = $this->dbValue;
 		if ($fileName && $this->get('util')->post($inputName.'_delete')) {
 			$this->get('imagestorage')->remove($fileName);
 			$fileName = '';

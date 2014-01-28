@@ -1,115 +1,62 @@
+{if !$isAjax}
+{if $user}
 <div class="row-fluid club-chat">
 	<div class="span2">
-		<div class="club-avatar"><img src="/bundles/public/img/avatar3.jpg"></div>
-		<div class="club-name"><span>Игрок</span><a class="user-link" href="javascript:;">Roman<br>Alyakritskiy</a></div>
+		<div class="club-avatar"><img src="{if $account.avatar}{$account.avatar_value.extra.main.path}{else}/bundles/public/img/avatar_empty.png{/if}"></div>
+		<div class="club-name"><span>{$user.group_id_title}</span><a class="user-link" data-action="card2">{$user.name}<br>{$user.lastname}</a></div>
 	</div>
 	<div class="span10">
 		<div class="club-arrow2-container">
 			<div class="arrow2"></div>
 		</div>
 		<div class="club-add-message">
-			<div contenteditable="true" class="text" name="message"></div>
+			<div contenteditable="true" class="text"></div>
 			<div class="row-fluid">
-				<div class="span6"><a href="javascript:;">Добавить смайл</a></div>
-				<div class="span6 text-right"><button class="btn btn-primary">ОТПРАВИТЬ</button></div>	 
+				<div class="span6"><a data-action="show-smiles">Добавить смайл</a></div>
+				<div class="span6 text-right"><button class="btn btn-primary" data-action="message">ОТПРАВИТЬ</button></div>	 
 			</div>
 		</div>
 	</div>
 </div>
-<div class="row-fluid club-chat">
-	<div class="span2">
-		<div class="club-avatar"><img src="/bundles/public/img/avatar3.jpg"></div>
-		<div class="club-name"><span>Игрок</span><a class="user-link" href="javascript:;">Roman<br>Alyakritskiy</a></div>
-	</div>
-	<div class="span10">
-		<div class="club-arrow-container">
-			<div class="arrow"></div>
+{else}
+	<div class="club-nouser">Для добавления сообщений и комментариев необходимо <a href="/members/cabinet">войти на сайт</a> или <a href="/members/register">зарегистрироваться</a></div>
+{/if}
+{/if}
+<div id="messages">
+	{foreach from=$messages item=message}
+	<div class="row-fluid club-chat" data-message-id="{$message.id}">
+		<div class="span2">
+			<div class="club-avatar"><img src="{if $message.account.avatar}{$message.account.avatar_value.extra.main.path}{else}/bundles/public/img/avatar_empty.png{/if}"></div>
+			<div class="club-name"><span>{$message.user.group_id_value.item.title}</span><a class="user-link" data-action="card2">{$message.account.name}<br>{$message.account.lastname}</a></div>
 		</div>
-		<div class="club-message">
-			<div class="text">
-				Вселенная достаточно огромна, чтобы кульминация последовательно притягивает астероид - это солнечное затмение предсказал ионянам Фалес Милетский. Большая Медведица наблюдаема. Млечный Путь колеблет эллиптический дип-скай объект – у таких объектов рукава столь фрагментарны и обрывочны, что их уже нельзя назвать спиральными.
-			</div>	
-			<div class="row-fluid">
-				<div class="span4 like"><input class="btn btn-warning" type="button" value="ЛАЙК!"> <img src="/bundles/public/img/heart_club.png"> : <span id="like-counter-{$account.id}">2</span></div>
-				<div class="span3 date">12.12.2013 23:56</div>
-				<div class="span5 slogan">Чем дальше в лес, тем толще партизаны!</div>
-			</div>	
-		</div>
-		<div class="club-add-comment">
-			Добавить комментарий:<br>
-			<input type="text" class="input-block-level" name="comment">
-			<div class="row-fluid">
-				<div class="span6"><a href="javascript:;">Добавить смайл</a></div>
-				<div class="span6 text-right"><button class="btn btn-primary">ОТПРАВИТЬ</button></div>	 
+		<div class="span10" id="message{$message.id}">
+			<div class="club-arrow-container">
+				<div class="arrow"></div>
 			</div>
-		</div>
-		<div id="message{$message.id}">			
-			<div class="club-comment">
-				<div class="club-comment-name"><span>Игрок</span> <a class="user-link" href="javascript:;">Roman Alyakritskiy</a>:</div>
-				<div class="text">Вселенная достаточно огромна, чтобы кульминация последовательно притягивает астероид - это солнечное затмение предсказал ионянам Фалес Милетский.       Большая Медведица наблюдаема. Млечный Путь колеблет эллиптический дип-скай объект – у таких объектов рукава столь фрагментарны и обрывочны, что их уже нельзя назвать спиральными. </div>
+			<div class="club-message">
+				<div class="text">
+					{$message.message}
+				</div>	
 				<div class="row-fluid">
-					<div class="span4 like"><input class="btn btn-warning" type="button" value="ЛАЙК!"> <img src="/bundles/public/img/heart_club.png"> : <span id="like-counter-{$account.id}">2</span></div>
-					<div class="span3 date">12.12.2013 23:56</div>
-					<div class="span5 slogan">Чем дальше в лес, тем толще партизаны!</div>
-				</div>
+					<div class="span4 like"><button class="btn btn-warning" data-action="like-message">ЛАЙК!</button> <img src="/bundles/public/img/heart_club.png"> : <span data-message-id="{$message.id}">{$message.likes}</span></div>
+					<div class="span3 date">{$message.created|format_date:"d.m.Y H:i"}</div>
+					<div class="span5 slogan">{$message.account.slogan}</div>
+				</div>	
 			</div>
-			<div class="club-comment">
-				<div class="club-comment-name"><span>Игрок</span> <a class="user-link" href="javascript:;">Roman Alyakritskiy</a>:</div>
-				<div class="text">Вселенная достаточно огромна, чтобы кульминация последовательно притягивает астероид - это солнечное затмение предсказал ионянам Фалес Милетский.       Большая Медведица наблюдаема. Млечный Путь колеблет эллиптический дип-скай объект – у таких объектов рукава столь фрагментарны и обрывочны, что их уже нельзя назвать спиральными. 
-				</div>
-				<div class="row-fluid">
-					<div class="span4 like"><input class="btn btn-warning" type="button" value="ЛАЙК!"> <img src="/bundles/public/img/heart_club.png"> : <span id="like-counter-{$account.id}">2</span></div>
-					<div class="span3 date">12.12.2013 23:56</div>
-					<div class="span5 slogan">Чем дальше в лес, тем толще партизаны!</div>
-				</div>
-			</div>
-		</div>
-		<div class="club-hide-link" id="hide-message{$message.id}">
-			<a href="javascript:;">скрыть комментарии</a>
+			<div class="club-show-link"><a data-action="comments">{if $message.comments_count}Показать комментарии ({$message.comments_count}){else}Комментировать{/if}</a></div>	
 		</div>
 	</div>
-</div>
-<div class="row-fluid club-chat">
-	<div class="span2">
-		<div class="club-avatar"><img src="/bundles/public/img/avatar3.jpg"></div>
-		<div class="club-name"><span>Игрок</span><a class="user-link" href="javascript:;">Roman<br>Alyakritskiy</a></div>
-	</div>
-	<div class="span10">
-		<div class="club-arrow-container">
-			<div class="arrow"></div>
+	{/foreach}	
+{if !$isAjax}</div>
+<div class="member-card"></div>
+<div class="smiles-container">
+	<div class="smiles">
+		<div class="arrow"></div>
+		<div class="list">
+			{section name=smile start=1 loop=33 step=1}
+			<i class="smile smile{$smarty.section.smile.index}"></i>	
+			{/section}
 		</div>
-		<div class="club-message">
-			<div class="text">
-				Вселенная достаточно огромна, чтобы кульминация последовательно притягивает астероид - это солнечное затмение предсказал ионянам Фалес Милетский. Большая Медведица наблюдаема. Млечный Путь колеблет эллиптический дип-скай объект – у таких объектов рукава столь фрагментарны и обрывочны, что их уже нельзя назвать спиральными.
-			</div>	
-			<div class="row-fluid">
-				<div class="span4 like"><input class="btn btn-warning" type="button" value="ЛАЙК!"> <img src="/bundles/public/img/heart_club.png"> : <span id="like-counter-{$account.id}">2</span></div>
-				<div class="span3 date">12.12.2013 23:56</div>
-				<div class="span5 slogan">Чем дальше в лес, тем толще партизаны!</div>
-			</div>	
-		</div>
-		<div class="club-show-link" id="show-message{$message.id}"><a href="javascript:;">Показать комментарии (46)</a></div>
+		
 	</div>
-</div>
-<div class="row-fluid club-chat">
-	<div class="span2">
-		<div class="club-avatar"><img src="/bundles/public/img/avatar3.jpg"></div>
-		<div class="club-name"><span>Игрок</span><a class="user-link" href="javascript:;">Roman<br>Alyakritskiy</a></div>
-	</div>
-	<div class="span10">
-		<div class="club-arrow-container">
-			<div class="arrow"></div>
-		</div>
-		<div class="club-message">
-			<div class="text">
-				Вселенная достаточно огромна, чтобы кульминация последовательно притягивает астероид - это солнечное затмение предсказал ионянам Фалес Милетский. Большая Медведица наблюдаема. Млечный Путь колеблет эллиптический дип-скай объект – у таких объектов рукава столь фрагментарны и обрывочны, что их уже нельзя назвать спиральными.
-			</div>	
-			<div class="row-fluid">
-				<div class="span4 like"><input class="btn btn-warning" type="button" value="ЛАЙК!"> <img src="/bundles/public/img/heart_club.png"> : <span id="like-counter-{$account.id}">2</span></div>
-				<div class="span3 date">12.12.2013 23:56</div>
-				<div class="span5 slogan">Чем дальше в лес, тем толще партизаны!</div>
-			</div>	
-		</div>
-		<div class="club-show-link" id="show-message{$message.id}"><a href="javascript:;">Показать комментарии (46)</a></div>
-	</div>
-</div>				
+</div>{/if}

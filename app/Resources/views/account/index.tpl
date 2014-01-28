@@ -1,3 +1,10 @@
+{if !$isAjax}<div class="member-search-container">
+	<div class="member-search">
+		<input type="text" name="text" value="{$smarty.session.member_search_text}" placeholder="Поиск участника...">
+		<span></span>
+	</div>
+</div>
+<div id="members">{/if}
 {foreach from=$members item=account}
 <div class="member" data-member-id="{$account.id}">
 	<div class="member-common">
@@ -33,4 +40,6 @@
 </div>
 {/foreach}
 {$paginator->render()}
-<div class="member-card"></div>
+{if !$members}<div class="member-search-empty">По заданным параметрам поиска не найдено ни одного участника</div>{/if}
+{if !$isAjax}</div>
+<div class="member-card"></div>{/if}

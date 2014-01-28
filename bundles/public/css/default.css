@@ -580,7 +580,7 @@ hr.red-line {
     display:block;
 }
 
-.register-field input[type=text], .register-field input[type=password] {
+.register-field input[type=text], .member-search input[type=text], .register-field input[type=password] {
 	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
 	width: 375px;
 	border: 3px solid #b2d000;
@@ -666,6 +666,35 @@ hr.red-line {
 .register-button a {
 	margin: 0 0 0 25px;
 }
+
+.member-search-container {
+	height: 100px;
+}
+
+.member-search {
+	position: relative;
+}
+
+.member-search input[type=text] {
+	position: relative;
+}
+
+.member-search span {
+	display: inline-block;
+	position: relative;
+	top: 4px;
+	left: -55px;
+	background-image: url(../img/lupa.png);
+	background-position: top center;
+	background-repeat: no-repeat;
+	width: 31px;
+	height: 23px;
+}
+
+.member-search-empty {
+	margin-bottom: 30px;
+}
+
 .member {
 	padding: 0 0 20px;
 	margin-bottom: 20px;
@@ -844,9 +873,17 @@ hr.red-line {
 	margin-right: 5px;
 }
 
+.club-nouser {
+	margin: 0 0 30px;
+}
+
 .club-chat {
 	margin-top: 30px;
 	border-bottom: 1px solid #000;
+}
+
+.club-chat a {
+	cursor: pointer;
 }
 
 .club-avatar img {
@@ -966,15 +1003,21 @@ hr.red-line {
 	margin-left: 30px;
 }
 
-.club-add-comment input[type=text] {
-	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
+.club-add-comment .text {
 	border: 3px solid #b2d000;
 	border-radius: 25px;
 	height: 50px;
-	padding: 4px 25px;
+	padding: 25px 30px;
 	font-size: 16px;
-	line-height: 16px;
-	margin: 15px 0;
+	line-height: 20px;
+	margin: 0 0 15px;
+	overflow-y: scroll;
+}
+
+.club-add-comment .text:focus {
+	box-shadow: none;
+	transition: none;
+	outline: none;
 }
 
 .club-add-comment a {
@@ -995,8 +1038,8 @@ hr.red-line {
 .club-comment {
 	margin-left: 15px;
 	margin-bottom: 30px;
-	border-top: 1px solid #b2d000;
-	padding: 30px 0 0 15px;
+	padding: 0 0 30px 15px;
+	border-bottom: 1px solid #b2d000;
 }
 
 .club-comment-name {
@@ -1059,6 +1102,198 @@ hr.red-line {
 	color: #b2d000;
 	border-bottom: 0;
 	text-decoration: none;
+}
+
+.smiles-container {
+	width: 250px;
+	height: 140px;
+	position: absolute;
+	top: 255px;
+	left: 300px;
+	z-index: 50;
+	display: none;
+}
+
+.smiles {
+	position: relative;
+}
+
+.smiles .list {
+	position: absolute;
+	border-radius: 10px;
+	background-color: #f1f1f1;
+	padding: 10px;
+	width: 100%;
+	height: 120px;
+	overflow: hidden;
+}
+
+.smiles .arrow {
+	position: absolute;
+	top: 140px;
+	left: 114px;
+	background-color: #fff;
+	border-top: 12px solid #f1f1f1;
+	border-left: 9px solid transparent;
+	border-right: 9px solid transparent;
+	border-bottom: 0;
+
+}
+
+.smile {
+	display: block;
+	width: 25px;
+	height: 25px;
+	background-image: url(../img/im_emoji_2x.png);
+	background-repeat: no-repeat;
+	margin: 3px;
+	float: left;
+	cursor: pointer;
+	background-size: 24px 816px;
+}
+
+.smile:hover {
+	background-color: #e1e1e1;
+	border-radius: 2px;
+}
+
+.smile1 {
+	background-position: 0 0;
+}
+
+.smile2 {
+	background-position: 0 -25px;
+}
+
+.smile3 {
+	background-position: 0 -51px;
+}
+
+.smile4 {
+	background-position: 0 -76px;
+}
+
+.smile5 {
+	background-position: 0 -102px;
+}
+
+.smile6 {
+	background-position: 0 -127px;
+}
+
+.smile7 {
+	background-position: 0 -153px;
+}
+
+.smile8 {
+	background-position: 0 -179px;
+}
+
+.smile9 {
+	background-position: 0 -204px;
+}
+
+.smile10 {
+	background-position: 0 -230px;
+}
+
+.smile11 {
+	background-position: 0 -255px;
+}
+
+.smile12 {
+	background-position: 0 -280px;
+}
+
+.smile13 {
+	background-position: 0 -305px;
+}
+
+.smile14 {
+	background-position: 0 -331px;
+}
+
+.smile15 {
+	background-position: 0 -356px;
+}
+
+.smile16 {
+	background-position: 0 -382px;
+}
+
+.smile17 {
+	background-position: 0 -407px;
+}
+
+.smile18 {
+	background-position: 0 -433px;
+}
+
+.smile19 {
+	background-position: 0 -459px;
+}
+
+.smile20 {
+	background-position: 0 -484px;
+}
+
+.smile21 {
+	background-position: 0 -510px;
+}
+
+.smile22 {
+	background-position: 0 -535px;
+}
+
+.smile23 {
+	background-position: 0 -561px;
+}
+
+.smile24 {
+	background-position: 0 -586px;
+}
+
+.smile25 {
+	background-position: 0 -612px;
+}
+
+.smile26 {
+	background-position: 0 -637px;
+}
+
+.smile27 {
+	background-position: 0 -663px;
+}
+
+.smile28 {
+	background-position: 0 -689px;
+}
+
+.smile29 {
+	background-position: 0 -713px;
+}
+
+.smile30 {
+	background-position: 0 -738px;
+}
+
+.smile31 {
+	background-position: 0 -764px;
+}
+
+.smile32 {
+	background-position: 0 -790px;
+}
+
+.text .smile {
+	margin-right: 3px;
+	float: none;
+	display: inline-block;
+	cursor: default;
+}
+
+.text .smile:hover {
+	background-color: transparent;
 }
 
 .text-blue {

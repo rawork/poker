@@ -43,7 +43,7 @@ class Type {
 			$this->dbId		= (int)$entity['id'];
 			$this->dbValue	= isset($entity[$this->getName()]) ? $entity[$this->getName()] : '';
 		} elseif ($this->getParam('defvalue')) {
-			$this->dbValue	= $this->getParam('defvalue');
+//			$this->dbValue	= $this->getParam('defvalue');
 		}
 	}
 
@@ -52,7 +52,7 @@ class Type {
 	}
 
 	public function getGroupInput() {
-		return $this->getInput('', $this->getName().$this->dbId, 'input-mini');
+		return $this->getInput('', $this->getName().$this->dbId);
 	}
 	
 	public function getGroupStatic() {
@@ -70,7 +70,7 @@ class Type {
 
 	public function getValue($name = '') {
 		$name = $name ? $name : $this->getName();
-		$value = isset($_REQUEST[$name]) ? $_REQUEST[$name] : '';
+		$value = isset($_REQUEST[$name]) ? $_REQUEST[$name] : ($this->dbValue ?: null);
 		return $value;
 	}
 
@@ -78,13 +78,8 @@ class Type {
 		return $this->getValue($this->getSearchName($subName));
 	}
 
-	/*** abstract class, these methods must be reimplemented: */
-	public function getSQL() {
-		return $this->getName().' varchar(500) NULL';
-	}
-
 	public function getSQLValue($name = '') {
-		return addslashes($this->getValue($name));
+		return $this->getValue($name);
 	}
 	
 	public function getNativeValue() {
@@ -93,12 +88,13 @@ class Type {
 
 	public function getStatic() {
 		$ret = strip_tags(trim($this->dbValue));
-		return $ret ? $ret : '&nbsp;';
+		return $ret ?: '&nbsp;';
 	}
 
 	public function getInput($value = '', $name = '') {
 		$name = $name ? $name : $this->getName();
 		$value = $value ? str_replace('"', '&quot;', $value) : str_replace('"', '&quot;', $this->dbValue);
+		
 		return '<input type="text" class="form-control" name="'.$name.'" value="'.$value.'" >';
 	}
 
@@ -109,17 +105,17 @@ class Type {
 	public function getSearchSQL() {
 		if ($value = $this->getSearchValue()) {
 			return $this->getName()." LIKE '%".$value."%'";
-		} else {
-			return '';
 		}
+		
+		return '';
 	}
 
 	public function getSearchURL($name = '') {
 		if ($value = $this->getSearchValue($name)) {
 			return urlencode($this->getSearchName($name)).'='.urlencode($value);
-		} else {
-			return '';
 		}
+		
+		return '';
 	}
 	
 	public function getType() {

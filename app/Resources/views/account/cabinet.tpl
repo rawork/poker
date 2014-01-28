@@ -12,12 +12,13 @@
 			{$user.name}<br>{$user.lastname}
 		</div>
 		<div class="user-like">
-			<input class="btn btn-warning" type="button" value="ЛАЙК!"> <img src="/bundles/public/img/heart.png"> : <span id="like-counter-{$account.id}">{$account.likes}</span>
+			<img src="/bundles/public/img/heart.png"> : <span id="like-counter-{$account.id}">{$account.likes}</span>
 		</div>	
 		<ul class="user-data">
 			<li><span>Статус: </span>{$group.title}</li>
 			<li><span>Логин: </span>{$user.login}</li>
 			<li><span>СБЕ: </span>{$account.sbe}</li>
+			<li><span>Город: </span>{$account.city}</li>
 			<li><span>Должность: </span>{$account.position}</li>
 			<li><span>Девиз: </span>{$account.slogan}</li>
 		</ul>

@@ -32,7 +32,8 @@ class DatetimeType extends Type {
 	}
 
 	public function getSQLValue($name = '') {
-		if (empty($this->getValue($name)) || $this->getValue($name) == '00.00.0000 00:00:00') {
+		$value = $this->getValue($name);
+		if (in_array($value, array(null, '00.00.0000 00:00:00', '0000-00-00 00:00:00'))) {
 			return "0000-00-00 00:00:00";
 		}	
 		

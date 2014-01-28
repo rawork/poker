@@ -15,7 +15,7 @@ class NumberType extends LookUpType {
 		return intval(preg_replace('/\s+/', '', preg_replace('/\,/', '.', $this->getValue($name))));
 	}
 	
-	public function getType() {
-		return 'integer';
+	public function getStatic() {
+		return $this->dbValue.' &nbsp;';
 	}
 }

@@ -11,23 +11,48 @@ class AccountController extends PublicController {
 	}
 	
 	public function indexAction() {
+		$text = $this->get('util')->post('text') ?: $this->get('util')->session('member_search_text');
+		$criteria = array('1=1');
+		if ($text && $text != '1=1') {
+			$criteria = array();
+			$_SESSION['member_search_text'] = $text;
+			$words = explode(' ', $text);
+			$fields = array('lastname', 'name');
+			foreach($words as $word) {
+				$word_criteria = array();
+				foreach ($fields as $field) {
+					$word_criteria[] = $field." LIKE('".$word."%')";
+				}
+				$criteria[] = '('.implode(' OR ', $word_criteria).')';
+			}
+		} else {
+			unset($_SESSION['member_search_text']);
+		}
 		$user = $this->get('security')->getCurrentUser();
 		$page = $this->get('util')->request('page', true, 1);
         $paginator = $this->get('paginator');
         $paginator->paginate(
 				$this->get('container')->getTable('account_member'),
 				$this->get('router')->generateUrl($this->get('router')->getParam('node')).'?page=###',
-				'1=1',
+				implode(' AND ', $criteria),
 				$this->getParam('per_page'),
 				$page
 		);
 		$paginator->setTemplate('public');
-		$members = $this->get('container')->getitems('account_member', '1=1', 'lastname,name', $paginator->limit);
+		$members = $this->get('container')->getitems('account_member', implode(' AND ', $criteria), 'lastname,name', $paginator->limit);
 		foreach ($members as &$member) {
 			$member['group'] = $this->get('container')->getItem('user_group', $member['user_id_value']['item']['group_id']);
 		}
 		$this->get('container')->setVar('title', 'Участники клуба');
 		$this->get('container')->setVar('h1', 'Участники клуба');
+		
+		if ($this->get('router')->isXmlHttpRequest()) {
+			$isAjax = true;
+			return json_encode(array(
+				'ok' => true,
+				'content' => $this->render('account/index.tpl', compact('isAjax', 'user', 'members', 'paginator')),
+			));	
+		}
 		
 		return $this->render('account/index.tpl', compact('user', 'members', 'paginator'));
 	}
@@ -153,6 +178,7 @@ class AccountController extends PublicController {
 				);
 				unset($_SESSION['register']);
 				unset($_SESSION['account']);
+				$this->get('security')->login($user['login'], $user['password']);
 				
 				$this->get('router')->redirect('/members/cabinet');
 			}
@@ -208,20 +234,60 @@ class AccountController extends PublicController {
 	}
 	
 	public function editAction() {
-		$user = $this->get('security');
+		$user = $this->get('security')->getCurrentUser();
 		if (!$user) {
-			return $this->call('Fuga:Public:Account:login');
+			$this->get('router')->redirect('/members');
 		}
 		
 		if ('POST' == $_SERVER['REQUEST_METHOD']) {
+			$user['group_id'] = $this->get('util')->post('group_id');
+			$user['name']     = $this->get('util')->post('name');
+			$user['lastname'] = $this->get('util')->post('lastname');
 			
+			$account['sbe']      = $this->get('util')->post('sbe');
+			$account['city']     = $this->get('util')->post('city');
+			$account['position'] = $this->get('util')->post('position');
+			$account['slogan']   = $this->get('util')->post('slogan');
+			$account['name']     = $this->get('util')->post('name');
+			$account['lastname'] = $this->get('util')->post('lastname');
+			
+			$errors = array();
+			if (empty($user['group_id']) || !in_array($user['group_id'], array(2,3))) {
+				$user['group_id'] = 3;
+			}
+			if (empty($user['name'])) {
+				$errors[] = 'Не заполнено имя';
+			}
+			if (empty($user['lastname'])) {
+				$errors[] = 'Не заполнена фамилия';
+			}
+			
+			if ($errors) {
+				$_SESSION['danger'] = implode('<br>', $errors);
+				$this->get('router')->reload();
+			} else {
+				$this->get('container')->updateItem('user_user',
+						array('name' => $user['name'], 'lastname' => $user['lastname']),
+						array('id' => $user['id'])
+				);
+				$this->get('container')->getTable('account_member')->updateGlobals();
+					
+				$this->get('mailer')->send(
+					'Вы зарегистрировались на сайте клуба Чертова дюжина',
+					$this->render('mail/register.tpl', compact('user', 'account')),
+					$user['login']
+				);
+				
+				$this->get('router')->redirect('/members/cabinet');
+			}
 		}
 		
 		$message = $this->flash('danger') ?: $this->flash('success');
+		$account = $this->get('container')->getItem('account_member', 'user_id='.$user['id']);
 		$this->get('container')->setVar('title', 'Редактирование анкеты');
 		$this->get('container')->setVar('h1', 'Редактирование анкеты');
 		
-		return $this->render('account/edit.tpl', compact('user'));
+		return $this->render('account/edit.tpl', compact('message', 'account'));
 	}
 	
 	public function membersAction() {

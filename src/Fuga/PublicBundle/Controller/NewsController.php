@@ -29,12 +29,10 @@ class NewsController extends PublicController {
 	}
 	
 	public function lentaAction() {
-		$items = $this->get('container')->getItems('news_news', 'publish=1', null, $this->getParam('per_lenta'));
-		foreach ($items as &$item) {
-			$item['preview'] = $this->get('util')->cut_text($item['preview'], 170);
-		}
+		$items = $this->get('container')->getItems('news_news', 'publish=1', 'id DESC', $this->getParam('per_lenta'));
+		$num = ceil(count($items)/3);
 		
-		return $this->get('templating')->render('news/lenta.tpl', compact('items'));
+		return $this->get('templating')->render('news/lenta.tpl', compact('items', 'num'));
 	}
 	
 	public function readAction($params) {

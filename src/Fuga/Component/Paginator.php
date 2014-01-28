@@ -36,9 +36,9 @@ class Paginator {
 			if ($this->entityQuantity) {
 				$this->quantity = ceil($this->entityQuantity / $this->rowPerPage);
 				if ($this->quantity > 0) {
-					if ($this->currentPage > $this->quantity) {
-						$this->currentPage = 1;
-					}
+//					if ($this->currentPage > $this->quantity) {
+//						$this->currentPage = 1;
+//					}
 					if ($this->currentPage < 1) {
 						$this->currentPage = 1;
 					}

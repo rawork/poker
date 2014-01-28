@@ -9,7 +9,7 @@ class FileType extends Type {
 
 	public function getSQLValue($inputName = '') {
 		$inputName = $inputName ? $inputName : $this->getName();
-		$fileName = $_POST[$inputName.'_oldValue'];
+		$fileName = $this->dbValue;
 		if ($this->get('util')->post($inputName.'_delete')) {
 			$this->get('filestorage')->remove($fileName);
 			$fileName = '';

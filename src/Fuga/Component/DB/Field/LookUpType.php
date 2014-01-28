@@ -10,14 +10,15 @@ class LookUpType extends Type {
 	public function getSearchSQL() {
 		if ($value = $this->getSearchValue()) {
 			return $this->getName().'='.$value;
-		} else {
-			return '';
 		}
+		
+		return '';
 	}
 
 	public function getValue($name = '') {
-		$name = $name ? $name : $this->getName();
-		$value = isset($_REQUEST[$name]) ? intval($_REQUEST[$name]) : 0;
+		$name = $name ?: $this->getName();
+		$value = isset($_REQUEST[$name]) ? intval($_REQUEST[$name]) : ($this->dbValue ?: 0);
+		
 		return $value;
 	}
 	

@@ -8,15 +8,16 @@ class CheckboxType extends Type {
 	}
 
 	public function getSQLValue($name = '') {
-		return $this->getValue($name) == "1" ? $this->getValue($name) : 0;
+		$value = intval($this->getValue($name));
+		return $value  == 1 ? $value : 0;
 	}
 
 	public function getStatic() {
-		return $this->dbValue ? 'Да' : 'Нет';
+		return $this->dbValue == 1 ? 'Да' : 'Нет';
 	}
 
 	public function getInput($value = '', $name = '') {
-		return '<input type="checkbox" value="1" name="'.($name ? $name : $this->getName()).'" '.(empty($this->dbValue) ? '' : 'checked').'>';
+		return '<input type="checkbox" value="1" name="'.($name ?: $this->getName()).'" '.(empty($this->dbValue) ? '' : 'checked').'>';
 	}
 
 	public function getSearchInput() {
