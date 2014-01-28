@@ -7,7 +7,7 @@
 			<label>
 				<select name="group_id">
 					<option value="2"{if $register.group_id == 2} selected="true"{/if}>Игрок</option>
-					<option value="3"{if $register.group_id == 3} selected="true"{/if}>Наблюдатель</option>
+					<option value="3"{if $register.group_id == 3} selected="true"{/if}>Зритель</option>
 				</select>
 			</label>	
 		</div>

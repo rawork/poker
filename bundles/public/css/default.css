@@ -134,20 +134,21 @@ ul.index-news span.date {
 	color: #b2d000;
 }
 
-.index-gamers {
+.index-members {
 	text-align: center;
 	list-style: none;
 	margin: 20px 0 25px;
 	padding: 0;
 }
 
-.index-gamers li {
+.index-members li {
 	margin: 0 10px;
 	display: inline-block;
 }
 
-.index-gamers li img {
-	border-radius: 50px;
+.index-members li img {
+	border-radius: 51px;
+	width: 100px;
 }
 
 ul.footer-menu {
@@ -744,6 +745,7 @@ hr.red-line {
 }
 
 .member-card {
+	display: none;
 	top: 150px;
 	left: 50%;
 	width: 800px;

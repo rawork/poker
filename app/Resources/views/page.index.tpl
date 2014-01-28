@@ -42,23 +42,7 @@
 		</div>
 		<div class="container index-news-container">
 			{raMethod path=Fuga:Public:News:lenta}
-			<hr class="red-line">
-			<div class="row-fluid">
-				<div class="span12 text-center">
-					<h3>УЧАСТНИКИ КЛУБА:</h3>
-					<ul class="index-gamers">
-						<li><a href=""><img src="/bundles/public/img/avatar2.jpg"></a></li>
-						<li><a href=""><img src="/bundles/public/img/avatar2.jpg"></a></li>
-						<li><a href=""><img src="/bundles/public/img/avatar2.jpg"></a></li>
-						<li><a href=""><img src="/bundles/public/img/avatar2.jpg"></a></li>
-						<li><a href=""><img src="/bundles/public/img/avatar2.jpg"></a></li>
-						<li><a href=""><img src="/bundles/public/img/avatar2.jpg"></a></li>
-						<li><a href=""><img src="/bundles/public/img/avatar2.jpg"></a></li>
-					</ul>
-					<a class="btn btn-success btn-large" href="/members">УЧАСТНИКИ<small>клуба</small></a>
-					<br><br><br>
-				</div>
-			</div>
+			{raMethod path=Fuga:Public:Account:members}
 		</div>
 		<div class="poker-line"></div>
 		<div class="container">

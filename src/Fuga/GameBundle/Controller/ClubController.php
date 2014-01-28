@@ -15,4 +15,12 @@ class ClubController extends PublicController {
 		
 		return $this->render('club/index.tpl', compact('items', 'user'));
 	}
+	
+	public function messageAction() {
+		
+	}
+	
+	public function commentAction() {
+		
+	}
 }

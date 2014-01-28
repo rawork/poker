@@ -224,6 +224,93 @@ class AccountController extends PublicController {
 		return $this->render('account/edit.tpl', compact('user'));
 	}
 	
+	public function membersAction() {
+		$members = $this->get('container')->getItems('account_member', '1=1', 'RAND()', $this->getParam('per_mainpage'));
+		
+		return $this->render('account/members.tpl', compact('members'));
+	}
+	
+	public function cardAction($params) {
+		if (!$this->get('router')->isXmlHttpRequest()) {
+			$this->get('router')->redirect('/members');
+		}
+		
+		if (empty($params[0])) {
+			return json_encode(array(
+				'ok' => false,
+				'content' => 'Не выбран участник',
+			));
+		}
+
+		$account = $this->get('container')->getItem('account_member', intval($params[0]));
+		$group = $this->get('container')->getItem('user_group', $account['user_id_value']['item']['group_id']);
+		
+		return json_encode(array(
+			'ok' => true,
+			'content' => $this->render('account/card.tpl', compact('account', 'group')),
+		));
+	}
+	
+	public function likeAction($params) {
+		$user = $this->get('security')->getCurrentUser();
+		if (!$this->get('router')->isXmlHttpRequest()) {
+			$this->get('router')->redirect('/members');
+		}
+		
+		if (!$user) {
+			return json_encode(array(
+				'ok' => false,
+				'content' => 'Голосовать могут только зарегистрированные пользователи',
+			));
+		}
+		
+		if (empty($params[0])) {
+			return json_encode(array(
+				'ok' => false,
+				'content' => 'Не выбран участник для голосования',
+			));
+		}
+		
+		$memberId = intval($params[0]);
+		$account = $this->get('container')->getItem('account_member', $memberId);
+		
+		if (!$account) {
+			return json_encode(array(
+				'ok' => false,
+				'content' => 'Не выбран участник для голосования',
+			));
+		}
+		
+		if (0 < $this->get('container')->count('account_likes', 'user_id='.$user['id'].' AND member_id='.$memberId)) {
+			return json_encode(array(
+				'ok' => false,
+				'content' => 'Вы уже голосовали за выбранного участника',
+			));
+		}
+		
+		$this->get('container')->addItem('account_likes', array(
+			'user_id' => $user['id'],
+			'member_id' => $memberId,
+		));
+		$this->get('container')->updateItem('account_member', 
+				array('likes' => $account['likes']+1),
+				array('id' => $memberId)
+		);
+		
+		return json_encode(array(
+			'ok' => true,
+			'content' => $account['likes']+1,
+		));
+	}
+	
+	public function bet1Action () {
+		
+	}
+	
+	public function bet2Action () {
+		
+	}
+	
 	public function testAction() {
 		$fh = fopen($_SERVER['DOCUMENT_ROOT']).'/'.'q.txt';
 		 
