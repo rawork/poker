@@ -43,7 +43,7 @@
 					<div class="span5 slogan">{$message.account.slogan}</div>
 				</div>	
 			</div>
-			<div class="club-show-link"><a data-action="comments">{if $message.comments_count}Показать комментарии ({$message.comments_count}){else}Комментировать{/if}</a></div>	
+			<div class="club-show-link"><a data-action="comments">{if $message.comments_count}Показать комментарии ({$message.comments_count}){else}{if $user}Комментировать{/if}{/if}</a></div>	
 		</div>
 	</div>
 	{/foreach}	

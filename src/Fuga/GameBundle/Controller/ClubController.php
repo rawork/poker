@@ -33,6 +33,7 @@ class ClubController extends PublicController {
 				$message['user'] = $this->get('container')->getItem('user_user', $message['account']['user_id']);
 			}
 		}
+		$this->get('container')->setVar('javascript', 'club');
 		
 		return $this->render('club/index.tpl', compact('messages', 'user', 'account'));
 	}
@@ -125,6 +126,7 @@ class ClubController extends PublicController {
 	}
 	
 	public function commentsAction($params) {
+		$user = $this->get('security')->getCurrentUser();
 		if (!$this->get('router')->isXmlHttpRequest()) {
 			$this->get('router')->redirect('/club');
 		}
@@ -151,7 +153,7 @@ class ClubController extends PublicController {
 		
 		return json_encode(array(
 			'ok' => true,
-			'content' => $this->render('club/comments.tpl', compact('message', 'comments')),
+			'content' => $this->render('club/comments.tpl', compact('message', 'comments', 'user')),
 		));
 	}
 	

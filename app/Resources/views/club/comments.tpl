@@ -11,14 +11,14 @@
 	</div>
 	{/foreach}
 </div>
-<div class="club-add-comment">
+{if $user}<div class="club-add-comment">
 	Добавить комментарий:<br>
 	<div contenteditable="true" class="text"></div>
 	<div class="row-fluid">
 		<div class="span6"><a data-action="show-smiles">Добавить смайл</a></div>
 		<div class="span6 text-right"><button class="btn btn-primary" data-action="comment">ОТПРАВИТЬ</button></div>	 
 	</div>
-</div>
+</div>{/if}
 <div class="club-hide-link" id="hide-message{$message.id}">
 	<a data-action="hide">скрыть комментарии</a>
 </div>

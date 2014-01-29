@@ -134,13 +134,14 @@ class PageController extends Controller {
 		unset($link);
         
 		$params = array(
-			'h1'       => $this->getH1(),
-			'title'    => $this->getManager('Fuga:Common:Meta')->getTitle() ?: strip_tags($this->getTitle()),
-			'meta'     => $this->getManager('Fuga:Common:Meta')->getMeta(),
-			'links'    => $links,
-			'action'   => $this->get('router')->getParam('action'),
-			'curnode'  => $node,
-			'locale'   => $this->get('router')->getParam('locale'),
+			'h1'        => $this->getH1(),
+			'title'     => $this->getManager('Fuga:Common:Meta')->getTitle() ?: strip_tags($this->getTitle()),
+			'meta'      => $this->getManager('Fuga:Common:Meta')->getMeta(),
+			'links'     => $links,
+			'action'    => $this->get('router')->getParam('action'),
+			'curnode'   => $node,
+			'javascript'=> 'public',
+			'locale'    => $this->get('router')->getParam('locale'),
 		);
 		$this->get('templating')->assign($params);
 		$this->get('templating')->assign(array('maincontent' => $this->staticAction().$this->dinamicAction()));

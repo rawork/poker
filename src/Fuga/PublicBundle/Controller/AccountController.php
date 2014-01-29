@@ -45,6 +45,7 @@ class AccountController extends PublicController {
 		}
 		$this->get('container')->setVar('title', 'Участники клуба');
 		$this->get('container')->setVar('h1', 'Участники клуба');
+		$this->get('container')->setVar('javascript', 'members');
 		
 		if ($this->get('router')->isXmlHttpRequest()) {
 			$isAjax = true;
@@ -189,6 +190,7 @@ class AccountController extends PublicController {
 		$account = json_decode($this->get('util')->session('account'), true);
 		$this->get('container')->setVar('title', 'Регистрация');
 		$this->get('container')->setVar('h1', 'Регистрация');
+		$this->get('container')->setVar('javascript', 'register');
 		
 		return $this->render('account/register.tpl', compact('message', 'register', 'account'));
 	}
@@ -286,6 +288,7 @@ class AccountController extends PublicController {
 		$account = $this->get('container')->getItem('account_member', 'user_id='.$user['id']);
 		$this->get('container')->setVar('title', 'Редактирование анкеты');
 		$this->get('container')->setVar('h1', 'Редактирование анкеты');
+		$this->get('container')->setVar('javascript', 'register');
 		
 		return $this->render('account/edit.tpl', compact('message', 'account'));
 	}
@@ -375,11 +378,6 @@ class AccountController extends PublicController {
 	
 	public function bet2Action () {
 		
-	}
-	
-	public function testAction() {
-		$fh = fopen($_SERVER['DOCUMENT_ROOT']).'/'.'q.txt';
-		 
 	}
 	
 }
