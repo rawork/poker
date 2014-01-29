@@ -1,6 +1,6 @@
 User-agent: *
-Disallow: /admin/
+Disallow: /
 
 User-agent: Yandex
-Disallow: /admin/
-Host: poker.ancor.ru
+Disallow: /
+Host: club.ancor.ru
