@@ -30,19 +30,16 @@
 					</ul>
 				</div>
 				<div class="span2 text-center">
-					<img class="footer-logo" src="{$theme_ref}/public/img/logo.png">
+					<a href="/"><img class="footer-logo" src="{$theme_ref}/public/img/logo.png"></a>
 				</div>
 				<div class="span5 footer-right">
-					<ul class="login-menu">
-						<li><a href="/members/cabinet">ВХОД</a> /</li>
-						<li><a href="/members/register">РЕГИСТРАЦИЯ</a></li>
-					</ul>
+					{raMethod path=Fuga:Public:Account:widget}
 				</div>
 			</div>
 		</div>
 		<script type="text/javascript" src="{$theme_ref}/jquery/jquery.js"></script>
 		<script type="text/javascript" src="{$theme_ref}/jquery/jquery.cookie.js"></script>
 		<script type="text/javascript" src="{$theme_ref}/bootstrap2/js/bootstrap.js"></script>
-		<script type="text/javascript" src="{$theme_ref}/public/js/training.js"></script>
+		<script type="text/javascript" src="{$theme_ref}/public/js/{$javascript}.js"></script>
 	</body>
 </html>

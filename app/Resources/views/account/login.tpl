@@ -1,7 +1,7 @@
 {if $message}<div class="alert alert-{$message.type}">{$message.text}</div>{/if}
 <form action="{raURL node=members method=login}" method="post">
-<div class="row-fluid register-card">
-	<div class="span6">
+<div class="row-fluid register-card text-center">
+	<div class="span12">
 		<div class="register-title">Логин <span>(корпоративная почта)</span></div>
 		<div class="register-field">
 			<input type="text" name="_user">
@@ -15,7 +15,7 @@
 		</div>
 	</div>
 </div>
-<div class="register-button">
+<div class="register-button text-center">
 	<button class="btn btn-warning btn-large" type="submit">Войти<small>на сайт</small></button> 
 	<a class="user-link" href="/members/forget">забыли пароль?</a>
 	<a class="user-link" href="/members/register">регистрация</a>

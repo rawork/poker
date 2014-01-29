@@ -10,6 +10,7 @@ body {
 }
 
 .game-exit {
+	white-space: nowrap;
 	padding-top: 43px;
 	text-align: right;
 }
@@ -324,6 +325,10 @@ body {
 	
 }
 
+#game-question button {
+	width: 120px;
+}
+
 .question-body {
 	height: 320px;
 }
@@ -426,28 +431,65 @@ body {
 }
 
 .victorina-container {
-	
+	margin: 20px 20px;
 }
 
-.victorina-line1 {
-	
+.victorina-container .line1 {
+	margin-left: 45px;
 }
 
-.victorina-line2 {
-	
+.victorina-container .line2 {
+	margin-left: 0;
 }
-.victorina-line3 {
-	
-}
-
-.victorina-line4 {
-	
+.victorina-container .line3 {
+	margin-left: 45px;
 }
 
-.victorina-line5 {
-	
+.victorina-container .line4 {
+	margin-left: 90px;
 }
 
-.victorina-line6 {
-	
+.victorina-container .line5 {
+	margin-left: 45px;
+}
+
+.victorina-container .line6 {
+	margin-left: 180px;
+}
+
+.victorina-container .question {
+	display: inline-block;
+	margin: 3px 1px;
+}
+
+.victorina-container .question.active {
+	cursor: pointer;
+}
+
+.victorina-container .question img {
+	width: 75px;
+}
+
+.victorina-text-container {
+	position: relative;
+}
+
+.victorina-text-container .text {
+	position: absolute;
+	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
+	font-size: 25px;
+	line-height: 29px;
+	top: -70px;
+	left: 30px;
+}
+
+.victorina-message {
+	margin: 100px 20px;
+	text-align: center;font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
+	font-size: 40px;
+	line-height: 43px;
+}
+
+#game-question a {
+	cursor: pointer;
 }

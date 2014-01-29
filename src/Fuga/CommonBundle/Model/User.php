@@ -55,7 +55,7 @@ class User {
 				'title' => 'Группа',
 				'type' => 'select',
 				'l_table' => 'user_group',
-				'l_field' => 'name',
+				'l_field' => 'title',
 				'width' => '25%'
 			),
 			'is_admin' => array (

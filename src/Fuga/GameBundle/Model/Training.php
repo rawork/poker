@@ -256,7 +256,7 @@ class Training {
 	}
 	
 	public function setTimer($handler = '', $minutes = 0, $seconds = 0) {
-		if ($minutes == 0 && $seconds == 0) {
+		if ($minutes <= 0 && $seconds <= 0) {
 			setcookie('timerhandler', '', time()-86400, '/');
 			setcookie('timerminute', 0, time()-86400, '/');
 			setcookie('timersecond', 0, time()-86400, '/');

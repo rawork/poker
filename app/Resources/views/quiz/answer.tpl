@@ -1,0 +1,1 @@
+Вы ответили на {$answers_count} из 52 вопросов<br>правильных {$result.correct}

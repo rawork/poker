@@ -74,7 +74,7 @@
 					</ul>
 				</div>
 				<div class="span2 text-center">
-					<img class="footer-logo" src="{$theme_ref}/public/img/logo.png">
+					<a href="/"><img class="footer-logo" src="{$theme_ref}/public/img/logo.png"></a>
 				</div>
 				<div class="span5 footer-right">
 					{raMethod path=Fuga:Public:Account:widget}

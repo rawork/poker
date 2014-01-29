@@ -46,6 +46,7 @@ class TrainingController extends PublicController {
 		$start = $training->board->state == 0 
 				? $this->render('training/start.tpl') 
 				: null;
+		$this->get('container')->setVar('javascript', 'training');
 		
 		return $this->render('training/index.tpl', compact('training', 'question', 'start'));
 	}

@@ -14,52 +14,263 @@ class QuizController extends PublicController {
 	public function indexAction() {
 		$user = $this->get('security')->getCurrentUser();
 		if (!$user) {
-			return $this->call('Fuga:Public:Account:login');
+			$error = $this->call('Fuga:Public:Account:login');
+			return $this->render('quiz/error.tpl', compact('error'));
 		}
 		
-		if ($user['group_id_name'] == 'viewer') {
-			return 'зритель';
+		if ($user['group_id_name'] != 'admin' && $user['group_id_name'] != 'gamer') {
+			$error = 'К сожалению вы не можете участвовать в отборочном туре. Вы не зарегистрировались в качестве игрока.';
+			return $this->render('quiz/error.tpl', compact('error'));
 		}
 		
 		$account = $this->get('container')->getItem('account_member', 'user_id='.$user['id']);
 		if (!$account) {
-			return 'ошибка account';
+			$error = 'Для вашей учетной записи не зарегистрирован участник';
+			return $this->render('quiz/error.tpl', compact('error'));
 		}
 		
+		$isTooLate = false;
 		if ($account['quiz_date'] == '0000-00-00 00:00:00') {
-			return 'время не назначено';
+			$error = 'Отборочный тур проводится в строго определенное время.';
+			return $this->render('quiz/error.tpl', compact('error'));
+		} else {
+			$date = new \DateTime($account['quiz_date']);
+			if ($date->getTimestamp() - time() > 0) {
+				$error = 'Отборочный тур проводится в строго определенное время.';
+				return $this->render('quiz/error.tpl', compact('error'));
+			} elseif ($date->getTimestamp() + intval($this->getParam('quiz_timer')) - time() < 0) {
+				$isTooLate = true;
+			} else {
+				$now = new \DateTime();
+				$date->add(new \DateInterval('PT'.$this->getParam('quiz_timer').'S'));
+				$diff = $now->diff($date);
+				setcookie('timerhandler', 'stopGame', time()+86400, '/');
+				setcookie('timerminute', intval($diff->format('%i')), time()+86400, '/');
+				setcookie('timersecond', intval($diff->format('%s')), time()+86400, '/');
+			}
 		}
 		
-		$date = new \DateTime($account['quiz_date']);
-		if ($date->getTimestamp() - time() > 0) {
-			return 'викторина не началась';
-		} elseif ($date->getTimestamp() + 780 - time() < 0) {
-			return 'викторина закончилась';
-		}
-		
-		$result = $this->get('comntainer')->getItem('quiz_result', 'user_id='.$user['id']);
+		$result = $this->get('container')->getItem('quiz_result', 'user_id='.$user['id']);
 		if (!$result) {
-			return 'error result';
+			$error = 'Не создан набор вопросов. Обратитесь к администратору клуба';
+			return $this->render('quiz/error.tpl', compact('error'));
+		}
+		if ($result['totaltime']) {
+			$minutes = floor($result['totaltime'] / 60);
+			if ($minutes == 1) {
+				$minutes .= ' минуту'; 
+			} elseif (in_array($minutes, array(2,3,4))) {
+				$minutes .= ' минуты';
+			} else {
+				$minutes .= ' минут';
+			}
+			$seconds = $result['totaltime'] % 60;
+			if ($seconds == 0) {
+				$seconds = '';
+			} else {
+				$seconds .= ' c';
+			}
+			$error = 'За '.$minutes.' '.$seconds.' Вы ответили верно<br>на <span class="text-red">'.$result['correct'].'</span> вопросов!';
+			return $this->render('quiz/error.tpl', compact('error'));
+		} elseif ($isTooLate) {
+			$error = 'Отборочный тур проводится в строго определенное время.';
+			return $this->render('quiz/error.tpl', compact('error'));
 		}
 		
-		$questions = json_decode($result['questions']);
-		$answers = json_decode($result, true);
+		$questions = array();
+		$questions0 = json_decode($result['questions']);
+		$answers = json_decode($result['answers'], true);
+		foreach ($questions0 as $questionId) {
+			$questions[] = array(
+				'id'   => $questionId,
+				'card' => isset($answers[$questionId]) ? $answers[$questionId] : null,
+			);
+		}
+		$answers_count = count($answers);
+		$this->get('container')->setVar('javascript', 'victorina');
 		
-		var_dump($questions, $answers);
-		
-		return $this->render('quiz/index.tpl', compact('user', 'answers', 'questions'));
-	}
-	
-	public function questionAction($params) {
-		
-	}
-	
-	public function answerAction() {
-		
+		return $this->render('quiz/index.tpl', compact('result', 'user', 'questions'));
 	}
 	
 	public function stopAction() {
+		if (!$this->get('router')->isXmlHttpRequest()) {
+			$this->get('router')->redirect('/victorina');
+		}
 		
+		$user = $this->get('security')->getCurrentUser();
+		if (!$user) {
+			return json_encode(array(
+				'ok' => false
+			));
+		}
+		
+		$this->get('container')->updateItem('quiz_result', array(
+				'totaltime' => 780,
+			),
+			array('user_id' => $user['id'])
+		);
+		
+		return json_encode(array(
+			'ok' => true
+		));
+	}
+	
+	public function questionAction($params = array()) {
+		if (!$this->get('router')->isXmlHttpRequest()) {
+			$this->get('router')->redirect('/victorina');
+		}
+		
+		$user = $this->get('security')->getCurrentUser();
+		if (!$user) {
+			return json_encode(array(
+				'ok' => false
+			));
+		}
+		
+		if ($user['group_id_name'] != 'admin' && $user['group_id_name'] != 'gamer') {
+			return json_encode(array(
+				'ok' => false
+			));
+		}
+		
+		$account = $this->get('container')->getItem('account_member', 'user_id='.$user['id']);
+		if (!$account) {
+			return json_encode(array(
+				'ok' => false
+			));
+		}
+		
+		if ($account['quiz_date'] == '0000-00-00 00:00:00') {
+			return json_encode(array(
+				'ok' => false
+			));
+		} else {
+			$date = new \DateTime($account['quiz_date']);
+			if ($date->getTimestamp() - time() > 0) {
+				return json_encode(array(
+					'ok' => false
+				));
+			} elseif ($date->getTimestamp() + intval($this->getParam('quiz_timer')) - time() < 0) {
+				return json_encode(array(
+					'ok' => false
+				));
+			}
+		}
+		
+		if (!isset($params[0])) {
+			return json_encode(array(
+				'ok' => false
+			));
+		}
+		
+		$question = $this->get('container')->getItem('quiz_poll', intval($params[0]));
+		if (!$question) {
+			return json_encode(array(
+				'ok' => false
+			));
+		}
+		
+		return json_encode(array(
+			'ok' => true,
+			'content' => $this->render('quiz/question.tpl', compact('question')),
+		));
+	}
+	
+	public function answerAction() {
+		if (!$this->get('router')->isXmlHttpRequest()) {
+			$this->get('router')->redirect('/victorina');
+		}
+		
+		$user = $this->get('security')->getCurrentUser();
+		if (!$user) {
+			return json_encode(array(
+				'ok' => false
+			));
+		}
+		
+		if ($user['group_id_name'] != 'admin' && $user['group_id_name'] != 'gamer') {
+			return json_encode(array(
+				'ok' => false
+			));
+		}
+		
+		$account = $this->get('container')->getItem('account_member', 'user_id='.$user['id']);
+		if (!$account) {
+			return json_encode(array(
+				'ok' => false
+			));
+		}
+		
+		if ($account['quiz_date'] == '0000-00-00 00:00:00') {
+			return json_encode(array(
+				'ok' => false
+			));
+		} else {
+			$date = new \DateTime($account['quiz_date']);
+			if ($date->getTimestamp() - time() > 0) {
+				return json_encode(array(
+					'ok' => false
+				));
+			} elseif ($date->getTimestamp() + intval($this->getParam('quiz_timer')) - time() < 0) {
+				return json_encode(array(
+					'ok' => false
+				));
+			} else {
+				$now = new \DateTime();
+				$diff = $now->diff($date);
+			}
+		}
+		
+		$answerNo = $this->get('util')->post('answer_no', true, 0);
+		$questionId = $this->get('util')->post('question_id', true, 0);
+		
+		$question = $this->get('container')->getItem('quiz_poll', $questionId);
+		if (!$question) {
+			return json_encode(array(
+				'ok' => false
+			));
+		}
+		
+		$result = $this->get('container')->getItem('quiz_result', 'user_id='.$user['id']);
+		if (!$result) {
+			return json_encode(array(
+				'ok' => false
+			));
+		}
+		
+		if ($answerNo == $question['answer']) {
+			$result['correct'] += 1;
+		}
+		$result['total'] += 1;
+		$answers = json_decode($result['answers'], true);
+		$deck = unserialize($result['deck']);
+		$cards = $deck->take(1);
+		$answers[$questionId] = $cards[0]['name'];
+		$result['answers'] = json_encode($answers);
+		$answers_count = count($answers);
+		if ($answers_count >= 52) {
+			$result['totaltime'] = time() - $date->getTimestamp();
+		}
+		$this->get('container')->updateItem('quiz_result', array(
+				'total'   => $result['total'],
+				'correct' => $result['correct'],
+				'answers' => $result['answers'],
+				'deck'    => serialize($deck),
+				'totaltime' => $result['totaltime'],
+			),
+			array('id' => $result['id'])
+		);
+		if ($answers_count >= 52) {
+			return json_encode(array(
+				'ok' => false
+			));
+		}
+		
+		return json_encode(array(
+			'ok' => true,
+			'content' => $this->render('quiz/answer.tpl', compact('answers_count', 'result')),
+			'card' => $cards[0]['name'],
+		));
 	}
 	
 	public function importAction() {
