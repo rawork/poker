@@ -3,6 +3,7 @@
 namespace Fuga\GameBundle\Controller;
 
 use Fuga\CommonBundle\Controller\PublicController;
+use Fuga\GameBundle\Model\Deck;
 
 class QuizController extends PublicController {
 	
@@ -12,8 +13,53 @@ class QuizController extends PublicController {
 	
 	public function indexAction() {
 		$user = $this->get('security')->getCurrentUser();
+		if (!$user) {
+			return $this->call('Fuga:Public:Account:login');
+		}
 		
-		return $this->render('quiz/index.tpl', compact('items'));
+		if ($user['group_id_name'] == 'viewer') {
+			return 'зритель';
+		}
+		
+		$account = $this->get('container')->getItem('account_member', 'user_id='.$user['id']);
+		if (!$account) {
+			return 'ошибка account';
+		}
+		
+		if ($account['quiz_date'] == '0000-00-00 00:00:00') {
+			return 'время не назначено';
+		}
+		
+		$date = new \DateTime($account['quiz_date']);
+		if ($date->getTimestamp() - time() > 0) {
+			return 'викторина не началась';
+		} elseif ($date->getTimestamp() + 780 - time() < 0) {
+			return 'викторина закончилась';
+		}
+		
+		$result = $this->get('comntainer')->getItem('quiz_result', 'user_id='.$user['id']);
+		if (!$result) {
+			return 'error result';
+		}
+		
+		$questions = json_decode($result['questions']);
+		$answers = json_decode($result, true);
+		
+		var_dump($questions, $answers);
+		
+		return $this->render('quiz/index.tpl', compact('user', 'answers', 'questions'));
+	}
+	
+	public function questionAction($params) {
+		
+	}
+	
+	public function answerAction() {
+		
+	}
+	
+	public function stopAction() {
+		
 	}
 	
 	public function importAction() {
@@ -76,6 +122,34 @@ class QuizController extends PublicController {
 			fclose($fh);
 			exit;
 		}
-		 
+	}
+	
+	public function applyAction() {
+		$questions = $this->get('container')->getItems('quiz_poll', '1=1');
+		$ids = array_keys($questions);
+		$users = $this->get('container')->getItems('user_user', 'group_id=2 OR group_id=1');
+		$i = 0;
+		foreach ($users as $user) {
+			$result = $this->get('container')->getItem('quiz_result', 'user_id='.$user['id']);
+			if ($result) {
+				continue;
+			}
+			
+			shuffle($ids);
+			$readyIds = array_slice($ids, 0, 52);
+			$this->get('container')->addItem('quiz_result', array(
+				'user_id' => $user['id'],
+				'totaltime' => '',
+				'total' => 0,
+				'correct' => 0,
+				'questions' => json_encode($readyIds),
+				'answers'   => '',
+				'deck'		=> serialize(new Deck()),
+				'created' => date('Y-m-d H:i:s'),
+				'updated' => '0000-00-00 00:00:00',
+			));
+			$i++;
+		}
+		return 'applied '.$i.' users';
 	}
 }

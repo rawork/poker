@@ -76,9 +76,9 @@ body {
 .game-flop .card {
 	background-color: #fdb200;
 	border: 2px solid #fdb200;
-	-webkit-border-radius: 3px;
-	   -moz-border-radius: 3px;
-	        border-radius: 3px;
+	-webkit-border-radius: 7px;
+	   -moz-border-radius: 7px;
+	        border-radius: 7px;
 	width: 70px;
 	height: 97px;
 	display: inline-block;
@@ -215,9 +215,9 @@ body {
 	width: 41px;
 	height: 57px;
 	border: 2px solid #fdb200;
-	-webkit-border-radius: 3px;
-	   -moz-border-radius: 3px;
-	        border-radius: 3px;
+	-webkit-border-radius: 5px;
+	   -moz-border-radius: 5px;
+	        border-radius: 5px;
 	background-color: #fdb200;
 	margin: 2px;
 	display: inline-block;
@@ -423,4 +423,31 @@ body {
 	-webkit-border-radius: 15px;
 	   -moz-border-radius: 15px;
 	        border-radius: 15px;
+}
+
+.victorina-container {
+	
+}
+
+.victorina-line1 {
+	
+}
+
+.victorina-line2 {
+	
+}
+.victorina-line3 {
+	
+}
+
+.victorina-line4 {
+	
+}
+
+.victorina-line5 {
+	
+}
+
+.victorina-line6 {
+	
 }
