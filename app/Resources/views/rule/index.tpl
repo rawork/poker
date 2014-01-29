@@ -1,4 +1,4 @@
-<div class="accordion" id="accordion2">
+<div class="accordion" id="accordion2" data-collapse-type="manual">
 	{foreach from=$items item=item name=rule}
 	<div class="accordion-group">
 		<div class="accordion-heading">

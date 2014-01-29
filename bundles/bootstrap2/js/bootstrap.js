@@ -525,7 +525,7 @@
       scroll = $.camelCase(['scroll', dimension].join('-'))
       actives = this.$parent && this.$parent.find('> .accordion-group > .in')
 
-      if (actives && actives.length) {
+      if (this.$parent.attr("data-collapse-type") !== "manual" && actives && actives.length) {
         hasData = actives.data('collapse')
         if (hasData && hasData.transitioning) return
         actives.collapse('hide')
