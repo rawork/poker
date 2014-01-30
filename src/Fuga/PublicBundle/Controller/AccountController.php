@@ -188,11 +188,18 @@ class AccountController extends PublicController {
 		$message = $this->flash('danger');
 		$register = json_decode($this->get('util')->session('register'), true);
 		$account = json_decode($this->get('util')->session('account'), true);
+		$date = new \DateTime($this->getParam('end_of_gamer_register').' 23:59:59');
+		$now = new \DateTime();
+		if ($now > $date) {
+			$groups = $this->get('container')->getItems('user_group', 'id>2', 'id');
+		} else {
+			$groups = $this->get('container')->getItems('user_group', 'id>1', 'id');
+		}
 		$this->get('container')->setVar('title', 'Регистрация');
 		$this->get('container')->setVar('h1', 'Регистрация');
 		$this->get('container')->setVar('javascript', 'register');
 		
-		return $this->render('account/register.tpl', compact('message', 'register', 'account'));
+		return $this->render('account/register.tpl', compact('message', 'register', 'account', 'groups'));
 	}
 	
 	public function forgetAction() {

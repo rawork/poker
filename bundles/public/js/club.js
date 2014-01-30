@@ -85,8 +85,7 @@ $(document).ready(function() {
 		function(data){
 			if (data.ok) {
 				$('#message' + messageId).append(data.content);
-				$(this).parents('.club-show-link').siblings('.club-add-comment, .club-comments, .club-hide-link').show();
-				$(this).parents('.club-show-link').hide();
+				$('.club-show-link[data-comments-id='+messageId+']').hide();
 			} else {
 				alert(data.content);
 			}

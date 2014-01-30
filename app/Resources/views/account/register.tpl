@@ -6,8 +6,9 @@
 		<div class="register-field">
 			<label>
 				<select name="group_id">
-					<option value="2"{if $register.group_id == 2} selected="true"{/if}>Игрок</option>
-					<option value="3"{if $register.group_id == 3} selected="true"{/if}>Зритель</option>
+					{foreach from=$groups item=group}
+					<option value="{$group.id}"{if $register.group_id == $group.id} selected="true"{/if}>{$group.title}</option>
+					{/foreach}
 				</select>
 			</label>	
 		</div>

@@ -17,6 +17,6 @@
 				<div class="span5 slogan">{$account.slogan}</div>
 			</div>	
 		</div>
-		<div class="club-show-link" id="show-message{$message.id}"><a data-action="comments">{if $message.comments_count}Показать комментарии ({$message.comments_count}){else}Комментировать{/if}</a></div>
+		<div class="club-show-link" data-comments-id="{$message.id}"><a data-action="comments">{if $message.comments_count}Показать комментарии ({$message.comments_count}){else}Комментировать{/if}</a></div>
 	</div>
 </div>

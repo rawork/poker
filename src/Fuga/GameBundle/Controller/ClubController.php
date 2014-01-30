@@ -214,6 +214,7 @@ class ClubController extends PublicController {
 			$this->get('router')->redirect('/club');
 		}
 		
+		$user = $this->get('security')->getCurrentUser();
 		$page = $this->get('util')->post('page',true, 0);
 		if (!$page) {
 			return json_encode(array(
@@ -250,7 +251,7 @@ class ClubController extends PublicController {
 		
 		return json_encode(array(
 			'ok' => true,
-			'content' => $this->render('club/index.tpl', compact('messages', 'isAjax')),
+			'content' => $this->render('club/index.tpl', compact('messages', 'isAjax', 'user')),
 		));
 	}
 }
