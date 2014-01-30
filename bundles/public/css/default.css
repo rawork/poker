@@ -116,22 +116,22 @@ ul.mainmenu li.item4 a:hover, ul.mainmenu li.item4 a.active, ul.mainmenu li.item
 	padding-top: 50px;
 }
 
-ul.index-news {
-	list-style: none;
-	margin: 0 0 40px;
+.index-news {
+	margin: 0 0 20px;
 	padding: 0;
-	font-size: 13px;
+	font-size: 14px;
+	line-height: 20px;
 }
 
-ul.index-news li {
-	margin: 0;
-	padding: 0;
-	margin-bottom: 20px;
-	line-height: 16px;
-}
-
-ul.index-news span.date {
+.index-news span.date {
 	color: #b2d000;
+	margin-right: 10px;
+}
+
+.index-news div.title {
+	margin-bottom: 5px;
+	font-size: 16px;
+	font-weight: bold;
 }
 
 .index-members {
