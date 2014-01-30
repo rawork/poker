@@ -71,6 +71,11 @@ class ClubController extends PublicController {
 			'likes'   => 0,
 		));
 		$this->get('connection')->query("UPDATE club_message SET message='".$message."' WHERE id =".$messageId);
+		$this->get('mailer')->send(
+			'Новое сообщение на сайте клуба Чертова дюжина',
+			$this->render('mail/message.admin.tpl', compact('account', 'message', 'messageId')),
+			ADMIN_EMAIL
+		);
 		
 		$message = $this->get('container')->getItem('club_message', $messageId);
 		
@@ -114,6 +119,11 @@ class ClubController extends PublicController {
 			'likes'   => 0,
 		));
 		$this->get('connection')->query("UPDATE club_message SET message='".$message."' WHERE id =".$commentId);
+		$this->get('mailer')->send(
+			'Новый комментарий на сайте клуба Чертова дюжина',
+			$this->render('mail/comment.admin.tpl', compact('account', 'message', 'commentId')),
+			ADMIN_EMAIL
+		);
 		
 		$comment = $this->get('container')->getItem('club_message', $commentId);
 		$counter = $this->get('container')->count('club_message', 'publish=1 AND message_id='.$messageId);

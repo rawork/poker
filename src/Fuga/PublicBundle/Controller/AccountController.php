@@ -143,7 +143,7 @@ class AccountController extends PublicController {
 			} elseif (!$this->get('util')->isEmail($user['login'])) {
 				$errors[] = 'Логин не является e-mail';
 			}
-			if ($user['login'] && 0 < $this->get('container')->count('user_user', 'login="'.$user['login']."'")) {
+			if ($user['login'] && 0 < $this->get('container')->count('user_user', "login='".$user['login']."' OR email='".$user['login']."'")) {
 				$errors[] = 'Такой логин уже занят. Попробуйте <a href="/members/forget">восстановить пароль</a> или обратиться к администратору клуба';
 			}
 			if (empty($user['password'])) {
@@ -176,6 +176,11 @@ class AccountController extends PublicController {
 					'Вы зарегистрировались на сайте клуба Чертова дюжина',
 					$this->render('mail/register.tpl', compact('user', 'account')),
 					$user['login']
+				);
+				$this->get('mailer')->send(
+					'Новый участник на сайте клуба Чертова дюжина',
+					$this->render('mail/register.admin.tpl', compact('user', 'account')),
+					ADMIN_EMAIL
 				);
 				unset($_SESSION['register']);
 				unset($_SESSION['account']);

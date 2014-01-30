@@ -2,7 +2,6 @@ tinymce.init({
 	mode : 'textareas',
 	theme : 'modern',
 	editor_selector : 'tinymce',
-	content_css : prj_ref+'/bundles/public/css/default.css',
 	language : 'ru',
 	forced_root_block : '',
 	file_browser_callback : 'fileBrowserCallBack',

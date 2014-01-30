@@ -81,27 +81,27 @@ ul.mainmenu li.item4 a {
 	border-bottom: 1px solid #fdb201;
 }
 
-ul.mainmenu li.item1 a:hover, ul.mainmenu li.item1 a.active {
+ul.mainmenu li.item1 a:hover, ul.mainmenu li.item1 a.active, ul.mainmenu li.item1 a:active {
 	color: #b2d000;
 	border-bottom: 0;
 }
 
-ul.mainmenu li.item2 a:hover, ul.mainmenu li.item2 a.active {
+ul.mainmenu li.item2 a:hover, ul.mainmenu li.item2 a.active, ul.mainmenu li.item2 a:active {
 	color: #fa4e0b;
 	border-bottom: 0;
 }
 
-ul.mainmenu li.item3 a:hover, ul.mainmenu li.item3 a.active{
+ul.mainmenu li.item3 a:hover, ul.mainmenu li.item3 a.active, ul.mainmenu li.item3 a:active{
 	color: #4fafeb;
 	border-bottom: 0;
 }
 
-ul.mainmenu li.item4 a:hover, ul.mainmenu li.item4 a.active {
+ul.mainmenu li.item4 a:hover, ul.mainmenu li.item4 a.active, ul.mainmenu li.item4 a:active {
 	color: #fdb201;
 	border-bottom: 0;
 }
 
-.mainmenu li a:hover {
+.mainmenu li a:hover, .mainmenu li a:active {
 	text-decoration: none;
 }
 
