@@ -14,9 +14,20 @@ class DefaultController extends PublicController {
 	
 	public function indexAction() {
 		$user = $this->get('security')->getCurrentUser();
-		if (!$user) {
-			return $this->call('Fuga:Public:Account:login');
+		
+		$date = new \DateTime($this->getParam('access_date').' 00:00:01');
+		$now  = new \Datetime();
+		if ( $date > $now  ) {
+			if (!$user || $user['group_id'] != 1) {
+				$error = 'Игровой зал открыт<br> только в период проведения игры.<br> Расписание игр 
+размещено<br> в рубрике <a href="/rules">"Правила"</a>.';
+				return $this->render('quiz/error.tpl', compact('error'));
+			}	
+		} elseif ( !$user ) {
+			$error = $this->call('Fuga:Public:Account:login');
+			return $this->render('quiz/error.tpl', compact('error'));
 		}
+		
 		$gamer0 = $this->get('container')->getItem('account_member', 'user_id='.$user['id']);
 		if (!$gamer0) {
 			return 'Вы не являетесь DEMO игроком. Войдите на сайт с логином demo и паролем demo<br>'.$this->call('Fuga:Public:Account:login');

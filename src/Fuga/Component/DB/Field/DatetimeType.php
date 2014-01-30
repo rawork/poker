@@ -39,7 +39,7 @@ class DatetimeType extends Type {
 		
 		$date = \DateTime::createFromFormat('d.m.Y H:i:s', $this->getValue($name));
 
-		return $date->format('Y-m-d H:i:s');
+		return $date ? $date->format('Y-m-d H:i:s') : '0000-00-00 00:00:00';
 	}
 
 	public function getStatic() {

@@ -175,8 +175,16 @@ function onClickCheck() {
 }
 
 function onClickNew() {
-	console.log('onClickNew');
-	$.post('/training/new', {},
+	$.post('/training/start', {},
+	function(data){
+		if (data.ok) {
+			window.location.reload();
+		}
+	}, "json");
+}
+
+function onClickStop() {
+	$.post('/training/stop', {},
 	function(data){
 		if (data.ok) {
 			window.location.reload();
@@ -241,11 +249,14 @@ $(document).ready(function(){
 function startTraining() {
 	startTime();
 	if (gamestate == 0) {
-		$('#game-start .btn').on('click', onClickNew);
+		$('.game-start button').on('click', onClickNew);
 	} else if (gamestate == 1) {
-		$('.game-change').on('click', changeCard);
+		$('.game-message').on('click', changeCard);
 		$('.gamer-cards .card').css('cursor', 'pointer');
 		$('#gamer-cards').on('click', chooseCard);
+	} else if (gamestate == 6) {
+		$('.game-message .btn-primary').on('click', onClickNew);
+		$('.game-message .btn-danger').on('click', onClickStop); 
 	} else if (gamestate == 11) {
 		$('.question-footer .btn').on('click', onClickAnswer);
 		$('.question-answer').on('click', onChooseAnswer);
@@ -287,6 +298,8 @@ function startTime() {
 
 function startTimer() {
 	var timerName = timerNode || 'game-timer';
+	
+//	console.log($.cookie());
 	
 	if (!$.cookie('timerhandler')) {
 		$('#' + timerName).empty();

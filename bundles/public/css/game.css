@@ -95,8 +95,54 @@ body {
 	height: 97px;
 }
 
-.game-change {
-	padding-top: 40px;
+.game-message {
+	margin-top: 40px;
+}
+
+.game-end {
+	margin-top: 100px;
+}
+
+.game-start-container {
+	position: relative;
+}
+
+.game-start {
+	position: absolute;
+	top: 20px;
+	left: -60px;
+	padding: 20px;
+	background-color: #fff;
+	border: 3px solid #fa4e0c; 
+	-webkit-border-radius: 20px;
+	   -moz-border-radius: 20px;
+	        border-radius: 20px;
+	width: 350px;
+	height: 200px;
+	text-align: center;
+}
+
+.game-start .text {
+	margin-top: 20px;
+	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
+	font-size: 18px;
+}
+
+.game-start img {
+	height: 190px;
+}
+
+.game-start button {
+	margin-top: 50px;
+}
+
+.joker-message {
+	padding: 10px;
+	background-color: #fefefe;
+	margin-bottom: 10px;
+	-webkit-border-radius: 15px;
+	   -moz-border-radius: 15px;
+	        border-radius: 15px;
 }
 
 .game-timer {
@@ -105,9 +151,14 @@ body {
 	font-family: "Times New Roman";
 }
 
+.game-combinations0 {
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
 .game-combinations {
-	padding-top: 190px;
-	padding-bottom: 20px;
+	margin-top: 190px;
+	margin-bottom: 20px;
 }
 
 #bank, #bets, #min_bet {
@@ -229,7 +280,7 @@ body {
 	height: 57px;
 }
 
-#gamer-cards .active {
+.gamer-cards .active {
 	border-color: #fb4e0c;
 }
 
@@ -400,36 +451,6 @@ body {
 	text-align: right;
 }
 
-#game-start {
-	padding: 20px;
-	background-color: #fff;
-	border: 3px solid #b2d000; 
-	-webkit-border-radius: 20px;
-	   -moz-border-radius: 20px;
-	        border-radius: 20px;
-	position: fixed;
-	width: 400px;
-	height: 220px;
-	top: 240px;
-	margin-left: -200px; 
-	left:50%;
-	text-align: center;
-	
-}
-
-#game-start a {
-	margin-top: 130px;
-}
-
-.joker-message {
-	padding: 10px;
-	background-color: #fefefe;
-	margin-bottom: 10px;
-	-webkit-border-radius: 15px;
-	   -moz-border-radius: 15px;
-	        border-radius: 15px;
-}
-
 .victorina-container {
 	margin: 20px 20px;
 }
@@ -485,7 +506,8 @@ body {
 
 .victorina-message {
 	margin: 100px 20px;
-	text-align: center;font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
+	text-align: center;
+	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
 	font-size: 40px;
 	line-height: 43px;
 }

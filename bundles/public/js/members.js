@@ -15,10 +15,6 @@ $(document).ready(function() {
 		}, "json");
 	});
 	
-	$(document).on('click', 'button[data-action=bet]', function () {
-		alert($(this).parents('.member').attr('data-member-id'));
-	});
-	
 	$(document).on('click', 'a[data-action=card]', function () {
 		var memberId = $(this).parents('.member').attr('data-member-id');
 		
@@ -64,6 +60,36 @@ $(document).ready(function() {
 		},
 		events: 'keyup',
 		idle: 1000
+	});
+	
+	$(document).on('click', 'button[data-action=bet1]', function () {
+		var memberId = $(this).parents('.member, .user-card').attr('data-member-id');
+		var that = this; 
+		$.post('/members/bet1/' + memberId, {},
+		function(data){
+			if (data.ok) {
+				$(that).html('Ваш<small>выбор</small>');
+				$(that).attr('disabled', true);
+				$(that).off('click');
+			} else {
+				alert(data.content);
+			}
+		}, "json");
+	});
+	
+	$(document).on('click', 'button[data-action=bet2]', function () {
+		var memberId = $(this).parents('.member, .user-card').attr('data-member-id');
+		var that = this; 
+		$.post('/members/bet2/' + memberId, {},
+		function(data){
+			if (data.ok) {
+				$(that).html('Ваш<small>выбор</small>');
+				$(that).attr('disabled', true);
+				$(that).off('click');
+			} else {
+				alert(data.content);
+			}
+		}, "json");
 	});
 		
 });

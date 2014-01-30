@@ -17,6 +17,7 @@ class Board {
 			'minbet'   => 1,
 			'allin'    => 0,
 			'winner'   => array(),
+			'combination' => array(),
 			'flop'     => array(),
 			'state'    => 0,
 		);

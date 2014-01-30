@@ -34,7 +34,17 @@
 		
 	</div>
 	<div class="member-vote">
-		<button data-action="bet" class="btn btn-warning btn-large">Ставлю<small>на победу</small></button>
+		{if $user && $account.group.id == 2}
+			{if $selected[$account.id] == 1}
+			<button disabled="true" class="btn btn-warning btn-large">Ваш<small>выбор</small></button>	
+			{elseif $isBet1} 
+			<button data-action="bet1" class="btn btn-warning btn-large">Ставлю<small>на победу</small></button>
+			{elseif $isBet2}
+			<button data-action="bet2" class="btn btn-warning btn-large">Ставлю<small>на победу</small></button>
+			{else}
+			<button disabled="true" class="btn btn-warning btn-large">Скоро<small>тотализатор</small></button>
+			{/if}
+		{/if}
 	</div>
 	<div class="clearfix"></div>
 </div>

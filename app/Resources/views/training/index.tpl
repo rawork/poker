@@ -6,18 +6,22 @@
 <div class="game-board-container">	
 	<div class="game-board">
 		<div class="row-fluid">
-			<div class="span4 game-min-bet">{if $training->board->state > 0}Минимальная ставка: <div id="min_bet">{$training->board->minbet}</div>{/if}</div>
+			<div class="span4 game-min-bet">{if $training->board->state != 0 && $training->board->state != 6}Минимальная ставка: <div id="min_bet">{$training->board->minbet}</div>{/if}</div>
 			<div class="span4 game-table" id="table">
-				{if $training->board->state == 1}
-				<div class="game-change">
+				{if $training->board->state == 0}
+				{$start}
+				{elseif $training->board->state == 1}
+				<div class="game-message">
 					<div class="joker-message">Вы можете поменять до 2-х карт, ответив на вопрос. Выберите карты, щелкнув на них мышью. В случае неправильного ответа вы теряете фишки</div>
 					<input class="btn btn-primary btn-xs" type="button" value="Готов менять">
 					<input class="btn btn-danger btn-xs" type="button" value="Не меняю">
 				</div>
+				{elseif $training->board->state == 6}
+				{$end}
 				{else}
 				<div class="game-flop">	
 					{foreach from=$training->board->flop item=card}
-					<div class="card" data-card-name="{$card.name}">
+					<div class="card{if $training->board->state == 4 && $training->board->combination[$card.name]} active{/if}" data-card-name="{$card.name}">
 						{if $training->board->state > 2}<img src="/bundles/public/img/cards/{$card.name}.png" />
 						{else}
 						<img src="/bundles/public/img/shirt.png" />
@@ -29,7 +33,7 @@
 				<div class="game-timer" id="game-timer"></div>
 			</div>
 			<div class="span4 game-main-bank">
-				{if $training->board->state > 0}<div>Банк игры: <div id="bank">{$training->board->bank}</div></div>{/if}
+				{if $training->board->state != 0 && $training->board->state != 6}<div>Банк игры: <div id="bank">{$training->board->bank}</div></div>{/if}
 			</div>
 			<div class="clearfix"></div>
 		</div>
@@ -41,7 +45,7 @@
 		{if $gamer->position == 1 || $gamer->position == 5}
 		<div class="gamer-cards">
 			{foreach from=$gamer->cards item=card}
-			<div class="card" data-card-name="{$card.name}">
+			<div class="card{if $training->board->state == 4 && $training->board->combination[$card.name]} active{/if}" data-card-name="{$card.name}">
 				{if $training->board->state == 4}<img src="/bundles/public/img/cards/{$card.name}.png" />
 				{else}
 				<img src="/bundles/public/img/shirt.png" />
@@ -58,7 +62,7 @@
 		{if $gamer->position > 1 && $gamer->position < 5}
 		<div class="gamer-cards">
 			{foreach from=$gamer->cards item=card}
-			<div class="card" data-card-name="{$card.name}">
+			<div class="card{if $training->board->state == 4 && $training->board->combination[$card.name]} active{/if}" data-card-name="{$card.name}">
 				{if $training->board->state == 4}<img src="/bundles/public/img/cards/{$card.name}.png" />
 				{else}
 				<img src="/bundles/public/img/shirt.png" />
@@ -69,10 +73,10 @@
 		{/if}
 	</div>
 	{/foreach}
-	<div class="gamer">
+	{if $training->board->state != 0}<div class="gamer">
 		<div class="gamer-cards" id="gamer-cards">
 			{foreach from=$training->gamer->cards key=k item=card}
-			<div class="card" data-card-name="{$card.name}" data-card-id="{$k}"><img src="/bundles/public/img/cards/{$card.name}.png" /></div> 
+			<div class="card{if $training->board->state == 4 && $training->board->combination[$card.name]} active{/if}" data-card-name="{$card.name}" data-card-id="{$k}"><img src="/bundles/public/img/cards/{$card.name}.png" /></div> 
 			{/foreach}
 			<div class="clearfix"></div>
 		</div>
@@ -95,14 +99,13 @@
 			&nbsp;&nbsp;&nbsp;&nbsp;
 			<input class="btn btn-warning" data-move="new" type="button" value="Заново">
 		</div>
-	</div>
+	</div>{/if}
 	{foreach from=$training->board->winner item=combination}
 	<div class="game-winner winner{$combination.position}">Победитель - {$combination.name}</div>
 	{/foreach}
 </div>
-<div class="game-combinations"><img src="{$theme_ref}/public/img/combinations4.jpg"></div>
+<div class="game-combinations{if $training->board->state == 0}0{/if}"><img src="{$theme_ref}/public/img/combinations4.jpg"></div>
 <div {if $training->board->state != 11}class="closed"{/if} id="game-question">{$question}</div>
-<div {if $training->board->state != 0}class="closed"{/if} id="game-start">{$start}</div>
 <script type="text/javascript">
 	// common game parameters
 	var gamestate = {$training->board->state};

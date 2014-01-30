@@ -68,14 +68,15 @@ class Training {
 		$this->deck->make();
 		$this->gamer->cards = $this->deck->take(4);
 		$this->gamer->chips = 100;
-		foreach ($this->bots as &$bot) {
+		foreach ($this->bots as $bot) {
 			$bot->cards = $this->deck->take(4);
 			$bot->chips = 100;
 		}
 		$this->board->state = self::STATE_CHANGE;
 		$this->board->flop = $this->deck->take(3);
 		$this->board->fromdate = new \DateTime();
-		$this->firstBet();
+		$this->board->stopbuydate = new \DateTime();
+//		$this->firstBet();
 		$this->setTime();
 		$this->setTimer('onClickNoChange', 0, 14);
 	}
@@ -114,23 +115,50 @@ class Training {
 	}
 	
 	public function next() {
+		if ($this->gamer->chips <= 0) {
+			return $this->end();
+		}
 		$this->deck->make();
 		$this->gamer->cards = $this->deck->take(4);
-		foreach ($this->bots as &$bot) {
+		$botsWithCards = 0;
+		foreach ($this->bots as $bot) {
+			if ($bot->chips <= 0) {
+				continue;
+			}
 			$bot->cards = $this->deck->take(4);
+			$botsWithCards++;
+		}
+		if ($botsWithCards == 0) {
+			return $this->end();
 		}
 		$this->board->state = self::STATE_CHANGE;
 		$this->board->flop = $this->deck->take(3);
-		$this->firstBet();
+//		$this->firsstBet();
 		$this->setTimer('onClickNoChange', 0, 14);
 		
 		return $this;
 	}
 	
 	public function end() {
+		$this->board->winner = null;
+		$this->board->combination = null;
+		$this->board->fromtime = null;
 		$this->board->state = self::STATE_END;
 		$this->bots = array();
 		$this->gamer->cards = array();
+		$this->setTimer();
+		$this->setTime();
+		
+		return $this;
+	}
+	
+	public function stop() {
+		$this->board->fromtime = null;
+		$this->board->state = self::STATE_NOSTART;
+		$this->bots = array();
+		$this->gamer->cards = array();
+		$this->setTimer();
+		$this->setTime();
 		
 		return $this;
 	}
@@ -141,14 +169,24 @@ class Training {
 		$this->board->bank += $bet;
 		
 		foreach ($this->bots as $bot) {
-			if ($allin) {
-				$bet = $bot->chips;
+			if ($bot->chips <=0) {
+				continue;
 			}
-			$bot->chips -= $bet;
-			$this->board->bank += $bet; 
+
+			$botbet = $bet;
+			
+			if ($allin && $bot->chips < $bet) {
+				$botbet = $bot->chips;
+			}
+			
+			$bot->chips -= $botbet;
+			$this->board->bank += $botbet; 
 		}
 		
 		$this->board->state += 1;
+		if ($this->gamer->chips <= 0) {
+			$this->board->state = Training::STATE_SHOWDOWN;
+		}
 		
 		if ($this->board->state == Training::STATE_SHOWDOWN) {
 			$this->showdown();
@@ -159,9 +197,13 @@ class Training {
 	
 	public function fold() {
 		$bet = rand(5,10);
-		foreach ($this->bots as &$bot) {
-			$bot->chips -= $bet;
-			$this->board->bank += $bet; 
+		foreach ($this->bots as $bot) {
+			if ($bot->chips <=0) {
+				continue;
+			}
+			$botbet = $bot->chips < $bet ? $bot->chips : $bet;
+			$bot->chips -= $botbet;
+			$this->board->bank += $botbet; 
 		}
 		$this->gamer->cards = array();
 		$this->board->state = Training::STATE_SHOWDOWN;
@@ -178,23 +220,32 @@ class Training {
 				$this->gamer->chips += $share;
 				break;
 			}
-			foreach ($this->bots as &$bot) {
+			foreach ($this->bots as $bot) {
 				if ($bot->position == $winner['position']) {
 					$bot->chips += $share;
 					break;
 				}
 			}
 		}
-		foreach ($this->bots as &$bot) {
-			$bot->cards = array();
-		}
 		$this->gamer->cards  = array();
 		$this->board->winner = array();
+		$this->board->combination = array();
 		$this->board->flop   = array();
 		$this->board->bank   = 0;
 		$this->board->bets   = 0;
 		$this->board->allin  = 0;
 		$this->board->state = Training::STATE_BUY;
+		$botsWithoutMoney = 0;
+		foreach ($this->bots as $bot) {
+			if ($bot->chips <= 0) {
+				$botsWithoutMoney++;
+				continue;
+			}
+			$bot->cards = array();
+		}
+		if ($botsWithoutMoney == count($this->bots) || $this->gamer->chips <=0) {
+			return $this->end();
+		}
 		$this->setTimer('nextGame', 0, 14);
 		
 		return $this;
@@ -208,6 +259,9 @@ class Training {
 			$this->log->write('FLOP');
 			$this->log->write(serialize($this->board->flop));
 			foreach ($this->bots as $bot) {
+				if (!$bot->cards) {
+					continue;
+				}
 				$this->log->write('BOT'.$bot->id);
 				$this->log->write(serialize($bot->cards));
 				$cards = $combination->get(array_merge($bot->cards, $this->board->flop));
@@ -225,14 +279,21 @@ class Training {
 			$suites[] = $cards;
 			$winners = $combination->compare($suites);
 			$this->board->winner = $winners;
-			$this->setTimer('distributeWin', 0, 30);
+			$combinations = array();
+			foreach ($winners as $winner) {
+				foreach ($winner['cards'] as $card) {
+					$combinations[$card['name']] = 1;
+				}
+			}
+			$this->board->combination = $combinations;
+			$this->setTimer('distributeWin', 0, 14);
 		}
 		
 		return $this;
 	}
 	
 	public function firstBet() {
-		foreach($this->bots as &$bot) {
+		foreach($this->bots as $bot) {
 			$bot->bet($this->board->minbet);
 			$this->board->acceptBet($bot->takeBet());
 		}
@@ -242,16 +303,16 @@ class Training {
 	}
 	
 	public function setTime() {
-		if (!$this->board->fromdate) {
-			setcookie('gamehour', 0, time()-86400, '/');
-			setcookie('gameminute', 0, time()-86400, '/');
-			setcookie('gamesecond', 0, time()-86400, '/');
-		} else {
+		if ($this->board->fromdate) {
 			$now = new \DateTime();
 			$diff = $now->diff($this->board->fromdate);
 			setcookie('gamehour', intval($diff->format('%H')), time()+86400, '/');
 			setcookie('gameminute', intval($diff->format('%i')), time()+86400, '/');
 			setcookie('gamesecond', intval($diff->format('%s')), time()+86400, '/');
+		} else {
+			setcookie('gamehour', 0, time()-86400, '/');
+			setcookie('gameminute', 0, time()-86400, '/');
+			setcookie('gamesecond', 0, time()-86400, '/');
 		}
 	}
 	

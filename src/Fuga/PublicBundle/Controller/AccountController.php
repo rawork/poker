@@ -43,19 +43,46 @@ class AccountController extends PublicController {
 		foreach ($members as &$member) {
 			$member['group'] = $this->get('container')->getItem('user_group', $member['user_id_value']['item']['group_id']);
 		}
+		
 		$this->get('container')->setVar('title', 'Участники клуба');
 		$this->get('container')->setVar('h1', 'Участники клуба');
 		$this->get('container')->setVar('javascript', 'members');
+		
+		$date1_start = new \DateTime($this->getParam('bet1_start').' 00:00:01');
+		$date1_end = new \DateTime($this->getParam('bet1_end').' 23:59:59');
+		$date2_start = new \DateTime($this->getParam('bet2_start').' 00:00:01');
+		$date2_end = new \DateTime($this->getParam('bet2_end').' 23:59:59');
+		$now = new \Datetime();
+		
+		$bets = array();
+		if ($now > $date1_start && $now < $date1_end) {
+			$isBet1 = true;
+			if ($user) {
+				$bets = $this->get('container')->getItems('account_bet1', 'user_id='.$user['id']);
+			}
+		}
+		
+		if ($now > $date2_start && $now < $date2_end) {
+			$isBet2 = true;
+			if ($user) {
+				$bets = $this->get('container')->getItems('account_bet2', 'user_id='.$user['id']);
+			}
+		}
+		
+		$selected = array();
+		foreach ($bets as $bet){
+			$selected[$bet['member_id']] = 1;
+		} 
 		
 		if ($this->get('router')->isXmlHttpRequest()) {
 			$isAjax = true;
 			return json_encode(array(
 				'ok' => true,
-				'content' => $this->render('account/index.tpl', compact('isAjax', 'user', 'members', 'paginator')),
+				'content' => $this->render('account/index.tpl', compact('isAjax', 'user', 'members', 'paginator', 'isBet1', 'isBet2', 'selected')),
 			));	
 		}
 		
-		return $this->render('account/index.tpl', compact('user', 'members', 'paginator'));
+		return $this->render('account/index.tpl', compact('user', 'members', 'paginator', 'isBet1', 'isBet2', 'selected'));
 	}
 	
 	public function cabinetAction() {
@@ -384,12 +411,111 @@ class AccountController extends PublicController {
 		));
 	}
 	
-	public function bet1Action () {
+	public function bet1Action ($params) {
+		if (!$this->get('router')->isXmlHttpRequest()) {
+			$this->get('router')->redirect('/members');
+		}
 		
+		$user = $this->get('security')->getCurrentUser();
+		if (!$user) {
+			return json_encode(array(
+				'ok' => false,
+				'content' => 'Голосовать могут только зарегистрированные пользователи',
+			));
+		}
+		
+		if (empty($params[0])) {
+			return json_encode(array(
+				'ok' => false,
+				'content' => 'Не выбран участник для голосования',
+			));
+		}
+		
+		$memberId = intval($params[0]);
+		$account = $this->get('container')->getItem('account_member', $memberId);
+		
+		if (!$account) {
+			return json_encode(array(
+				'ok' => false,
+				'content' => 'Не выбран участник для голосования',
+			));
+		}
+		
+		if (0 < $this->get('container')->count('account_bet1', 'user_id='.$user['id'].' AND member_id='.$memberId)) {
+			return json_encode(array(
+				'ok' => false,
+				'content' => 'Вы уже голосовали за выбранного участника',
+			));
+		}
+		
+		if (13 <= $this->get('container')->count('account_bet1', 'user_id='.$user['id'])) {
+			return json_encode(array(
+				'ok' => false,
+				'content' => 'Вы уже проголосовали за 13 участников',
+			));
+		}
+		
+		$this->get('container')->addItem('account_bet1', array(
+			'user_id' => $user['id'],
+			'member_id' => $memberId,
+			'created' => date('Y-m-d H:i:s'),
+			'updated' => '0000-00-00 00:00:00',
+		));
+		
+		return json_encode(array(
+			'ok' => true,
+			'content' => 1,
+		));
 	}
 	
-	public function bet2Action () {
+	public function bet2Action ($params) {
+		if (!$this->get('router')->isXmlHttpRequest()) {
+			$this->get('router')->redirect('/members');
+		}
 		
+		$user = $this->get('security')->getCurrentUser();
+		if (!$user) {
+			return json_encode(array(
+				'ok' => false,
+				'content' => 'Голосовать могут только зарегистрированные пользователи',
+			));
+		}
+		
+		if (empty($params[0])) {
+			return json_encode(array(
+				'ok' => false,
+				'content' => 'Не выбран участник для голосования',
+			));
+		}
+		
+		$memberId = intval($params[0]);
+		$account = $this->get('container')->getItem('account_member', $memberId);
+		
+		if (!$account) {
+			return json_encode(array(
+				'ok' => false,
+				'content' => 'Не выбран участник для голосования',
+			));
+		}
+		
+		if (0 < $this->get('container')->count('account_bet2', 'user_id='.$user['id'])) {
+			return json_encode(array(
+				'ok' => false,
+				'content' => 'Вы уже проголосовали за 1 участника',
+			));
+		}
+		
+		$this->get('container')->addItem('account_bet2', array(
+			'user_id' => $user['id'],
+			'member_id' => $memberId,
+			'created' => date('Y-m-d H:i:s'),
+			'updated' => '0000-00-00 00:00:00',
+		));
+		
+		return json_encode(array(
+			'ok' => true,
+			'content' => 1,
+		));
 	}
 	
 }
