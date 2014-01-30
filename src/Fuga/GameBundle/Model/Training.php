@@ -142,7 +142,7 @@ class Training {
 	public function end() {
 		$this->board->winner = null;
 		$this->board->combination = null;
-		$this->board->fromtime = null;
+		$this->board->fromdate = null;
 		$this->board->state = self::STATE_END;
 		$this->bots = array();
 		$this->gamer->cards = array();
@@ -153,7 +153,7 @@ class Training {
 	}
 	
 	public function stop() {
-		$this->board->fromtime = null;
+		$this->board->fromdate = null;
 		$this->board->state = self::STATE_NOSTART;
 		$this->bots = array();
 		$this->gamer->cards = array();
