@@ -59,6 +59,9 @@ function clickNoAnswer(event) {
 
 function onClickBuyAnswer() {
 	var n = $('.question-answer i.active').attr('data-answer-id');
+	if (!n) {
+		return;
+	}
 	$.post('/training/buy', {answer: n},
 	function(data){
 		if (data.ok) {

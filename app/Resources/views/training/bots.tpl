@@ -1,3 +1,4 @@
+{if $training->board->state != 0 && $training->board->state != 6}
 {foreach from=$training->bots item=gamer}
 <div class="gamer{$gamer->position}">
 	{if $gamer->position == 1 || $gamer->position == 5}
@@ -31,3 +32,4 @@
 	{/if}
 </div>
 {/foreach}
+{/if}

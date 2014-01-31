@@ -4,7 +4,7 @@ namespace Fuga\GameBundle\Model;
 
 class Board {
 	
-	public $state = 0;
+	public  $state = 0;
 	private $data;
 	private $step = 1;
 	

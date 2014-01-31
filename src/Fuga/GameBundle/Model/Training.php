@@ -80,7 +80,7 @@ class Training {
 		$this->board->flop = $this->deck->take(3);
 		$this->fromtime = new \DateTime();
 		$this->stopbuytime = new \DateTime();
-		$this->stopbuytime->add(new \DateInterval('P35M'));
+		$this->stopbuytime->add(new \DateInterval('PT35M'));
 		$this->setTime();
 		$this->timer->set('onClickNoChange', 'change-timer', 14);
 	}
@@ -119,6 +119,8 @@ class Training {
 	}
 	
 	public function next() {
+		$this->gamer->question = null;
+		$this->gamer->buying = null;
 		if ($this->gamer->chips <= 0) {
 			return $this->end();
 		}
@@ -250,8 +252,7 @@ class Training {
 		}
 		$now = new \Datetime();
 		if ($now > $this->stopbuytime) {
-			$this->board->state = Training::STATE_CHANGE;
-			$this->timer->set('onClickNoChange', 'change-timer', 14);
+			$this->next();
 		} else {
 			$this->board->state = Training::STATE_BUY;
 			$this->timer->set('nextGame', 'question-timer', 121);

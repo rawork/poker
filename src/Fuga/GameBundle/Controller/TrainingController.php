@@ -31,7 +31,8 @@ class TrainingController extends PublicController {
 		
 		if (!$gamer || 
 			(!$this->get('security')->isGroup('admin') && !$this->get('security')->isGroup('gamer'))) {
-			return 'Вы не являетесь игроком. Войдите на сайт с логином и паролем игрока<br>'.$this->call('Fuga:Public:Account:login');
+			$error = 'Вы не являетесь игроком. Войдите на сайт с логином и паролем игрока<br>'.$this->call('Fuga:Public:Account:login');
+			return $this->render('quiz/error.tpl', compact('error'));
 		}
 		
 		$data = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
