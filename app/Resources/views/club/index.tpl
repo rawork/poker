@@ -35,7 +35,7 @@
 			</div>
 			<div class="club-message">
 				<div class="text">
-					{$message.message}
+					{$message.message|nl2br}
 				</div>	
 				<div class="row-fluid">
 					<div class="span4 like"><button class="btn btn-warning" data-action="like-message">ЛАЙК!</button> <img src="/bundles/public/img/heart_club.png"> : <span data-message-id="{$message.id}">{$message.likes}</span></div>

@@ -3,7 +3,7 @@
 		<div class="club-avatar"><img src="{if $account.avatar}{$account.avatar_value.extra.main.path}{else}/bundles/public/img/avatar_empty.png{/if}"></div>
 		<div class="club-name"><span>{$user.group_id_title}</span><a class="user-link" data-action="card2">{$account.name}<br>{$account.lastname}</a></div>
 	</div>
-	<div class="span10">
+	<div class="span10" id="message{$message.id}">
 		<div class="club-arrow-container">
 			<div class="arrow"></div>
 		</div>
