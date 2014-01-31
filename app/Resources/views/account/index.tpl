@@ -6,6 +6,7 @@
 </div>
 <div id="members">{/if}
 {foreach from=$members item=account}
+{if $account.group.id > 1}
 <div class="member" data-member-id="{$account.id}">
 	<div class="member-common">
 		<img class="avatar" src="{if $account.avatar}{$account.avatar_value.extra.main.path}{else}/bundles/public/img/avatar_empty.png{/if}">
@@ -48,6 +49,7 @@
 	</div>
 	<div class="clearfix"></div>
 </div>
+{/if}
 {/foreach}
 {$paginator->render()}
 {if !$members}<div class="member-search-empty">По заданным параметрам поиска не найдено ни одного участника</div>{/if}

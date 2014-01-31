@@ -136,9 +136,13 @@ $(document).ready(function() {
 		if (messageDiv) {
 			node = $('<img src="/bundles/public/img/0.gif"></img>').attr('class', $(this).attr('class'));
 			messageDiv.focus();
-			restoreCaretPos();
-			messageDiv.insertHtmlAtCursor(node[0].outerHTML);
-			caretPos = null;
+			if (range) {
+				restoreCaretPos();
+				messageDiv.insertHtmlAtCursor(node[0].outerHTML);
+			} else {
+				messageDiv.append(node[0].outerHTML);
+			}
+			
 		}
 		$('.smiles-container').hide();
 		messageDiv = null;
