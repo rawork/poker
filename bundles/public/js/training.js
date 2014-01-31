@@ -1,4 +1,3 @@
-var timerNode = null;
 var eventtimerId = null;
 
 function onChooseAnswer(event){
@@ -23,26 +22,15 @@ function nextGame() {
 	}, "json");
 }
 
-function showBuy() {
-	console.log('showBuy.start');
-	return;
-	showQuestion(true);
-}
-
-function showQuestion(buying) {
-	buying = buying || false; 
+function showQuestion() {
 	console.log('showQuestion.start');
-	$.post('/training/question', {buying: buying},
+	$.post('/training/question', {},
 	function(data){
 		if (data.ok) {
-			$('#game-question').html(data.content);
-			$('#game-question').removeClass('closed');
+			$('#table').html(data.content);
 			$('.question-footer .btn').on('click', onClickAnswer);
 			$('.question-answer').on('click', onChooseAnswer);
-			$.cookie('timerhandler', data.timerhandler);
-			$.cookie('timerminute', data.timerminute);
-			$.cookie('timersecond', data.timersecond);
-			timerNode = 'question-timer';
+			gametimer = data.timer.holder;
 			startTimer();
 		}
 	}, "json");
@@ -62,6 +50,25 @@ function onClickAnswer(event) {
 function clickNoAnswer(event) {
 	removeTimer();
 	$.post('/training/answer', {answer: 0},
+	function(data){
+		if (data.ok) {
+			window.location.reload();
+		}
+	}, "json");
+}
+
+function onClickBuyAnswer() {
+	var n = $('.question-answer i.active').attr('data-answer-id');
+	$.post('/training/buy', {answer: n},
+	function(data){
+		if (data.ok) {
+			window.location.reload();
+		}
+	}, "json");
+}
+
+function onClickNoBuy() {
+	$.post('/training/buy', {answer: 0},
 	function(data){
 		if (data.ok) {
 			window.location.reload();
@@ -254,13 +261,16 @@ function startTraining() {
 		$('.game-message').on('click', changeCard);
 		$('.gamer-cards .card').css('cursor', 'pointer');
 		$('#gamer-cards').on('click', chooseCard);
+	} else if (gamestate == 5) {
+		$('.question-footer .btn').on('click', onClickBuyAnswer);
+		$('.question-footer a').on('click', onClickNoBuy);
+		$('.question-answer').on('click', onChooseAnswer);
 	} else if (gamestate == 6) {
 		$('.game-message .btn-primary').on('click', onClickNew);
 		$('.game-message .btn-danger').on('click', onClickStop); 
 	} else if (gamestate == 11) {
 		$('.question-footer .btn').on('click', onClickAnswer);
 		$('.question-answer').on('click', onChooseAnswer);
-		timerNode = 'question-timer';
 	}
 	$('.game-buttons').on('click', makeMove);
 	enableButtons();
@@ -302,7 +312,7 @@ function startTime() {
 }
 
 function startTimer() {
-	var timerName = timerNode || 'game-timer';
+	var timerName = gametimer || 'game-timer';
 	
 //	console.log($.cookie());
 	

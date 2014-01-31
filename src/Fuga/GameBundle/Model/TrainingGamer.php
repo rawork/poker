@@ -4,6 +4,10 @@ namespace Fuga\GameBundle\Model;
 
 class TrainingGamer {
 	
+	public $question;
+	public $buying;
+	public $change;
+	public $cards;
 	private $data;
 	
 	public function __construct($gamer, array $options = array()) {
@@ -17,9 +21,6 @@ class TrainingGamer {
 			'status'  => 1,
 			'seat'    => 6,
 			'position'=> 0,
-			'cards'   => array(),
-			'change'  => null,
-			'question' => null,
 		);
 	}
 	

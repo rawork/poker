@@ -362,18 +362,18 @@ body {
 .game-question {
 	padding: 20px;
 	background-color: #fff;
-	border: 3px solid #b2d000; 
+	border: 3px solid #fb4e0c; 
 	-webkit-border-radius: 20px;
 	   -moz-border-radius: 20px;
 	        border-radius: 20px;
 	position: absolute;
 	width: 286px;
 	height: 370px;
-	top: -30px;
-	left: -60px;
+	top: -80px;
+	left: -37px;
 }
 
-game-question button {
+.game-question button {
 	width: 120px;
 }
 
@@ -383,7 +383,7 @@ game-question button {
 
 .question-body {
 	text-align: left;
-	height: 320px;
+	height: 300px;
 }
 
 .question-body .title {
@@ -430,24 +430,35 @@ game-question button {
 	text-align: center;
 }
 
-.question-footer .btn {
-	width: 90px;
+.question-footer a {
+	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
+	margin-left: 15px;
 	font-weight: bold;
+	border-bottom: 1px dashed #b2d000;
+	color: #000;
+	cursor: pointer;
+}
+
+.question-footer a:hover, .question-footer a:active {
+	color: #b2d000;
+	text-decoration: none;
+	border-bottom: 0;
 }
 
 .question-footer a {
-	margin-left: 15px;
-	font-weight: bold;
+	margin-left: 25px;
+	color: #000;
+	border-bottom: 1px dashed #b2d000;
 }
 
 .question-timer {
-	padding-top: 5px;
+	margin-top: 15px;
 	font-size: 11px;
 	font-weight: bold;
 }
 
 .question-times {
-	padding-top: 5px;
+	margin-top: 15px;
 	font-size: 11px;
 	font-weight: bold;
 	text-align: right;

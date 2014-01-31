@@ -1,0 +1,1 @@
+{if $training->board->state != 0 && $training->board->state != 6}Минимальная ставка: <div id="min_bet">{$training->board->minbet}</div>{/if}

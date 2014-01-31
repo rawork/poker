@@ -4,13 +4,13 @@ namespace Fuga\GameBundle\Model;
 
 class Board {
 	
+	public $state = 0;
 	private $data;
 	private $step = 1;
 	
 	public function __construct($id) {
 		$this->data = array(
 			'user_id'  => $id,
-			'fromtime' => null,
 			'bank'     => 0,
 			'bets'     => 0,
 			'maxbet'   => 0,
@@ -19,7 +19,6 @@ class Board {
 			'winner'   => array(),
 			'combination' => array(),
 			'flop'     => array(),
-			'state'    => 0,
 		);
 	}
 	

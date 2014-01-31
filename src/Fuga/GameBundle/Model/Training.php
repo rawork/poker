@@ -14,23 +14,27 @@ class Training {
 	const STATE_END       = 6;
 	
 	public $deck;
-	public $bots = array();
+	public $bots;
 	public $gamer;
 	public $board;
+	public $timer;
+	public $fromtime;
+	public $stopbuytime;
 	
 	private $log;
 	
 	public function __construct(array $gamer, $log) {
-		$this->log = $log;
-		$this->deck = new Deck();
-		$this->createGamer($gamer);
+		$this->log   = $log;
+		$this->timer = new Timer();
+		$this->deck  = new Deck();
+		$this->createGamer(new TrainingGamer($gamer));
 		$this->createBots(3);
 		$this->createBoard($gamer['user_id']);
 		$this->setTime();
 	}
 	
-	public function createGamer($gamer) {
-		$this->gamer = new TrainingGamer($gamer);
+	public function createGamer(TrainingGamer $gamer) {
+		$this->gamer = $gamer;
 		$this->gamer->position = 0;
 	}
 	
@@ -74,11 +78,11 @@ class Training {
 		}
 		$this->board->state = self::STATE_CHANGE;
 		$this->board->flop = $this->deck->take(3);
-		$this->board->fromdate = new \DateTime();
-		$this->board->stopbuydate = new \DateTime();
-//		$this->firstBet();
+		$this->fromtime = new \DateTime();
+		$this->stopbuytime = new \DateTime();
+		$this->stopbuytime->add(new \DateInterval('P35M'));
 		$this->setTime();
-		$this->setTimer('onClickNoChange', 0, 14);
+		$this->timer->set('onClickNoChange', 'change-timer', 14);
 	}
 	
 	public function setChange($cards, $question) {
@@ -91,7 +95,7 @@ class Training {
 	
 	public function nochange() {
 		$this->board->state = self::STATE_PREFLOP;
-		$this->setTimer();
+		$this->timer->stop();
 		
 		return $this;
 	}
@@ -109,7 +113,7 @@ class Training {
 		$this->gamer->change = null;
 		$this->gamer->question = null;
 		$this->board->state = self::STATE_PREFLOP;
-		$this->setTimer();
+		$this->timer->stop();
 		
 		return $this;
 	}
@@ -133,8 +137,7 @@ class Training {
 		}
 		$this->board->state = self::STATE_CHANGE;
 		$this->board->flop = $this->deck->take(3);
-//		$this->firsstBet();
-		$this->setTimer('onClickNoChange', 0, 14);
+		$this->timer->set('onClickNoChange', 'change-timer', 14);
 		
 		return $this;
 	}
@@ -142,22 +145,22 @@ class Training {
 	public function end() {
 		$this->board->winner = null;
 		$this->board->combination = null;
-		$this->board->fromdate = null;
+		$this->fromtime = null;
 		$this->board->state = self::STATE_END;
 		$this->bots = array();
 		$this->gamer->cards = array();
-		$this->setTimer();
+		$this->timer->stop();
 		$this->setTime();
 		
 		return $this;
 	}
 	
 	public function stop() {
-		$this->board->fromdate = null;
+		$this->fromtime = null;
 		$this->board->state = self::STATE_NOSTART;
 		$this->bots = array();
 		$this->gamer->cards = array();
-		$this->setTimer();
+		$this->timer->stop();
 		$this->setTime();
 		
 		return $this;
@@ -234,7 +237,6 @@ class Training {
 		$this->board->bank   = 0;
 		$this->board->bets   = 0;
 		$this->board->allin  = 0;
-		$this->board->state = Training::STATE_BUY;
 		$botsWithoutMoney = 0;
 		foreach ($this->bots as $bot) {
 			if ($bot->chips <= 0) {
@@ -246,7 +248,33 @@ class Training {
 		if ($botsWithoutMoney == count($this->bots) || $this->gamer->chips <=0) {
 			return $this->end();
 		}
-		$this->setTimer('nextGame', 0, 14);
+		$now = new \Datetime();
+		if ($now > $this->stopbuytime) {
+			$this->board->state = Training::STATE_CHANGE;
+			$this->timer->set('onClickNoChange', 'change-timer', 14);
+		} else {
+			$this->board->state = Training::STATE_BUY;
+			$this->timer->set('nextGame', 'question-timer', 121);
+		}
+		
+		
+		return $this;
+	}
+	
+	public function buying($answer_no = null) {
+		if (!is_null($answer_no) && $this->gamer->question) {
+			if ($answer_no == $this->gamer->question['answer']) {
+				$this->gamer->chips += $this->board->minbet;
+			}
+		}
+		if ($this->gamer->buying) {
+			$this->gamer->question = array_shift($this->gamer->buying);
+			$this->gamer->question['number'] = 3 - count($this->gamer->buying);
+		} else {
+			$this->gamer->buying = null;
+			$this->gamer->question = null;
+			$this->next();
+		}
 		
 		return $this;
 	}
@@ -286,13 +314,13 @@ class Training {
 				}
 			}
 			$this->board->combination = $combinations;
-			$this->setTimer('distributeWin', 0, 14);
+			$this->timer->set('distributeWin', 'game-timer', 14);
 		}
 		
 		return $this;
 	}
 	
-	public function firstBet() {
+	public function bet1() {
 		foreach($this->bots as $bot) {
 			$bot->bet($this->board->minbet);
 			$this->board->acceptBet($bot->takeBet());
@@ -303,9 +331,9 @@ class Training {
 	}
 	
 	public function setTime() {
-		if ($this->board->fromdate) {
+		if ($this->fromtime) {
 			$now = new \DateTime();
-			$diff = $now->diff($this->board->fromdate);
+			$diff = $now->diff($this->fromtime);
 			setcookie('gamehour', intval($diff->format('%H')), time()+86400, '/');
 			setcookie('gameminute', intval($diff->format('%i')), time()+86400, '/');
 			setcookie('gamesecond', intval($diff->format('%s')), time()+86400, '/');
@@ -314,19 +342,6 @@ class Training {
 			setcookie('gameminute', 0, time()-86400, '/');
 			setcookie('gamesecond', 0, time()-86400, '/');
 		}
-	}
-	
-	public function setTimer($handler = '', $minutes = 0, $seconds = 0) {
-		if ($minutes <= 0 && $seconds <= 0) {
-			setcookie('timerhandler', '', time()-86400, '/');
-			setcookie('timerminute', 0, time()-86400, '/');
-			setcookie('timersecond', 0, time()-86400, '/');
-		} else {
-			setcookie('timerhandler', $handler, time()+86400, '/');
-			setcookie('timerminute', $minutes, time()+86400, '/');
-			setcookie('timersecond', $seconds, time()+86400, '/');
-		}
-		
 	}
 	
 }
