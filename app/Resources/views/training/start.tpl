@@ -3,7 +3,7 @@
 		<div class="row-fluid">
 			<div class="span4"><img src="/bundles/public/img/joker.jpg"></div>
 			<div class="span8">
-				<div class="text">Приветствуем Вас<br>в тренировочной игре!</div>
+				<div class="text">Приветствуем Вас<br>в тренировочном зале!</div>
 				<button class="btn btn-success btn-large">Начать<small>игру</small></button>
 			</div>
 		</div>
