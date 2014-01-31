@@ -18,7 +18,7 @@
 		<ul>
 			<li><img src="/bundles/public/img/chip.png"> Фишки: <span class="text-blue">{$account.chips}</span></li>
 			<li><img src="/bundles/public/img/goblet.png"> Призы: <span class="text-red">{$account.prizes}</span></li>
-			<li><img src="/bundles/public/img/flag.png"> Раунды: <span class="text-green">{$account.rounds}</span></li>
+			<li><img src="/bundles/public/img/flag.png"> Туры: <span class="text-green">{$account.rounds}</span></li>
 		</ul>
 	</div>
 	<div class="member-progress">
