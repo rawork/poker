@@ -1,3 +1,4 @@
+{if $members}
 <hr class="red-line">
 <div class="row-fluid">
 	<div class="span12 text-center">
@@ -11,3 +12,4 @@
 		<br><br><br>
 	</div>
 </div>
+{/if}

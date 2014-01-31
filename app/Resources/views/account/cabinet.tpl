@@ -17,7 +17,7 @@
 		<ul class="user-data">
 			<li><span>Статус: </span>{$group.title}</li>
 			<li><span>Логин: </span>{$user.login}</li>
-			<li><span>СБЕ: </span>{$account.sbe}</li>
+			<li><span>СБЕ: </span>{$account.sbe_id_value.item.name}</li>
 			<li><span>Город: </span>{$account.city}</li>
 			<li><span>Должность: </span>{$account.position}</li>
 			<li><span>Девиз: </span>{$account.slogan}</li>

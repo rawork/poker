@@ -8,9 +8,12 @@
 		<div class="register-field">
 			<label>
 				<select name="group_id">
-					{if $account.user_id_value.item.is_admin == 1}<option value="1"{if $account.user_id_value.item.group_id == 1} selected="true"{/if}>Администратор</option>{/if}
-					<option value="2"{if $account.user_id_value.item.group_id == 2} selected="true"{/if}>Игрок</option>
-					<option value="3"{if $account.user_id_value.item.group_id == 3} selected="true"{/if}>Зритель</option>
+					{if $account.user_id_value.item.is_admin == 1}<option value="1">Администратор</option>
+					{else}
+					{foreach from=$groups item=group}
+					<option value="{$group.id}"{if $account.user_id_value.item.group_id == $group.id} selected="true"{/if}>{$group.title}</option>
+					{/foreach}	
+					{/if}
 				</select>
 			</label>	
 		</div>
@@ -26,7 +29,14 @@
 	<div class="span6">
 		<div class="register-title">СБЕ</div>
 		<div class="register-field">
-			<input type="text" name="sbe" value="{$account.sbe}">
+			<label>
+				<select name="sbe_id">
+					<option value="0">...</option>
+					{foreach from=$sbe item=sbe0}
+					<option value="{$sbe0.id}"{if $account.sbe_id == $sbe0.id} selected="true"{/if}>{$sbe0.name}</option>
+					{/foreach}
+				</select>
+			</label>
 		</div>
 		<div class="register-title">Город</div>
 		<div class="register-field">

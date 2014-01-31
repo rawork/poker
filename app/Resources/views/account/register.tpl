@@ -36,7 +36,14 @@
 	<div class="span6">
 		<div class="register-title">СБЕ</div>
 		<div class="register-field">
-			<input type="text" name="sbe" value="{$account.sbe}">
+			<label>
+				<select name="sbe_id">
+					<option value="0">...</option>
+					{foreach from=$sbe item=sbe0}
+					<option value="{$sbe0.id}"{if $account.sbe_id == $sbe0.id} selected="true"{/if}>{$sbe0.name}</option>
+					{/foreach}
+				</select>
+			</label>
 		</div>
 		<div class="register-title">Город</div>
 		<div class="register-field">

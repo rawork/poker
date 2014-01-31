@@ -134,6 +134,10 @@ ul.mainmenu li.item4 a:hover, ul.mainmenu li.item4 a.active, ul.mainmenu li.item
 	font-weight: bold;
 }
 
+.index-news-button {
+	margin-bottom: 20px;
+}
+
 .index-members {
 	text-align: center;
 	list-style: none;

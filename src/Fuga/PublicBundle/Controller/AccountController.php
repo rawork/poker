@@ -148,7 +148,7 @@ class AccountController extends PublicController {
 			$user['name']     = $this->get('util')->post('name');
 			$user['lastname'] = $this->get('util')->post('lastname');
 			
-			$account['sbe']      = $this->get('util')->post('sbe');
+			$account['sbe_id']   = $this->get('util')->post('sbe_id');
 			$account['city']     = $this->get('util')->post('city');
 			$account['position'] = $this->get('util')->post('position');
 			$account['slogan']   = $this->get('util')->post('slogan');
@@ -220,6 +220,7 @@ class AccountController extends PublicController {
 		$message = $this->flash('danger');
 		$register = json_decode($this->get('util')->session('register'), true);
 		$account = json_decode($this->get('util')->session('account'), true);
+		$sbe = $this->get('container')->getItems('account_sbe', 'publish=1');
 		$date = new \DateTime($this->getParam('end_of_gamer_register').' 23:59:59');
 		$now = new \DateTime();
 		if ($now > $date) {
@@ -231,7 +232,7 @@ class AccountController extends PublicController {
 		$this->get('container')->setVar('h1', 'Регистрация');
 		$this->get('container')->setVar('javascript', 'register');
 		
-		return $this->render('account/register.tpl', compact('message', 'register', 'account', 'groups'));
+		return $this->render('account/register.tpl', compact('message', 'register', 'account', 'groups', 'sbe'));
 	}
 	
 	public function forgetAction() {
@@ -285,7 +286,7 @@ class AccountController extends PublicController {
 			$user['name']     = $this->get('util')->post('name');
 			$user['lastname'] = $this->get('util')->post('lastname');
 			
-			$account['sbe']      = $this->get('util')->post('sbe');
+			$account['sbe_id']   = $this->get('util')->post('sbe_id');
 			$account['city']     = $this->get('util')->post('city');
 			$account['position'] = $this->get('util')->post('position');
 			$account['slogan']   = $this->get('util')->post('slogan');
@@ -325,15 +326,36 @@ class AccountController extends PublicController {
 		
 		$message = $this->flash('danger') ?: $this->flash('success');
 		$account = $this->get('container')->getItem('account_member', 'user_id='.$user['id']);
+		$sbe = $this->get('container')->getItems('account_sbe', 'publish=1');
+		$date = new \DateTime($this->getParam('end_of_gamer_register').' 23:59:59');
+		$now = new \DateTime();
+		if ($now > $date) {
+			$groups = $this->get('container')->getItems('user_group', 'id>2', 'id');
+		} else {
+			$groups = $this->get('container')->getItems('user_group', 'id>1', 'id');
+		}
 		$this->get('container')->setVar('title', 'Редактирование анкеты');
 		$this->get('container')->setVar('h1', 'Редактирование анкеты');
 		$this->get('container')->setVar('javascript', 'register');
 		
-		return $this->render('account/edit.tpl', compact('message', 'account'));
+		return $this->render('account/edit.tpl', compact('message', 'account', 'groups', 'sbe'));
 	}
 	
 	public function membersAction() {
-		$members = $this->get('container')->getItems('account_member', '1=1', 'RAND()', $this->getParam('per_mainpage'));
+		$members0 = $this->get('container')->getItems('account_member', '1=1');
+		$members = array();
+		shuffle($members0);
+		foreach ($members0 as $member) {
+			if ($member['user_id_value']['item']['group_id'] == 1) {
+				continue;
+			}
+				
+			$members[] = $member;	
+				
+			if (count($members) >= $this->getParam('per_mainpage')) {
+				break;
+			}
+		}
 		
 		return $this->render('account/members.tpl', compact('members'));
 	}
