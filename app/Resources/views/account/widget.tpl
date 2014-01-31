@@ -6,6 +6,7 @@
 	<li>
 		{if $curnode.name == 'members' && $action == 'cabinet'}<span class="text-red">ЛИЧНЫЙ КАБИНЕТ</span>{else}<a href="/members/cabinet">ЛИЧНЫЙ КАБИНЕТ</a>{/if} / 
 	</li>
+	{if $user.group_id == 1}<li><a href="/admin/" target="_blank">АДМИНКА</a> /</li>{/if}
 	<li><a href="/members/logout">ВЫЙТИ</a></li>
 </ul>	
 {else}

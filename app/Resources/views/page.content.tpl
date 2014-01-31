@@ -18,7 +18,7 @@
 		<div class="container">
 			<div class="row-fluid">
 				<div class="span2"><a href="/"><img class="logo" src="/bundles/public/img/logo.png"></a></div>
-				<div class="span7">
+				<div class="span6">
 					<ul class="mainmenu">
 						{foreach from=$links item=link name=link}
 						<li class="item{$smarty.foreach.link.index+1}"><a{if $curnode.id == $link.id} class="active"{/if} href="{$link.ref}">{$link.title}</a></li>
@@ -26,7 +26,7 @@
 					</ul>
 					<div class="clearfix"></div>
 				</div>
-				<div class="span3 header-right">
+				<div class="span4 header-right">
 					{raMethod path=Fuga:Public:Account:widget}
 				</div>
 			</div>
