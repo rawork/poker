@@ -95,60 +95,54 @@ body {
 	height: 97px;
 }
 
+.game-message-container {
+	position:relative;
+	z-index: 60;
+}
+
 .game-message {
-	margin-top: 40px;
-}
-
-.game-end {
-	margin-top: 100px;
-}
-
-.game-start-container {
-	position: relative;
-}
-
-.game-start {
 	position: absolute;
-	top: 20px;
-	left: -60px;
+	top: 30px;
+	left: -120px;
 	padding: 20px;
 	background-color: #fff;
 	border: 3px solid #fa4e0c; 
 	-webkit-border-radius: 20px;
 	   -moz-border-radius: 20px;
 	        border-radius: 20px;
-	width: 350px;
-	height: 200px;
+	width: 450px;
+	height: 180px;
 	text-align: center;
+}
+
+.game-message img {
+	height: 180px;
+}
+
+.game-message .text {
+	margin-top: 20px;
+	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
+	font-size: 18px;
+	height: 120px;
 }
 
 .game-start .text {
 	margin-top: 20px;
 	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
 	font-size: 18px;
+	height: 100px;
 }
 
-.game-start img {
-	height: 190px;
-}
-
-.game-start button {
-	margin-top: 50px;
-}
-
-.joker-message {
-	padding: 10px;
-	background-color: #fefefe;
-	margin-bottom: 10px;
-	-webkit-border-radius: 15px;
-	   -moz-border-radius: 15px;
-	        border-radius: 15px;
+.game-message .timer {
+	margin-top: 5px;
+	font-size: 11px;
+	font-weight: bold;
 }
 
 .game-timer {
 	font-size: 20px;
 	padding-top: 10px;
-	font-family: "Times New Roman";
+	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
 }
 
 .game-combinations0 {
@@ -360,27 +354,35 @@ body {
 	text-align: right;
 }
 
-#game-question {
+.game-question-container {
+	position: relative;
+	z-index: 50;
+}
+
+.game-question {
 	padding: 20px;
 	background-color: #fff;
 	border: 3px solid #b2d000; 
 	-webkit-border-radius: 20px;
 	   -moz-border-radius: 20px;
 	        border-radius: 20px;
-	position: fixed;
+	position: absolute;
 	width: 286px;
 	height: 370px;
-	top:150px;
-	margin-left: -143px; 
-	left:50%;
-	
+	top: -30px;
+	left: -60px;
 }
 
-#game-question button {
+game-question button {
 	width: 120px;
 }
 
+.game-question a {
+	cursor: pointer;
+}
+
 .question-body {
+	text-align: left;
 	height: 320px;
 }
 
@@ -512,6 +514,64 @@ body {
 	line-height: 43px;
 }
 
-#game-question a {
+#victorina-question {
+	padding: 20px;
+	background-color: #fff;
+	border: 3px solid #b2d000; 
+	-webkit-border-radius: 20px;
+	   -moz-border-radius: 20px;
+	        border-radius: 20px;
+	position: fixed;
+	width: 286px;
+	height: 370px;
+	top: 150px;
+	left: 50%;
+	margin-left: -143px;
+}
+
+.victorina-question-body {
+	text-align: left;
+	height: 280px;
+}
+
+.victorina-question-body .title {
+	font-size: 18px;
+	font-weight: bold;
+	
+}
+
+.victorina-question-body li i.active {
+	background: #fb4e0c;
+	height: 20px;
+	width: 20px;
+	-webkit-border-radius: 3px;
+	   -moz-border-radius: 3px;
+	        border-radius: 3px;
+	
+}
+
+.victorina-question-footer {
+	text-align: center;
+}
+
+.victorina-question-footer .btn {
+	width: 120px;
+	font-weight: bold;
+}
+
+.victorina-question-footer a {
+	display: inline-block;
+	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
+	margin-top: 35px;
+	font-weight: bold;
+	border-bottom: 1px dashed #b2d000;
+	color: #000;
 	cursor: pointer;
 }
+
+.victorina-question-footer a:hover, .victorina-question-footer a:active {
+	color: #b2d000;
+	text-decoration: none;
+	border-bottom: 0;
+}
+

@@ -62,9 +62,9 @@ $(document).ready(function(){
 			if (data.ok) {
 				var top = ($(window).height()-370)/2;
 				top = top < 0 ? 50 : top;
-				$('#game-question').html(data.content);
-				$('#game-question').css('top', top);
-				$('#game-question').show();
+				$('#victorina-question').html(data.content);
+				$('#victorina-question').css('top', top);
+				$('#victorina-question').show();
 			} else {
 				window.location.reload();
 			}
@@ -72,7 +72,7 @@ $(document).ready(function(){
 	});
 	
 	$(document).on('click', 'a[data-action=close]', function() {
-		$('#game-question').hide();
+		$('#victorina-question').hide();
 	});
 	
 	$(document).on('click', 'button[data-action=answer]', function() {
@@ -87,7 +87,7 @@ $(document).ready(function(){
 				$('#victorina-tooltip').html(data.content);
 				$('.question[data-question-id='+questionId+']').removeClass('active');
 				$('.question[data-question-id='+questionId+']').html('<img src="/bundles/public/img/cards/'+data.card+'.png"></img>');
-				$('#game-question').hide();
+				$('#victorina-question').hide();
 			} else {
 				window.location.reload();
 			}

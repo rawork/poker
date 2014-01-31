@@ -22,9 +22,6 @@
 		</div>
 	</div>
 </div>
-<div class="closed" id="game-question"></div>
-<script type="text/javascript">
-	
-</script>
+<div class="closed" id="victorina-question"></div>
 
 	

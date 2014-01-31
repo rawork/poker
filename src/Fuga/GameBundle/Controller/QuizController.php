@@ -57,20 +57,13 @@ class QuizController extends PublicController {
 		}
 		if ($result['totaltime']) {
 			$minutes = floor($result['totaltime'] / 60);
-			if ($minutes == 1) {
-				$minutes .= ' минуту'; 
-			} elseif (in_array($minutes, array(2,3,4))) {
-				$minutes .= ' минуты';
-			} else {
-				$minutes .= ' минут';
-			}
 			$seconds = $result['totaltime'] % 60;
 			if ($seconds == 0) {
 				$seconds = '';
 			} else {
-				$seconds .= ' c';
+				$seconds = ':'.$seconds;
 			}
-			$error = 'За '.$minutes.' '.$seconds.' Вы ответили верно<br>на <span class="text-red">'.$result['correct'].'</span> вопросов!';
+			$error = 'За '.$minutes.$seconds.' минут Вы ответили верно<br>на <span class="text-red">'.$result['correct'].'</span> вопросов!';
 			return $this->render('quiz/error.tpl', compact('error'));
 		} elseif ($isTooLate) {
 			$error = 'Отборочный тур проводится в строго определенное время.';

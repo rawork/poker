@@ -13,10 +13,16 @@ class DefaultController extends PublicController {
 	}
 	
 	public function indexAction() {
+		$now  = new \Datetime();
+		$date = new \DateTime('2014-02-17 00:00:01');
+		if ($date > $now) {
+			$this->get('router')->redirect('/victorina');
+		}
+		
 		$user = $this->get('security')->getCurrentUser();
 		
 		$date = new \DateTime($this->getParam('access_date').' 00:00:01');
-		$now  = new \Datetime();
+		
 		if ( $date > $now  ) {
 			if (!$user || $user['group_id'] != 1) {
 				$error = 'Игровой зал открыт<br> только в период проведения игры.<br> Расписание игр 
