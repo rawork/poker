@@ -16,7 +16,7 @@ class TrainingGamer {
 			'avatar'  => $gamer['avatar_value']['extra']['main']['path'],
 			'name'    => $gamer['name'],
 			'lastname'=> $gamer['lastname'],
-			'chips'   => isset($options['chips']) ? $options['chips'] : 100,
+			'chips'   => isset($options['chips']) ? $options['chips'] : 10,
 			'bet'     => 0,
 			'status'  => 1,
 			'seat'    => 6,

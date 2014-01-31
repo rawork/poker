@@ -12,7 +12,7 @@ class Bot {
 			'avatar'  => '/bundles/public/img/avatar_computer.png',
 			'name'    => 'Компьютер '.$id,
 			'lastname'=> '',
-			'chips'   => isset($options['chips']) ? $options['chips'] : 100,
+			'chips'   => isset($options['chips']) ? $options['chips'] : 10,
 			'bet'     => 0,
 			'status'  => 1,
 			'seat'    => isset($options['seat']) ? $options['seat'] : $id,
