@@ -354,6 +354,8 @@ class QuizController extends PublicController {
 			));
 			$i++;
 		}
-		return 'applied '.$i.' users';
+		
+		$error = "Найдено $i новых пользователей. Вопросы для них сгенерированы.";
+		return $this->render('quiz/error.tpl', compact('error'));
 	}
 }
