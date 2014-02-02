@@ -20,16 +20,11 @@
 	{$gamer}
 	{$winner}
 </div>
-<div class="game-combinations{if $training->board->state == 0}0{/if}"><img src="{$theme_ref}/public/img/combinations4.jpg"></div>
+<div class="game-combinations"><img src="{$theme_ref}/public/img/combinations4.jpg"></div>
 <script type="text/javascript">
-	// common game parameters
-	var gamestate = {$training->board->state};
 	var gamemaxbet = {$training->board->maxbet};
 	var gameallin = {$training->board->allin};
 	var gamerbet = {$training->gamer->bet};
-	var gametimer = '{$training->timer->holder}';
-	// training start
-	var gametraining = true;
 </script>
 
 	

@@ -1,7 +1,7 @@
-{if $training->board->state != 0}<div class="gamer">
+{if !$training->isState(0)}<div class="gamer">
 	<div class="gamer-cards" id="gamer-cards">
 		{foreach from=$training->gamer->cards key=k item=card}
-		<div class="card{if $training->board->state == 4 && $training->board->combination[$card.name]} active{/if}" data-card-name="{$card.name}" data-card-id="{$k}"><img src="/bundles/public/img/cards/{$card.name}.png" /></div> 
+		<div class="card{if $training->isState(4) && $training->board->combination[$card.name]} active{/if}" data-card-name="{$card.name}" data-card-id="{$k}"><img src="/bundles/public/img/cards/{$card.name}.png" /></div> 
 		{/foreach}
 		<div class="clearfix"></div>
 	</div>

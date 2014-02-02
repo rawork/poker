@@ -49,6 +49,7 @@ body {
 }
 
 .game-main-bank {
+	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
 	height:280px;
 	text-align: center;
 	padding-top: 100px;
@@ -57,6 +58,7 @@ body {
 }
 
 .game-min-bet {
+	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
 	height:280px;
 	text-align: center;
 	padding-top: 100px;
@@ -76,7 +78,7 @@ body {
 
 .game-flop .card {
 	background-color: #fdb200;
-	border: 2px solid #fdb200;
+	border: 2px solid transparent;/*#fdb200;*/
 	-webkit-border-radius: 7px;
 	   -moz-border-radius: 7px;
 	        border-radius: 7px;
@@ -260,7 +262,7 @@ body {
 .gamer-cards .card {
 	width: 41px;
 	height: 57px;
-	border: 2px solid #fdb200;
+	border: 2px solid transparent;/*#fdb200;*/
 	-webkit-border-radius: 5px;
 	   -moz-border-radius: 5px;
 	        border-radius: 5px;
@@ -316,6 +318,7 @@ body {
 }
 
 .winner {
+	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
 	display: none;
 }
 
@@ -387,6 +390,7 @@ body {
 }
 
 .question-body .title {
+	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
 	font-size: 18px;
 	font-weight: bold;
 	

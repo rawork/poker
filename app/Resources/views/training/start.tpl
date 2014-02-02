@@ -4,7 +4,7 @@
 			<div class="span4"><img src="/bundles/public/img/joker.jpg"></div>
 			<div class="span8">
 				<div class="text">Приветствуем Вас<br>в тренировочном зале!</div>
-				<button class="btn btn-success btn-large">Начать<small>игру</small></button>
+				<button class="btn btn-success btn-large" data-action="start">Начать<small>игру</small></button>
 			</div>
 		</div>
 	</div>

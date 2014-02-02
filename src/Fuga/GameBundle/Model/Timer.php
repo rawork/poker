@@ -9,10 +9,9 @@ class Timer {
 	private $time;
 	
 	public function set($handler, $holder, $time = null) {
-		$time = $time == null ? time() : time() + $time;
 		$this->holder = $holder;
 		$this->handler = $handler;
-		$this->time = $time;
+		$this->time = $time == null ? time() : time() + $time;
 		
 		return $this;
 	}
@@ -24,6 +23,7 @@ class Timer {
 		$seconds = $this->time - time();
 		$minutes = floor($seconds / 60);
 		$seconds = $seconds - ($minutes * 60);
+		setcookie('gametimer', $this->holder, time()+86400, '/');
 		setcookie('timerhandler', $this->handler, time()+86400, '/');
 		setcookie('timerminute',  $minutes, time()+86400, '/');
 		setcookie('timersecond',  $seconds, time()+86400, '/');
@@ -41,4 +41,13 @@ class Timer {
 		
 		return $this;
 	}
+	
+	public function setHolder($name = null) {
+		$this->holder = $name ?: 'game-timer';
+	}
+	
+	public function getHolder() {
+		return $this->holder; 
+	}
+	
 }

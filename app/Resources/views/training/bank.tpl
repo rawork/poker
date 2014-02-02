@@ -1,1 +1,1 @@
-{if $training->board->state != 0 && $training->board->state != 6}<div>Банк игры: <div id="bank">{$training->board->bank}</div></div>{/if}
+{if !$training->isState(0) && !$training->isState(6)}<div>Банк игры: <div id="bank">{$training->board->bank}</div></div>{/if}
