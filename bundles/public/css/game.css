@@ -34,12 +34,12 @@ body {
 }
 
 .game-board-container {
-	padding-left: 70px;
+	padding-left: 10px;
 }
 
 .game-board {
 	margin-top: 110px;
-	width: 800px;
+	width: 920px;
 	height: 285px;
 	background-color: #b2d000;
 	border: 3px solid #fa4e0c;
@@ -73,19 +73,17 @@ body {
 
 .game-flop {
 	text-align: center;
-	padding-top: 90px;
+	margin-top: 80px;
 }
 
 .game-flop .card {
-	background-color: #fdb200;
+	background-color: transparent;//#fdb200;
 	border: 2px solid transparent;/*#fdb200;*/
 	-webkit-border-radius: 7px;
 	   -moz-border-radius: 7px;
 	        border-radius: 7px;
-	width: 70px;
-	height: 97px;
 	display: inline-block;
-	margin: 2px;
+	margin: 1px;
 }
 
 .game-flop .active {
@@ -93,8 +91,7 @@ body {
 }
 
 .game-flop .card img {
-	width: 70px;
-	height: 97px;
+	height: 110px;
 }
 
 .game-message-container {
@@ -105,7 +102,7 @@ body {
 .game-message {
 	position: absolute;
 	top: 30px;
-	left: -120px;
+	left: -102px;
 	padding: 20px;
 	background-color: #fff;
 	border: 3px solid #fa4e0c; 
@@ -153,7 +150,8 @@ body {
 }
 
 .game-combinations {
-	margin-top: 190px;
+	text-align: center;
+	margin-top: 195px;
 	margin-bottom: 20px;
 }
 
@@ -164,43 +162,31 @@ body {
 .gamer1 {
 	position: absolute;
 	top: -30px;
-	left: 100px;
-	width: 220px;
+	left: 40px;
 }
 
 .gamer2 {
 	position: absolute;
-	top: -410px;
-	left: 100px;
-	width: 220px;
+	top: -390px;
+	left: 40px;
 }
 
 .gamer3 {
 	position: absolute;
-	top: -410px;
-	left: 364px;
-	width: 220px;
+	top: -390px;
+	left: 338px;
 }
 
 .gamer4 {
 	position: absolute;
-	top: -410px;
-	left: 628px;
-	width: 220px;
+	top: -390px;
+	left: 640px;
 }
 
 .gamer5 {
 	position: absolute;
 	top: -30px;
-	left: 628px;
-	width: 220px;
-}
-
-.gamer {
-	position: absolute;
-	top: -30px;
-	left: 364px;
-	width: 220px;
+	left: 640px;
 }
 
 .gamer-container {
@@ -208,16 +194,30 @@ body {
 	text-align: left;
 }
 
+.gamer {
+	position: absolute;
+	width: 300px;
+}
+
+#gamer {
+	position: absolute;
+	top: -30px;
+	left: 312px;
+	width: 320px;
+ }
+
 .gamer-avatar {
-	padding-right: 12px;
-	padding-bottom: 5px;
+	margin-right: 8px;
+	height: 60px;
 }
 
 .gamer-avatar img {
-	width: 55px;
-	-webkit-border-radius: 27px;
-	   -moz-border-radius: 27px;
-	        border-radius: 27px;
+	margin: 0;
+	padding: 0;
+	height: 55px;
+	-webkit-border-radius: 28px;
+	   -moz-border-radius: 28px;
+	        border-radius: 28px;
 }
 
 .gamer-status {
@@ -236,14 +236,25 @@ body {
 	font-size: 15px;
 }
 
+.gamer-title-container {
+	padding-left: 23px;
+}
+.gamer-title {
+	min-width: 170px;
+	height: 55px;
+	float:left;
+}
+
 .gamer-info {
-	margin-left: 0;
+	margin: 0;
+	padding: 10px 0 0;
 	font-size: 13px;
-	padding: 0;
+	height: 55px;
+	float:left;
 }
 
 .gamer-info img {
-	margin: 0 5px;
+	margin: 0 3px;
 }
 
 .gamer-chips {
@@ -260,72 +271,90 @@ body {
 }
 
 .gamer-cards .card {
-	width: 41px;
-	height: 57px;
-	border: 2px solid transparent;/*#fdb200;*/
+	border: 2px solid transparent;//#fdb200;
 	-webkit-border-radius: 5px;
 	   -moz-border-radius: 5px;
 	        border-radius: 5px;
-	background-color: #fdb200;
-	margin: 2px;
+	background-color: transparent;//#fdb200;
+	margin: 1px;
 	display: inline-block;
 }
 
 .gamer-cards .card img {
-	width: 41px;
 	height: 57px;
+}
+
+#gamer-cards {
+	height: 95px;
+}
+
+#gamer-cards .card img {
+	height: 85px;
+}
+
+.gamer-cards .card.choose {
+	cursor: pointer;
 }
 
 .gamer-cards .active {
 	border-color: #fb4e0c;
 }
 
-.game-winner {
+.gamer-card-zoom {
 	position: absolute;
-	width: 220px;
+	top: -220px; 
+	left: 50%;
+	margin-left: -62px;
+	width: 124px;
+	z-index: 80;
+}
+
+.game-winner {
+	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
+	position: absolute;
+	width: 300px;
 	text-align: center;
 	font-size: 16px;
 }
 
 .winner1 {
 	top: -55px;
-	left: 100px;
+	left: 18px;
 }
 
 .winner2 {
-	top: -250px;
-	left: 100px;
+	top: -260px;
+	left: 18px;
 }
 
 .winner3 {
-	top: -250px;
-	left: 366px;
+	top: -260px;
+	left: 320px;
 }
 
 .winner4 {
-	top: -250px;
-	left: 628px;
+	top: -260px;
+	left: 622px;
 }
 
 .winner5 {
 	top: -55px;
-	left: 628px;
+	left: 622px;
 }
 
 .winner0 {
 	top: -55px;
-	left: 366px;
+	left: 320px;
 }
 
 .winner {
-	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
 	display: none;
 }
 
 .game-buttons-container {
 	text-align: center;
 	position: absolute;
-	top: 116px;
+	top: 122px;
 	left: 85px;
 }
 
@@ -373,7 +402,7 @@ body {
 	width: 286px;
 	height: 370px;
 	top: -80px;
-	left: -37px;
+	left: -20px;
 }
 
 .game-question button {

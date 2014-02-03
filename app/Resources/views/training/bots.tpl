@@ -13,11 +13,17 @@
 		{/foreach}
 	</div>
 	{/if}
-	<div class="pull-left gamer-avatar"><img src="{$gamer->avatar}" /></div>
-	<div class="gamer-status gamer-status-ready">Активен</div>
-	<div class="gamer-name">{$gamer->name}<br>{$gamer->lastname}</div>
-	<div class="clearfix"></div>
-	<div class="gamer-info"><img src="/bundles/public/img/chips.png"> Фишки: <span class="gamer-chips" data-bot-id="{$gamer->id}">{$gamer->chips}</span> <img src="/bundles/public/img/bet.png"> Ставка: <span class="gamer-bet" id="bet{$gamer->position}">{$gamer->bet}</span> </div>
+	<div>
+		<div class="gamer-title">
+			<div class="pull-left gamer-avatar"><img src="{$gamer->avatar}" /></div>
+			<div class="gamer-status gamer-status-ready">Активен</div>
+			<div class="gamer-name">{$gamer->name}<br>{$gamer->lastname}</div>
+		</div>
+		<div class="gamer-info">
+			<div><img src="/bundles/public/img/chips.png"> Фишки: <span class="gamer-chips" data-bot-id="{$gamer->id}">{$gamer->chips}</span></div>
+			<div><img src="/bundles/public/img/bet.png"> Ставка: <span class="gamer-bet" id="bet{$gamer->position}">{$gamer->bet}</span> </div>
+		</div>
+	</div>	
 	{if $gamer->position > 1 && $gamer->position < 5}
 	<div class="gamer-cards" data-bot-id="{$gamer->id}">
 		{foreach from=$gamer->cards item=card}

@@ -120,7 +120,7 @@ class Combination {
 		if (count($suite) < 4) {
 			return false;
 		}
-		
+		$aceCard = null;
 		$cards = array(
 			'rank'   => self::STREET,
 			'weight' => 0,

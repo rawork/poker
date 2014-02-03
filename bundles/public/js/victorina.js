@@ -42,7 +42,7 @@ function startTimer() {
 	
 	$('#'+ timerName).html( minutes + ":" + seconds );
 	
-	eventtimerId = setTimeout(startTimer, 1000);
+	eventtimerId = setTimeout(startTimer, 990);
 }
 
 function removeTimer() {

@@ -29,7 +29,7 @@ class Training {
 		$this->timer = new Timer();
 		$this->deck  = new Deck();
 		$this->createGamer(new TrainingGamer($gamer));
-		$this->createBots(3);
+		$this->createBots(5);
 		$this->createBoard($gamer['user_id']);
 		$this->setTime();
 		$this->setState();
@@ -226,7 +226,7 @@ class Training {
 	
 	public function win($buying = null) {
 		$numWin = count($this->board->winner);
-		$share = intval($this->board->bank / $numWin);
+		$share = $numWin ? intval($this->board->bank / $numWin) : $this->board->bank;
 		foreach ($this->board->winner as $winner) {
 			if ($winner['position'] == 0) {
 				$this->gamer->chips += $share;

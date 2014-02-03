@@ -1,3 +1,32 @@
+(function( $ ) {
+	$.fn.zoomcard = function(options) {
+
+		var $this = this,
+			defaults = {}, 
+			options = $.extend(defaults, options);
+
+		this.on('mouseover', '#gamer-cards .card', function(){
+			var name = $(this).attr('data-card-name');
+			var src = $(this).children('img').attr('src');
+			if (src == '/bundles/public/img/shirt.png') {
+				return;
+			}
+			var div = $this.children('div[data-name='+name+']');
+			if (div.length == 0) {
+				div = $('<div><img src="'+src+'"></div>').addClass('gamer-card-zoom').attr('data-name', name);
+				$this.append(div);
+			}
+			div.show();
+		});
+		
+		this.on('mouseout', '#gamer-cards .card', function() {
+			var name = $(this).attr('data-card-name');
+			$this.children('.gamer-card-zoom[data-name='+name+']').hide();
+		});
+
+	};
+})(jQuery);
+
 var eventtimerId = null;
 
 function onShowQuestion() {
@@ -76,38 +105,8 @@ function onBuy(n) {
 
 function onChooseCard(event){
 	var n = $('.card.active').length;
-	var target = event.target || event.srcElement;
-
-	while(target != this) { 
-		if ($(target).hasClass('card')) { 
-			if (n < 2 || $(target).hasClass('active')) {
-				$(target).toggleClass('active');
-			}
-			break;
-		}
-		target = target.parentNode;
-	}
-}
-
-function onMoveButton() {
-	var target = event.target || event.srcElement;
-
-	while(target != this) { 
-		if ($(target).hasClass('btn')) { 
-			if ($(target).attr('data-move') == 'vabank') {
-				onClickVaBank();
-			} else if ($(target).attr('data-move') == 'bet') {
-				onClickBet();
-			} else if ($(target).attr('data-move') == 'check') {
-				onClickCheck();
-			} else if ($(target).attr('data-move') == 'fold') {
-				onClickFold();
-			} else if ($(target).attr('data-move') == 'new') {
-				onClickStart();
-			}
-			break;
-		}
-		target = target.parentNode;
+	if (n < 2 || $(this).hasClass('active')) {
+		$(this).toggleClass('active');
 	}
 }
 
@@ -210,7 +209,8 @@ function onClickFold() {
 }
 
 function onClickNoChange() {
-	$('#gamer-cards .card').css('cursor', 'default');
+	$('#gamer-cards .card').removeClass('choose');
+	$('#gamer-cards .card').removeClass('active');
 	$('.game-message .btn').prop('disabled', true);
 	stopTimer();
 	$.post('/training/nochange', {},
@@ -234,7 +234,6 @@ function onClickStart() {
 			$('.game-min-bet').html(data.minbet);
 			$('.game-main-bank').html(data.bank);
 			$('#table').html(data.board);
-			$('#gamer-cards .card').css('cursor', 'pointer');
 			enableButtons();
 			startTimer();
 		} else {
@@ -303,7 +302,7 @@ function onDistributeWin() {
 				$('.gamer-chips[data-bot-id='+i+']').html(data.chips0[i]);
 			}
 			$('.game-main-bank').html(data.bank);
-			$('#gamer-chips').html(data.chips);
+			$('#chips').html(data.chips);
 			$('#table').html(data.board);
 			if (data.state == 1) {
 				$('#gamer-cards .card').css('cursor', 'pointer');
@@ -337,36 +336,40 @@ function enableButtons() {
 	var state = +$.cookie('gamestate');
 	switch (state) {
 		case 2:
-			$('.game-buttons input').prop('disabled', false);
-			$('.game-buttons input[data-move=check]').prop('disabled', true);
+			$('.game-buttons button').prop('disabled', false);
+			$('.game-buttons button[data-move=check]').prop('disabled', true);
 			break;
 		case 3:
-			$('.game-buttons input').prop('disabled', false);
+			$('.game-buttons button').prop('disabled', false);
 			break;
 		default:
-			$('.game-buttons input').prop('disabled', true);
+			$('.game-buttons button').prop('disabled', true);
 	}
-	$('.game-buttons input[data-move=new]').prop('disabled', false);
+	$('.game-buttons button[data-move=new]').prop('disabled', false);
 }
-
-
 
 function initTraining() {
 	setInterval(startTime, 990);
 	$(document).on('click', 'button[data-action=change]', onClickChange);
 	$(document).on('click', 'button[data-action=nochange]', onClickNoChange);
-	$(document).on('click', '#gamer-cards', onChooseCard);
+	$(document).on('click', '.choose', onChooseCard);
 	$(document).on('click', 'button[data-action=buying]', onClickBuyAnswer);
 	$(document).on('click', 'a[data-action=nobuying]', onClickNoBuy);
 	$(document).on('click', '.question-answer', onChooseAnswer);
 	$(document).on('click', 'button[data-action=start]', onClickStart);
 	$(document).on('click', 'button[data-action=stop]', onClickStop); 
 	$(document).on('click', 'button[data-action=answer]', onClickAnswer);
+	$(document).on('click', 'button[data-move=vabank]', onClickVaBank);
+	$(document).on('click', 'button[data-move=bet]', onClickBet);
+	$(document).on('click', 'button[data-move=check]', onClickCheck);
+	$(document).on('click', 'button[data-move=fold]', onClickFold);
+	$(document).on('click', 'button[data-move=new]', onClickStart);
 	$(document).on('click', '.game-buttons', onMoveButton);
 	$('#gamer-cards .card').css('cursor', 'pointer');
 	enableButtons();
 	startTimer();
 	setInterval(onCheckMinBet, 5000);
+	$('.gamer-container').zoomcard();
 }
 
 function startTime() {
@@ -437,10 +440,11 @@ function startTimer() {
 	
 	$('#'+ timerName).html( minutes + ":" + seconds );
 	
-	eventtimerId = setTimeout(startTimer, 990);
+	eventtimerId = setTimeout(startTimer, 950);
 }
 
 function stopTimer() {
+	$('.gamer-card-zoom').hide();
 	clearTimeout(eventtimerId);
 	$.removeCookie('timerhandler');
 	$.removeCookie('timerminute');
@@ -450,3 +454,6 @@ function stopTimer() {
 $(document).ready(function(){
 	initTraining();
 });
+
+
+
