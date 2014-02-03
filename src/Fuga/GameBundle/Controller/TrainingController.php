@@ -80,8 +80,9 @@ class TrainingController extends PublicController {
 		$training->minbet();
 		$training->setTime();
 		$training->timer->start();
+		$deck = $training->deck->names(true);
 		
-		return $this->render('training/index.tpl', compact('training', 'minbet', 'bank', 'bots', 'gamer', 'winner', 'board'));
+		return $this->render('training/index.tpl', compact('training', 'minbet', 'bank', 'bots', 'gamer', 'winner', 'board','deck'));
 	}
 	
 	public function startAction() {

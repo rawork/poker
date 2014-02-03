@@ -25,6 +25,29 @@
 		});
 
 	};
+	
+	$.fn.preloadImages = function () {
+		if (typeof arguments[arguments.length - 1] == 'function') {
+			var callback = arguments[arguments.length - 1];
+		} else {
+			var callback = false;
+		}
+		if (typeof arguments[0] == 'object') {
+			var images = arguments[0];
+			var n = images.length;
+		} else {
+			var images = arguments;
+			var n = images.length - 1;
+		}
+		var not_loaded = n;
+		for (var i = 0; i < n; i++) {
+			jQuery(new Image()).attr('src', '/bundles/public/img/cards/'+images[i]+'.png').load(function() {
+				if (--not_loaded < 1 && typeof callback == 'function') {
+					callback();
+				}
+			});
+		}
+	};
 })(jQuery);
 
 var eventtimerId = null;
@@ -364,12 +387,12 @@ function initTraining() {
 	$(document).on('click', 'button[data-move=check]', onClickCheck);
 	$(document).on('click', 'button[data-move=fold]', onClickFold);
 	$(document).on('click', 'button[data-move=new]', onClickStart);
-	$(document).on('click', '.game-buttons', onMoveButton);
 	$('#gamer-cards .card').css('cursor', 'pointer');
 	enableButtons();
 	startTimer();
 	setInterval(onCheckMinBet, 5000);
 	$('.gamer-container').zoomcard();
+	$('.game-board-container').preloadImages(cardimages);
 }
 
 function startTime() {

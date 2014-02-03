@@ -25,6 +25,7 @@
 	var gamemaxbet = {$training->board->maxbet};
 	var gameallin = {$training->board->allin};
 	var gamerbet = {$training->gamer->bet};
+	var cardimages = {$deck};
 </script>
 
 	

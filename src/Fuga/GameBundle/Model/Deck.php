@@ -2,8 +2,6 @@
 
 namespace Fuga\GameBundle\Model;
 
-
-
 class Deck {
 
 	private $defaultdeck = array(
@@ -93,6 +91,14 @@ class Deck {
 		}
 		
 		return $res;
+	}
+	
+	public function names($json = false) {
+		$names = array();
+		foreach ($this->defaultdeck as $card) {
+			$names[] = $card['name'];
+		}
+		return $json ? json_encode($names) : $names; 
 	}
 	
 }
