@@ -191,6 +191,7 @@ function onClickFold() {
 	$.post('/training/fold', {},
 	function(data){
 		if (data.ok) {
+			enableButtons();
 			$('#table').html(data.board);
 			for (i in data.chips0) {
 				$('.gamer-chips[data-bot-id='+i+']').html(data.chips0[i]);
@@ -228,6 +229,7 @@ function onClickStart() {
 	$.post('/training/start', {},
 	function(data){
 		if (data.ok) {
+			startTime();
 			$('.gamer-container').empty().append(data.bots).append(data.gamer);
 			$('.game-min-bet').html(data.minbet);
 			$('.game-main-bank').html(data.bank);
@@ -350,7 +352,7 @@ function enableButtons() {
 
 
 function initTraining() {
-	startTime();
+	setInterval(startTime, 990);
 	$(document).on('click', 'button[data-action=change]', onClickChange);
 	$(document).on('click', 'button[data-action=nochange]', onClickNoChange);
 	$(document).on('click', '#gamer-cards', onChooseCard);
@@ -393,7 +395,6 @@ function startTime() {
     if (minutes < 10) minutes = "0" + minutes;
     if (seconds < 10) seconds = "0" + seconds;
     $('#game-time').html('Тренировка ' + hours + ":" + minutes + ":" + seconds);
-    setTimeout(startTime, 990);
 }
 
 function startTimer() {

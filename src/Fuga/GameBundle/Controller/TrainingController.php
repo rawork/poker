@@ -399,7 +399,7 @@ class TrainingController extends PublicController {
 		} elseif ($training->isState($training::STATE_CHANGE)) {
 			$board = $this->render('training/change.tpl', compact('training'));
 		} else {
-			$board = $this->render('training/end.tpl');
+			$board = $this->render('training/end.tpl', array('isYou' => $training->gamer->chips <= 0));
 		}
 		
 		$this->get('log')->write('gamer.chip:'.$training->gamer->chips);

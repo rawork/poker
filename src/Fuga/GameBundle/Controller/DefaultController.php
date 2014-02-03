@@ -133,6 +133,18 @@ class DefaultController extends PublicController {
 			array('name' => 'king_diams', 'suit' => 1, 'weight' => 2048),
 			array('name' => 'joker', 'suit' => 16, 'weight' => 8192),
 		);
+		
+		$suite = array(
+			array('name' => '6_clubs', 'suit' => 8, 'weight' => 16),
+			array('name' => '7_clubs', 'suit' => 8, 'weight' => 32),
+			array('name' => '3_hearts', 'suit' => 2, 'weight' => 2),
+			array('name' => '3_clubs', 'suit' => 8, 'weight' => 2),
+			array('name' => 'king_hearts', 'suit' => 2, 'weight' => 2048),
+			array('name' => '5_spades', 'suit' => 4, 'weight' => 8),
+			array('name' => '4_clubs', 'suit' => 8, 'weight' => 4),
+		);
+		
+		
 		$combination = new Combination();
 		$cards = $combination->get($suite);
 		if (is_array($cards)) {

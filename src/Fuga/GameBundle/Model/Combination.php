@@ -144,6 +144,7 @@ class Combination {
 			$newSuite[] = $card;
 		}
 		unset($weights);
+		
 
 		foreach ($newSuite as $card) {
 			$quantity = count($cards['cards']);
@@ -166,15 +167,19 @@ class Combination {
 		}
 		
 		$i = 0;
-		
-		while ($pos = array_search(1, $cards['cards']) || $i < 7) {
+		while ($pos = array_search(1, $cards['cards']) && $i < 7) {
 			$weightHigh = $cards['cards'][$pos-1]['weight'];
 			$weightLow = $cards['cards'][$pos+1]['weight'];
-			if (!$weightLow) {
+			if ($weightLow == 0) {
 				return false;
 			}
 			if ($weightHigh / $weightLow > 4 || !$hasJoker) {
-				return false;
+				for ($i = 0; $i < $pos+1; $i++) {
+					array_shift($cards['cards']);
+				}
+				if (count($cards['cards']) < 4) {
+					return false;
+				}
 			} elseif ($hasJoker) {
 				$cards['cards'][$pos] = array(
 					'name' => $this->jokerName,
