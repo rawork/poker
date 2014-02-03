@@ -1,9 +1,9 @@
 Новый участник {$account.name} {$account.lastname}:
 <br><br>
 Логин: {$user.login}<br>
-СБЕ:{$account.sbe_id_value.item.name}<br>
-Город:{$account.city}<br>
-Должность:{$account.position}<br>
+СБЕ: {$account.sbe_id_value.item.name}<br>
+Город: {$account.city}<br>
+Должность: {$account.position}<br>
 Девиз: {$account.slogan}<br>
 <br><br>
 Для модерации участника пройдите по ссылке<br>
