@@ -423,6 +423,8 @@ hr.red-line {
 }
 
 .user-avatar img {
+	width: 200px;
+	height: 200px;
 	border-radius: 101px;
 }
 
@@ -716,6 +718,7 @@ hr.red-line {
 .member-common img.avatar {
 	margin-right: 35px;
 	width: 100px;
+	height: 100px;
 	border-radius: 51px;
 	float: left;
 }
@@ -892,6 +895,7 @@ hr.red-line {
 
 .club-avatar img {
 	width: 100px;
+	height: 100px;
 	border-radius: 51px;
 }
 
