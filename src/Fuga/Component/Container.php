@@ -122,7 +122,7 @@ class Container
 				}
 				$this->ownmodules = $this->tempmodules;
 				if (!$user['is_admin']) {
-					unset($this->ownmodules['user'], $this->ownmodules['template'], $this->ownmodules['table']);
+					unset($this->ownmodules['config'], $this->ownmodules['user'], $this->ownmodules['template'], $this->ownmodules['table']);
 				}
 				$sql = 'SELECT id, sort, name, title, \'content\' AS ctype 
 					FROM config_module WHERE id IN ('.$user['rules'].') ORDER BY sort, title';

@@ -16,7 +16,6 @@ use Fuga\Component\Container;
 use Fuga\Component\Registry;
 use Fuga\Component\Exception\AutoloadException;
 use Fuga\CommonBundle\Controller\SecurityController;
-use Fuga\CommonBundle\Controller\ExceptionController;
 use Doctrine\DBAL\Types\Type;
 
 Type::addType('money', 'Fuga\Component\DBAL\Types\MoneyType');
@@ -33,14 +32,12 @@ if (preg_match($se_mask,$_SERVER['HTTP_USER_AGENT']) > 0) {
 
 function exception_handler($exception) 
 {	
-	// TODO Подключить логирование
-	if ($exception instanceof Fuga\Component\Exception\NotFoundHttpException) {
-		$controller = new ExceptionController();
-		echo $controller->indexAction($exception->getStatusCode(), $exception->getMessage());
-	} else {
-		$controller = new ExceptionController();
-		echo $controller->indexAction(500, $exception->getMessage());
-	}
+	$statusCode = $exception instanceof Fuga\Component\Exception\NotFoundHttpException 
+			? $exception->getStatusCode() 
+			: 500;
+	$controller = new Fuga\CommonBundle\Controller\ExceptionController();
+	
+	echo $controller->indexAction($statusCode, $exception->getMessage());
 }
 
 function autoloader($className)

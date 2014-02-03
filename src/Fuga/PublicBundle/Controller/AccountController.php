@@ -198,6 +198,8 @@ class AccountController extends PublicController {
 						array('id' => $accountId)
 					);
 				}
+				
+				$account = $this->get('container')->getItem('account_member', $accountId);
 					
 				$this->get('mailer')->send(
 					'Вы зарегистрировались на сайте клуба Чертова дюжина',
