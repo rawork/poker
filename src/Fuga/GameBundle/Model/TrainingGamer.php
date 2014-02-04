@@ -13,7 +13,7 @@ class TrainingGamer {
 	public function __construct($gamer, array $options = array()) {
 		$this->data = array(
 			'id'      => $gamer['user_id'],
-			'avatar'  => $gamer['avatar_value']['extra']['main']['path'],
+			'avatar'  => isset($gamer['avatar_value']['extra']) ? $gamer['avatar_value']['extra']['main']['path'] : '/bundles/public/img/avatar_empty.png',
 			'name'    => $gamer['name'],
 			'lastname'=> $gamer['lastname'],
 			'chips'   => isset($options['chips']) ? $options['chips'] : 10,
