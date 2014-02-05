@@ -4,8 +4,10 @@ namespace Fuga\GameBundle\Model;
 
 class AbstractGamer {
 	
-	public $cards = array();
-	public $active = true;
+	public $cards;
+	public $active = false;
+	public $allin = false;
+	
 	protected $data = array();
 	
 	public function bet($bet, $allin = false) {
@@ -30,8 +32,16 @@ class AbstractGamer {
 		$this->bet = 0;
 	}
 	
+	public function giveChips($chips) {
+		$this->chips += $chips;
+	}
+	
 	public function isActive() {
 		return $this->active;
+	}
+	
+	public function checkActive() {
+		 $this->active = $this->chips > 0;
 	}
 	
 	public function __set($name, $value) 

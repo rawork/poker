@@ -12,7 +12,7 @@
 		<div class="question-footer">
 			<button class="btn btn-warning" data-action="buying">ОТВЕТИТЬ</button> <a data-action="nobuying">без ответа</a> 
 			<div class="row-fluid">
-				<div class="span6 question-timer">Время на ответ: <span id="question-timer"></span></div>
+				<div class="span6 question-timer">Время на ответ: <span id="answer-timer"></span></div>
 				<div class="span6 question-times">Попытка <span id="question-times">{$question.number}</span> из <span id="question-max-times">3</span></div>
 			</div>
 		</div>

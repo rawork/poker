@@ -36,7 +36,6 @@ class TrainingController extends PublicController {
 		}
 		
 		$data = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
-
 		if (!$data) {
 			$training = new Training($gamer, $this->get('log'));
 			$this->get('container')->addItem('training_training', array(
@@ -47,45 +46,21 @@ class TrainingController extends PublicController {
 			$training = unserialize($data['state']);
 		}
 		
-		$minbet = $this->render('training/minbet.tpl', compact('training'));
-		$bank = $this->render('training/bank.tpl', compact('training'));
-		$bots = $this->render('training/bots.tpl', compact('training'));
-		$gamer = $this->render('training/gamer.tpl', compact('training'));
-		
-		switch ($training->getState()) {
-			case 0:
-				$board = $this->render('training/start.tpl');
-				break;
-			case 1:
-				$board = $this->render('training/change.tpl');
-				break;
-			case 11:
-				$board = $this->render('training/question.tpl', array('question' => $training->gamer->question)); 
-				break;
-			case 2:
-			case 3:
-			case 4;
-				$board = $this->render('training/flop.tpl', compact('training'));
-				$winner = $this->render('training/winner.tpl', compact('training'));
-				break;
-			case 41:
-				$board = $this->render('training/joker.tpl');
-				break;
-			case 5:
-				$board = $this->render('training/buying.tpl', array('question' => $training->gamer->question));
-				break;
-			case 6:
-				$board = $this->render('training/end.tpl', array('isYou' => $training->gamer->chips <= 0));
-				break;
-		}
-		
-		$this->get('container')->setVar('javascript', 'training');
 		$training->minbet();
-		$training->setTime();
-		$training->timer->start();
+		$minbet = $this->render('training/minbet.tpl', compact('training'));
+		$bank   = $this->render('training/bank.tpl',   compact('training'));
+		$bots   = $this->render('training/bots.tpl',   compact('training'));
+		$gamer  = $this->render('training/gamer.tpl',  compact('training'));
+		$winner = $this->render('training/winner.tpl', compact('training'));
+		$hint = $this->render('training/hint.tpl',   compact('training'));
+		$board  = $this->render('training/board.tpl',  compact('training'));
+		$this->get('container')->setVar('javascript', 'training');
 		$deck = $training->deck->names(true);
+		$training->syncTime();
+		$training->timer->start();
 		
-		return $this->render('training/index.tpl', compact('training', 'minbet', 'bank', 'bots', 'gamer', 'winner', 'board','deck'));
+		
+		return $this->render('training/index.tpl', compact('training', 'minbet', 'bank', 'bots', 'gamer', 'winner', 'board','deck', 'hint'));
 	}
 	
 	public function startAction() {
@@ -100,14 +75,15 @@ class TrainingController extends PublicController {
 			));
 		}
 		
-		$this->get('container')->deleteItem('training_training', 'user_id='.$user['id']);
 		$gamer = $this->get('container')->getItem('account_member', 'user_id='.$user['id']);
-		$training = new Training($gamer, $this->get('log'));
+		$trainingData = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
+		$training = unserialize($trainingData['state']);
 		$training->start();
-		$this->get('container')->addItem('training_training', array(
-			'user_id' => $user['id'],
-			'state'   => serialize($training),
-		));
+		
+		$this->get('container')->updateItem('training_training', 
+			array('state'   => serialize($training)),
+			array('user_id' => $user['id'])
+		);
 		
 		return json_encode(array(
 			'ok'     => true,
@@ -115,7 +91,7 @@ class TrainingController extends PublicController {
 			'gamer'  => $this->render('training/gamer.tpl', compact('training')),
 			'minbet' => $this->render('training/minbet.tpl', compact('training')),
 			'bank'	 => $this->render('training/bank.tpl', compact('training')),
-			'board'  => $this->render('training/change.tpl', compact('training')),
+			'board'  => $this->render('training/board.tpl', compact('training')),
 			'timer'  => $training->timer->start(),
 		));
 	}
@@ -151,37 +127,10 @@ class TrainingController extends PublicController {
 		
 		return json_encode(array(
 			'ok' => true,
-			'board' => $this->render('training/change.tpl'),
+			'board' => $this->render('training/board.tpl', compact('training')),
 			'cards' => $this->render('training/cards.tpl', compact($training)),
 			'bet'   => $training->gamer->bet,
 			'bots'  => $bots,
-			'timer' => $training->timer->start(),
-		));
-	}
-	
-	public function questionAction() {
-		if (!$this->get('router')->isXmlHttpRequest()) {
-			$this->get('router')->redirect('/training');
-		}
-		
-		$user = $this->get('security')->getCurrentUser();
-		if (!$user) 
-		{
-			return json_encode(array('ok' => false));
-		}
-		
-		$trainingData = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
-		$training = unserialize($trainingData['state']);
-		$training->question();
-		
-		$this->get('container')->updateItem('training_training', 
-			array('state'   => serialize($training)),
-			array('user_id' => $user['id'])
-		);
-		
-		return json_encode(array(
-			'ok' => true,
-			'board' => $this->render('training/question.tpl', array('question' => $training->gamer->question)),
 			'timer' => $training->timer->start(),
 		));
 	}
@@ -199,7 +148,8 @@ class TrainingController extends PublicController {
 		
 		$trainingData = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
 		$training = unserialize($trainingData['state']);
-		$training->answer($this->get('util')->post('answer', true, 0));
+		$questions = $this->get('container')->getItems('training_poll');
+		$training->answer($this->get('util')->post('answer', true, 0), $questions[array_rand($questions)]);
 		
 		$this->get('container')->updateItem('training_training', 
 			array('state'   => serialize($training)),
@@ -208,9 +158,10 @@ class TrainingController extends PublicController {
 		
 		return json_encode(array(
 			'ok' => true,
-			'board' => $this->render('training/flop.tpl', compact('training')),
+			'board' => $this->render('training/board.tpl', compact('training')),
 			'chips' => $training->gamer->chips,
 			'cards' => $this->render('training/cards.tpl', compact('training')),
+			'hint'  => $this->render('training/hint.tpl', compact('training')),
 			'timer' => $training->timer->start(),
 		));
 	}
@@ -229,13 +180,17 @@ class TrainingController extends PublicController {
 		$trainingData = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
 		$training = unserialize($trainingData['state']);
 		$questions = $this->get('container')->getItems('training_poll');
-		$training->setChange(isset($_POST['cards']) ? $_POST['cards'] : array(), $questions[array_rand($questions)]); 
+		$training->change($this->get('util')->post('card_no', true, 999), $questions[array_rand($questions)]); 
 		$this->get('container')->updateItem('training_training', 
 			array('state'   => serialize($training)),
 			array('user_id' => $user['id'])
 		);
 		
-		return json_encode(array('ok' => true));
+		return json_encode(array(
+			'ok' => true,
+			'board' => $this->render('training/board.tpl', compact('training')),
+			'timer' => $training->timer->start(),
+		));
 	}
 	
 	public function nochangeAction() {
@@ -259,7 +214,9 @@ class TrainingController extends PublicController {
 		
 		return json_encode(array(
 			'ok' => true,
-			'board' => $this->render('training/flop.tpl', compact('training')),
+			'board' => $this->render('training/board.tpl', compact('training')),
+			'cards' => $this->render('training/cards.tpl', compact('training')),
+			'hint'  => $this->render('training/hint.tpl', compact('training')),
 			'timer' => $training->timer->start(),
 		));
 	}
@@ -296,7 +253,7 @@ class TrainingController extends PublicController {
 		
 		return json_encode(array(
 			'ok' => true,
-			'board' => $this->render('training/flop.tpl', compact('training')),
+			'board' => $this->render('training/board.tpl', compact('training')),
 			'winner' => $this->render('training/winner.tpl', compact('training')),
 			'bots' => $bots,
 			'bank' => $this->render('training/bank.tpl', compact('training')),
@@ -337,7 +294,7 @@ class TrainingController extends PublicController {
 		
 		return json_encode(array(
 			'ok' => true,
-			'board' => $this->render('training/flop.tpl', compact('training')),
+			'board' => $this->render('training/board.tpl', compact('training')),
 			'bank'  => $this->render('training/bank.tpl', compact('training')),
 			'chips' => $training->gamer->chips,
 			'cards' => $this->render('training/cards.tpl', compact($training)),
@@ -372,7 +329,7 @@ class TrainingController extends PublicController {
 		return json_encode(array('ok' => true));
 	}
 	
-	public function winAction() {
+	public function distributeAction() {
 		if (!$this->get('router')->isXmlHttpRequest()) {
 			$this->get('router')->redirect('/training');
 		}
@@ -386,75 +343,12 @@ class TrainingController extends PublicController {
 		
 		$trainingData = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
 		$training = unserialize($trainingData['state']);
-		$training->win($this->get('container')->getItems('training_poll', '1=1', 'RAND()', 3));
+		$training->distribute($this->get('container')->getItems('training_poll', '1=1', 'RAND()', 3));
 		
 		$this->get('container')->updateItem('training_training', 
 			array('state'   => serialize($training)),
 			array('user_id' => $user['id'])
 		);
-		
-		if ($training->isState($training::STATE_BUY)) {
-			$board = $this->render('training/buying.tpl', array('question' => $training->gamer->question));
-		} elseif ($training->isState($training::STATE_CHANGE)) {
-			$board = $this->render('training/change.tpl', compact('training'));
-		}  elseif ($training->isState($training::STATE_JOKER)) {
-			$board = $this->render('training/joker.tpl');
-		} else {
-			$board = $this->render('training/end.tpl', array('isYou' => $training->gamer->chips <= 0));
-		}
-		
-		$bots = array();
-		foreach ($training->bots as $gamer) {
-			$this->get('log')->write('BOT'.$gamer->id.':'.serialize($gamer->isActive()));
-			$bots[$gamer->id] = array(
-				'chips' => $gamer->chips,
-				'cards' => $this->render('training/botcards.tpl', compact('gamer', 'training')),
-				'bet'   => $gamer->bet,
-				'active' => $gamer->isActive(),
-			);
-		}
-		
-		return json_encode(array(
-			'ok' => true,
-			'board' => $board,
-			'chips' => $training->gamer->chips,
-			'cards' => $this->render('training/cards.tpl', compact($training)),
-			'bet'   => $training->gamer->bet,
-			'bots'  => $bots,
-			'bank'	=> $this->render('training/bank.tpl', compact('training')),
-			'state' => $training->getState(),
-			'timer' => $training->timer->start(),
-		));
-	}
-	
-	public function jokerAction() {
-		if (!$this->get('router')->isXmlHttpRequest()) {
-			$this->get('router')->redirect('/training');
-		}
-		
-		$user = $this->get('security')->getCurrentUser();
-		
-		if (!$user) 
-		{
-			return json_encode(array('ok' => false));
-		}
-		
-		$trainingData = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
-		$training = unserialize($trainingData['state']);
-		$training->joker();
-		
-		$this->get('container')->updateItem('training_training', 
-			array('state'   => serialize($training)),
-			array('user_id' => $user['id'])
-		);
-		
-		if ($training->isState($training::STATE_BUY)) {
-			$board = $this->render('training/buying.tpl', array('question' => $training->gamer->question));
-		} elseif ($training->isState($training::STATE_CHANGE)) {
-			$board = $this->render('training/change.tpl', compact('training'));
-		}  else {
-			$board = $this->render('training/end.tpl', array('isYou' => $training->gamer->chips <= 0));
-		}
 		
 		$bots = array();
 		foreach ($training->bots as $gamer) {
@@ -468,18 +362,18 @@ class TrainingController extends PublicController {
 		
 		return json_encode(array(
 			'ok' => true,
-			'board' => $board,
+			'board' => $this->render('training/board.tpl', compact('training')),
 			'chips' => $training->gamer->chips,
 			'cards' => $this->render('training/cards.tpl', compact($training)),
 			'bet'   => $training->gamer->bet,
 			'bots'  => $bots,
 			'bank'	=> $this->render('training/bank.tpl', compact('training')),
-			'state' => $training->getState(),
+			'state' => $training->getStateNo(),
 			'timer' => $training->timer->start(),
 		));
 	}
-		
-	public function endAction() {
+	
+	public function prebuyAction() {
 		if (!$this->get('router')->isXmlHttpRequest()) {
 			$this->get('router')->redirect('/training');
 		}
@@ -493,16 +387,36 @@ class TrainingController extends PublicController {
 		
 		$trainingData = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
 		$training = unserialize($trainingData['state']);
-		$training->end();
+		$training->prebuy();
 		
 		$this->get('container')->updateItem('training_training', 
 			array('state'   => serialize($training)),
 			array('user_id' => $user['id'])
 		);
 		
-		return json_encode(array('ok' => true));
+		$bots = array();
+		foreach ($training->bots as $gamer) {
+			$bots[$gamer->id] = array(
+				'chips' => $gamer->chips,
+				'cards' => $this->render('training/botcards.tpl', compact('gamer', 'training')),
+				'bet'   => $gamer->bet,
+				'active' => $gamer->isActive(),
+			);
+		}
+		
+		return json_encode(array(
+			'ok' => true,
+			'board' => $this->render('training/board.tpl', compact('training')),
+			'chips' => $training->gamer->chips,
+			'cards' => $this->render('training/cards.tpl', compact($training)),
+			'bet'   => $training->gamer->bet,
+			'bots'  => $bots,
+			'bank'	=> $this->render('training/bank.tpl', compact('training')),
+			'state' => $training->getState(),
+			'timer' => $training->timer->start(),
+		));
 	}
-	
+		
 	public function stopAction() {
 		if (!$this->get('router')->isXmlHttpRequest()) {
 			$this->get('router')->redirect('/training');
@@ -518,15 +432,16 @@ class TrainingController extends PublicController {
 		$trainingData = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
 		$training = unserialize($trainingData['state']);
 		$training->stop();
+		$this->get('container')->deleteItem('training_training', 'user_id='.$user['id']);
 		
-		$this->get('container')->updateItem('training_training', 
-			array('state'   => serialize($training)),
-			array('user_id' => $user['id'])
-		);
+//		$this->get('container')->updateItem('training_training', 
+//			array('state'   => serialize($training)),
+//			array('user_id' => $user['id'])
+//		);
 		
 		return json_encode(array(
 			'ok' => true,
-			'board' => $this->render('training/start.tpl'),
+			'board' => $this->render('training/board.tpl', compact('training')),
 		));
 	}
 	
@@ -544,14 +459,58 @@ class TrainingController extends PublicController {
 		
 		$trainingData = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
 		$training = unserialize($trainingData['state']);
-		$training->buy($this->get('util')->post('answer', true, 0));
+		$training->buy();
 		
 		$this->get('container')->updateItem('training_training', 
 			array('state'   => serialize($training)),
 			array('user_id' => $user['id'])
 		);
 		
-		if ($training->isState($training::STATE_CHANGE)) {
+		$bots = array();
+		foreach ($training->bots as $gamer) {
+			$bots[$gamer->id] = array(
+				'chips' => $gamer->chips,
+				'cards' => $this->render('training/botcards.tpl', compact('gamer', 'training')),
+				'bet'   => $gamer->bet,
+				'active' => $gamer->isActive(),
+			);
+		}
+		
+		return json_encode(array(
+			'ok' => true,
+			'board' => $this->render('training/board.tpl', compact('training')),
+			'chips' => $training->gamer->chips,
+			'cards' => $this->render('training/cards.tpl', compact($training)),
+			'bet'   => $training->gamer->bet,
+			'bots'  => $bots,
+			'bank'	=> $this->render('training/bank.tpl', compact('training')),
+			'state' => $training->getState(),
+			'timer' => $training->timer->start(),
+		));
+	}
+	
+	public function buyanswerAction () {
+		if (!$this->get('router')->isXmlHttpRequest()) {
+			$this->get('router')->redirect('/training');
+		}
+		
+		$user = $this->get('security')->getCurrentUser();
+		
+		if (!$user) 
+		{
+			return json_encode(array('ok' => false));
+		}
+		
+		$trainingData = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
+		$training = unserialize($trainingData['state']);
+		$training->buyanswer($this->get('util')->post('answer', true, 0));
+		
+		$this->get('container')->updateItem('training_training', 
+			array('state'   => serialize($training)),
+			array('user_id' => $user['id'])
+		);
+		
+		if ($training->isState(Training::STATE_CHANGE)) {
 			$bots = array();
 			foreach ($training->bots as $gamer) {
 				$bots[$gamer->id] = array(
@@ -565,9 +524,9 @@ class TrainingController extends PublicController {
 			return json_encode(array(
 				'ok' => true,
 				'last' => true,
-				'board' => $this->render('training/change.tpl'),
+				'board' => $this->render('training/board.tpl', compact('training')),
 				'chips' => $training->gamer->chips,
-				'cards' => $this->render('training/cards.tpl', compact($training)),
+				'cards' => $this->render('training/cards.tpl', compact('training')),
 				'bet'   => $training->gamer->bet,
 				'bots' => $bots,
 				'timer' => $training->timer->start(),
@@ -576,7 +535,7 @@ class TrainingController extends PublicController {
 		
 		return json_encode(array(
 			'ok' => true,
-			'board' => $this->render('training/buying.tpl', array('question' => $training->gamer->question)),
+			'board' => $this->render('training/board.tpl', compact('training')),
 			'chips' => $training->gamer->chips,
 		));
 	}
@@ -594,6 +553,10 @@ class TrainingController extends PublicController {
 		}
 		
 		$trainingData = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
+		if (!$trainingData) {
+			return json_encode(array('ok' => false));
+		}
+		
 		$training = unserialize($trainingData['state']);
 		$training->minbet();
 		
@@ -604,7 +567,7 @@ class TrainingController extends PublicController {
 		
 		return json_encode(array(
 			'ok' => true,
-			'minbet' => $training->board->minbet,
+			'minbet' => $training->minbet,
 		));
 	}
 	

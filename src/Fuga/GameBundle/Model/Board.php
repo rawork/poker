@@ -21,21 +21,6 @@ class Board {
 		);
 	}
 	
-	public function acceptBet($bet) {
-		$this->bets += $bet;
-	}
-	
-	public function confirmBets() {
-		$this->bank += $this->bets;
-		$this->bets = 0;
-	}
-	
-	public function takeBank() {
-		$chips = $this->bank;
-		$this->bank = 0;
-		return $chips;
-	}
-	
 	public function __set($name, $value) 
     {
         $this->data[$name] = $value;

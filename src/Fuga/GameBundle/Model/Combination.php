@@ -422,8 +422,10 @@ class Combination {
 		);
 		
 		foreach ($suite as $card) {
+			if ($cards['cards']) {
+				$cards['cards'][] = $card;
+			}
 			$cards['weight'] += $card['weight'];
-			$cards['cards'][] = $card;
 		}
 		
 		return $cards;
@@ -470,6 +472,9 @@ class Combination {
 	}
 	
 	public function get($suite) {
+		if (!is_array($suite)) {
+			return false;
+		}
 		usort($suite, array('self', 'sortByWeight'));
 		$this->hasJoker = $this->hasJoker($suite);
 		$singles = array();
@@ -523,6 +528,9 @@ class Combination {
 		$newSuites = array();
 		
 		foreach ($suites as $suite) {
+			if (!is_array($suite)) {
+				continue;
+			}
 			if (count($newSuites) == 0) {
 				$newSuites[] = $suite;
 				continue;

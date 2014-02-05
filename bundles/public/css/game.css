@@ -90,6 +90,10 @@ body {
 	border-color: #fb4e0c;
 }
 
+.game-flop .hint {
+	border-color: #4fafeb;
+}
+
 .game-flop .card img {
 	height: 110px;
 }
@@ -119,10 +123,10 @@ body {
 }
 
 .game-message .text {
-	margin-top: 10px;
+	margin-top: 0;
 	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
 	font-size: 16px;
-	height: 130px;
+	height: 145px;
 }
 
 .game-start .text {
@@ -295,6 +299,10 @@ body {
 
 .gamer-cards .active {
 	border-color: #fb4e0c;
+}
+
+.gamer-cards .hint {
+	border-color: #4fafeb;
 }
 
 .gamer-card-zoom {

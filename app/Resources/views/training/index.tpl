@@ -1,6 +1,6 @@
 <div class="row-fluid">
 	<div class="span2"><a href="/"><img src="{$theme_ref}/public/img/logo.png"></a></div>
-	<div class="span8 game-time" id="game-time"></div>
+	<div class="span8 game-time" id="game-time">Тренировка</div>
 	<div class="span2 game-exit"><a href="/members/logout">выйти из игры</a></div>
 </div>
 <div class="game-board-container">	
@@ -19,11 +19,12 @@
 	{$bots}
 	{$gamer}
 	{$winner}
+	{$hint}
+	{$training->getStateNo()}
 </div>
 <div class="game-combinations"><img src="{$theme_ref}/public/img/combinations4.jpg"></div>
 <script type="text/javascript">
-	var gamemaxbet = {$training->board->maxbet};
-	var gameallin = {$training->board->allin};
+	var gamemaxbet = {$training->maxbet};
 	var gamerbet = {$training->gamer->bet};
 	var cardimages = {$deck};
 </script>

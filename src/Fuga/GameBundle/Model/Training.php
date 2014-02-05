@@ -2,9 +2,9 @@
 
 namespace Fuga\GameBundle\Model;
 
-class Training {
+class Training implements GameInterface {
 	
-	const STATE_NOSTART   = 0;
+	const STATE_BEGIN    = 0;
 	const STATE_CHANGE    = 1;
 	const STATE_QUESTION  = 11;
 	const STATE_PREFLOP   = 2;
@@ -16,23 +16,37 @@ class Training {
 	const STATE_END       = 6;
 	
 	public $deck;
+	public $flop;
+	
+	public $minbet = 1;
 	public $bots;
 	public $gamer;
-	public $board;
+	public $bets = 0;
+	public $maxbet = 0;
+	public $allin = false;
 	public $timer;
 	public $fromtime;
 	public $stopbuytime;
-	private $state = 0;
-	private $joker = false;
+	public $changes;
+	public $winner;
+	public $combination;
 	
-	private $upTimer      = 780;
-	private $timers = array(
-		'change' => false, //14
-		'answer' => 14,
-		'bet'    => 31,
-		'win'    => 14,
-		'joker'  => 14,
-		'buy'    => 121,
+	private $bank = 0;
+	private $stateNo;
+	private $prizes;
+	private $state;
+	private $user_id;
+	
+	private $cookietime = 7776000;
+	private $upTimer    = 780;
+	private $timers     = array(
+		'change'     => false, // array('handler' => 'onClickNoChange', 'holder' => 'change-timer', 'time' => 14)
+		'answer'     => array('handler' => 'onNoAnswer', 'holder' => 'answer-timer', 'time' => 14),
+		'bet'        => array('handler' => 'onFold', 'holder' => 'game-timer', 'time' => 31),
+		'distribute' => array('handler' => 'onDistribute', 'holder' => 'game-timer', 'time' => 14),
+		'prebuy'     => array('handler' => 'onShowPrebuy', 'holder' => 'joker-timer', 'time' => 14),
+		'nobuy'      => array('handler' => 'onNext', 'holder' => 'prebuy-timer', 'time' => 14),
+		'buy'        => array('handler' => 'onNext', 'holder' => 'buy-timer', 'time' => 121),
 	);
 	
 	private $log;
@@ -41,11 +55,10 @@ class Training {
 		$this->log   = $log;
 		$this->timer = new Timer();
 		$this->deck  = new Deck();
+		$this->user_id = $gamer['user_id'];
 		$this->createGamer(new TrainingGamer($gamer));
-		$this->createBots(5);
-		$this->createBoard($gamer['user_id']);
-		$this->setTime();
-		$this->setState();
+		$this->createBots(3);
+		$this->setState(self::STATE_BEGIN);
 	}
 	
 	public function createGamer(TrainingGamer $gamer) {
@@ -61,10 +74,6 @@ class Training {
 			$bot->position = $this->getPosition($i, $n);
 			$this->bots[] = $bot;
 		}
-	}
-	
-	public function createBoard($user_id) {
-		$this->board = new Board($user_id);
 	}
 	
 	public function getPosition($seat, $quantity) {
@@ -83,266 +92,27 @@ class Training {
 		}
 	}
 	
-	public function start() {
-		$this->deck->make();
-		$this->gamer->cards = $this->deck->take(4);
-		$this->gamer->chips = 10;
-		foreach ($this->bots as $bot) {
-			$bot->cards = $this->deck->take(4);
-			$bot->chips = 10;
-		}
-		$this->setState(self::STATE_CHANGE);
-		$this->board->flop = $this->deck->take(3);
-		$this->fromtime = new \DateTime();
-		$this->stopbuytime = new \DateTime();
-		$this->stopbuytime->add(new \DateInterval('PT35M'));
-		$this->setTime();
-		if ($this->timers['change']) {
-			$this->timer->set('onClickNoChange', 'change-timer', $this->timers['change']);
-		}
+	public function acceptBet($bet) {
+		$this->bets += $bet;
 	}
 	
-	public function setChange($cards, $question) {
-		$this->gamer->change = $cards;
-		$this->gamer->question = $question;
-		$this->setState(self::STATE_QUESTION);
-		$this->timer->stop();
-		
-		return $this;
+	public function confirmBets() {
+		$this->bank += $this->bets;
+		$this->bets = 0;
 	}
 	
-	public function nochange() {
-		$this->setState(self::STATE_PREFLOP);
-		if ($this->timers['bet']) {
-			$this->timer->set('onClickFold', 'game-timer', $this->timers['bet']);
-		}
-		
-		return $this;
+	public function takeBank() {
+		$chips = $this->bank;
+		$this->bank = 0;
+		return $chips;
 	}
 	
-	public function question(){
-		if ($this->timers['answer']) {
-		 $this->timer->set('onClickNoAnswer', 'question-timer', $this->timers['answer']);
-		}
-		
-		return $this;
+	public function getBank() {
+		return $this->bank;
 	}
 	
-	public function answer($answerNo) {
-		if ($answerNo == $this->gamer->question['answer']) {
-			foreach ($this->gamer->change as $cardNo) {
-				$this->gamer->cards[$cardNo] = array_shift($this->deck->take(1));
-			}
-		} else {
-			$this->gamer->chips -= $this->board->minbet;
-		}
-		$this->gamer->change = null;
-		$this->gamer->question = null;
-		$this->setState(self::STATE_PREFLOP);
-		if ($this->timers['bet']) {
-			$this->timer->set('onClickFold', 'game-timer', $this->timers['bet']);
-		}
-		
-		return $this;
-	}
-	
-	public function next() {
-		$this->timer->stop();
-		$this->gamer->question = null;
-		$this->gamer->buying = null;
-		if (!$this->gamer->isActive()) {
-			return $this->end();
-		}
-		$this->deck->make();
-		$this->gamer->cards = $this->deck->take(4);
-		$botsWithCards = 0;
-		foreach ($this->bots as $bot) {
-			if (!$bot->isActive()) {
-				continue;
-			}
-			$bot->cards = $this->deck->take(4);
-			$botsWithCards++;
-		}
-		if (0 == $botsWithCards) {
-			return $this->end();
-		}
-		$this->setState(self::STATE_CHANGE);
-		$this->board->flop = $this->deck->take(3);
-		if ($this->timers['change']) {
-			$this->timer->set('onClickNoChange', 'change-timer', $this->timers['change']);
-		}
-		
-		return $this;
-	}
-	
-	public function end() {
-		$this->board->winner = null;
-		$this->board->combination = null;
-		$this->fromtime = null;
-		$this->setState(self::STATE_END);
-		$this->bots = array();
-		$this->gamer->cards = array();
-		$this->timer->stop();
-		$this->setTime();
-		
-		return $this;
-	}
-	
-	public function stop() {
-		$this->fromtime = null;
-		$this->setState(self::STATE_NOSTART);
-		$this->bots = array();
-		$this->gamer->cards = array();
-		$this->timer->stop();
-		$this->setTime();
-		
-		return $this;
-	}
-	
-	public function bet($bet) {
-		$allin = ($bet == $this->gamer->chips);
-		$this->board->acceptBet($this->gamer->bet($bet, $allin));
-		
-		foreach ($this->bots as $bot) {
-			if (!$bot->isActive()) {
-				continue;
-			}
-			$this->board->acceptBet($bot->bet($bet, $allin)); 
-		}
-		$this->board->confirmBets();
-		$this->setState($this->getState() + 1);
-		if ($this->gamer->chips <= 0) {
-			$this->setState(self::STATE_SHOWDOWN);
-		}
-		
-		if ($this->isState(self::STATE_SHOWDOWN)) {
-			$this->showdown();
-		} else {
-			if ($this->timers['bet']) {
-				$this->timer->set('onClickFold', 'game-timer', $this->timers['bet']);
-			}
-		}
-		
-		return $this;
-	}
-	
-	public function fold() {
-		foreach ($this->gamer->cards as $card) {
-			if ('joker' == $card['name']) {
-				$this->joker = true;
-				break;
-			}
-		}
-		$this->gamer->cards = array();
-		foreach ($this->bots as $bot) {
-			$this->board->acceptBet($bot->bet($this->board->minbet));
-		}
-		$this->board->confirmBets();
-		$this->setState(self::STATE_SHOWDOWN);
-		$this->showdown();
-		
-		return $this;
-	}
-	
-	public function win($buying = null) {
-		$bank = $this->board->takeBank();
-		$numWin = count($this->board->winner);
-		$share = $numWin ? ceil($bank / $numWin) : $bank;
-		foreach ($this->board->winner as $winner) {
-			if ($winner['position'] == 0) {
-				$this->gamer->chips += $share;
-				break;
-			}
-			foreach ($this->bots as $bot) {
-				if ($bot->position == $winner['position']) {
-					$bot->chips += $share;
-					break;
-				}
-			}
-		}
-		$this->gamer->active = $this->gamer->chips > 0;
-		$this->gamer->emptyBet();
-		$this->gamer->cards  = null;
-		$this->board->winner = null;
-		$this->board->combination = null;
-		$this->board->flop   = null;
-		$this->board->bets   = 0;
-		$this->board->allin  = 0;
-		$botsWithoutMoney = 0;
-		foreach ($this->bots as $bot) {
-			$bot->cards = null;
-			$bot->emptyBet();
-			$this->log->write('WIN_BOT_CHIPS'.$bot->id.':'.$bot->chips);
-			if ($bot->chips <= 0) {
-				$this->log->write('WIN_BOT_CHIPS'.$bot->id.':'.$bot->chips);
-				$bot->active = false;
-				$botsWithoutMoney++;
-			}
-		}
-		if ($botsWithoutMoney == count($this->bots) || !$this->gamer->isActive()) {
-			return $this->end();
-		}
-		$deck = $this->deck->take();
-		$this->joker = true;
-		foreach ($deck as $card) {
-			if ('joker' == $card['name']) {
-				$this->joker = false;
-				break;
-			}
-		} 
-		// TODO поискать джокера в остатке колоды
-		if ($this->joker) {
-			$this->setState(self::STATE_JOKER);
-			$this->joker = false;
-		}
-		$this->gamer->buying = $buying;
-		$now = new \Datetime();
-		if ($this->isState(self::STATE_JOKER)) {
-			if ($this->timers['joker']) {
-				$this->timer->set('onJoker', 'joker-timer', $this->timers['joker']);
-			}
-			
-		} elseif ($now > $this->stopbuytime) {
-			$this->next();
-		} else {
-			$this->setState(self::STATE_BUY);
-			$this->buy();
-		}
-		
-		return $this;
-	}
-	
-	public function joker() {
-		$now = new \Datetime();
-		if ($now > $this->stopbuytime) {
-			$this->next();
-		} else {
-			$this->setState(self::STATE_BUY);
-			$this->buy();
-		}
-		
-		return $this;
-	}
-	
-	public function buy($answer_no = null) {
-		if (is_null($answer_no)) {
-			if ($this->timers['buy']) {
-				$this->timer->set('onClickNext', 'question-timer', $this->timers['buy']);
-			}
-		}
-		if (!is_null($answer_no) && $this->gamer->question) {
-			if ($answer_no == $this->gamer->question['answer']) {
-				$this->gamer->chips += $this->board->minbet;
-			}
-		}
-		if (is_array($this->gamer->buying) && count($this->gamer->buying) > 0) {
-			$this->gamer->question = array_shift($this->gamer->buying);
-			$this->gamer->question['number'] = 3 - count($this->gamer->buying);
-		} else {
-			$this->next();
-		}
-		
-		return $this;
+	public function setBank($value) {
+		$this->bank = $value;
 	}
 	
 	public function showdown() {
@@ -392,41 +162,109 @@ class Training {
 		if ($this->fromtime) {
 			$now = new \DateTime();
 			$seconds = $now->getTimestamp() - $this->fromtime->getTimestamp();
-			$this->board->minbet = ($seconds - $seconds % $this->upTimer) / $this->upTimer + 1;
+			$this->minbet = ($seconds - $seconds % $this->upTimer) / $this->upTimer + 1;
 		} else {
-			$this->board->minbet = 1;
+			$this->minbet = 1;
 		}		
 		return $this;
 	}
 	
-	public function bet1() {
+	public function bet0() {
 		foreach($this->bots as $bot) {
-			$bot->bet($this->board->minbet);
-			$this->board->acceptBet($bot->takeBet());
+			$bot->bet($this->minbet);
+			$this->acceptBet($bot->bet($this->minbet));
 		}
 		$this->gamer->bet($this->board->minbet);
-		$this->board->acceptBet($this->gamer->takeBet());
-		$this->board->confirmBets();
+		$this->acceptBet($this->gamer->bet($this->minbet));
+		$this->confirmBets();
 	}
 	
-	public function setTime() {
-		if ($this->fromtime) {
-			$now = new \DateTime();
-			$diff = $now->diff($this->fromtime);
-			setcookie('gamehour', intval($diff->format('%H')), time()+86400, '/');
-			setcookie('gameminute', intval($diff->format('%i')), time()+86400, '/');
-			setcookie('gamesecond', intval($diff->format('%s')), time()+86400, '/');
-		} else {
-			setcookie('gamehour', 0, time()-86400, '/');
-			setcookie('gameminute', 0, time()-86400, '/');
-			setcookie('gamesecond', 0, time()-86400, '/');
+	public function existsJoker() {
+		$cards = $this->deck->take();
+		foreach ($cards as $card) {
+			if ('joker' == $card['name']) {
+				$this->prizes += 1;
+				return true; 
+			}
+		}
+		
+		return false;
+	}
+	
+	public function existsBots() {
+		$exists = false;
+		foreach ($this->bots as $bot) {
+			if ($bot->chips > 0) {
+				$exists = $bot->active = true;
+			} else {
+				$bot->active = false;
+			}
+		}
+		
+		return $exists;
+	}
+	
+	public function startTime() {
+		$this->fromtime = new \DateTime();
+		$this->stopbuytime = new \DateTime();
+		$this->stopbuytime->add(new \DateInterval('PT35M'));
+		$this->syncTime();
+	}
+	
+	public function syncTime() {
+		if (!$this->fromtime) {
+			return;
+		}
+		$now = new \DateTime();
+		$diff = $now->diff($this->fromtime);
+		setcookie('gamehour', intval($diff->format('%H')), time()+$this->cookietime, '/');
+		setcookie('gameminute', intval($diff->format('%i')), time()+$this->cookietime, '/');
+		setcookie('gamesecond', intval($diff->format('%s')), time()+$this->cookietime, '/');
+	}
+	
+	public function stopTime() {
+		$this->fromtime = null;
+		$this->stopbuytime = null;
+		setcookie('gamehour', 0, time()-$this->cookietime, '/');
+		setcookie('gameminute', 0, time()-$this->cookietime, '/');
+		setcookie('gamesecond', 0, time()-$this->cookietime, '/');
+	}
+	
+	public function setTimer($name) {
+		if (array_key_exists($name, $this->timers) && $this->timers[$name]) {
+			$this->timer->set(
+				$this->timers[$name]['handler'],
+				$this->timers[$name]['holder'],
+				$this->timers[$name]['time']
+			);
 		}
 	}
 	
-	public function setState($state = 0) {
-		$this->state = $state;
-		setcookie('gamestate', $this->state, time() + 3600*24*365, '/');
-		$this->setTime();
+	public function setState($state) {
+		$this->stateNo = $state;
+		if ($state == self::STATE_BEGIN) {
+			$this->state = new State\BeginState($this);
+		} elseif ($state == self::STATE_CHANGE) {
+			$this->state = new State\ChangeState($this);
+		} elseif ($state == self::STATE_QUESTION) {
+			$this->state = new State\QuestionState($this);
+		} elseif ($state == self::STATE_PREFLOP) {
+			$this->state = new State\PreflopState($this);
+		} elseif ($state == self::STATE_FLOP) {
+			$this->state = new State\FlopState($this);
+		} elseif ($state == self::STATE_SHOWDOWN) {
+			$this->state = new State\ShowdownState($this);
+		} elseif ($state == self::STATE_JOKER) {
+			$this->state = new State\JokerState($this);
+		} elseif ($state == self::STATE_PREBUY) {
+			$this->state = new State\PrebuyState($this);
+		} elseif ($state == self::STATE_BUY) {
+			$this->state = new State\BuyState($this);
+		} elseif ($state == self::STATE_END) {
+			$this->state = new State\EndState($this);
+		} 
+		setcookie('gamestate', $state, time() + $this->cookietime, '/');
+		$this->syncTime();
 		$this->minbet();
 	}
 	
@@ -434,7 +272,67 @@ class Training {
 		return $this->state;
 	}
 	
+	public function getStateNo() {
+		return $this->stateNo;
+	}
+	
 	public function isState($state) {
-		return $this->state == $state; 
+		return $state == $this->stateNo;
+	}
+	
+	public function start() {
+		return $this->state->startGame();
+	}
+	
+	public function change($cardNo, $question) {
+		return $this->state->changeCards($cardNo, $question);
+	}
+	
+	public function nochange() {
+		return $this->state->noChangeCards();
+	}
+	
+	public function answer($answerNo, $question) {
+		return $this->state->answerQuestion($answerNo, $question);
+	}
+	
+	public function bet($chips) {
+		return $this->state->makeBet($chips);
+	}
+	
+	public function allin() {
+		return $this->state->allinBet();
+	}
+	
+	public function check() {
+		return $this->state->checkBet();
+	}
+	
+	public function fold() {
+		return $this->state->foldCards();
+	}
+	
+	public function distribute($questions) {
+		return $this->state->distributeWin($questions);
+	}
+	
+	public function prebuy() {
+		return $this->state->buyChips();
+	}
+	
+	public function buy() {
+		return $this->state->buyChips();
+	}
+	
+	public function buyanswer($answerNo) {
+		return $this->state->answerBuyQuestion($answerNo);
+	}
+	
+	public function next() {
+		return $this->state->nextGame();
+	}
+	
+	public function stop() {
+		return $this->state->stopGame();
 	}
 }

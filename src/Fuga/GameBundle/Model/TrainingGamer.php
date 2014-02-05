@@ -7,6 +7,8 @@ class TrainingGamer extends AbstractGamer {
 	public $question;
 	public $buying;
 	public $change;
+	public $rank;
+	public $combination;
 	
 	public function __construct($gamer, array $options = array()) {
 		$this->data = array(
@@ -19,10 +21,6 @@ class TrainingGamer extends AbstractGamer {
 			'seat'    => 6,
 			'position'=> 0,
 		);
-	}
-	
-	public function emptyBet() {
-		$this->bet = 0;
 	}
 	
 }

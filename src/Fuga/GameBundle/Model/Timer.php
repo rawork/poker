@@ -7,6 +7,7 @@ class Timer {
 	public  $holder = 'game-timer';
 	private $handler;
 	private $time;
+	private $cookietime = 7776000;
 	
 	public function set($handler, $holder, $time = null) {
 		$this->holder = $holder;
@@ -23,10 +24,10 @@ class Timer {
 		$seconds = $this->time - time();
 		$minutes = floor($seconds / 60);
 		$seconds = $seconds - ($minutes * 60);
-		setcookie('gametimer', $this->holder, time()+86400, '/');
-		setcookie('timerhandler', $this->handler, time()+86400, '/');
-		setcookie('timerminute',  $minutes, time()+86400, '/');
-		setcookie('timersecond',  $seconds, time()+86400, '/');
+		setcookie('gametimer', $this->holder, time()+$this->cookietime, '/');
+		setcookie('timerhandler', $this->handler, time()+$this->cookietime, '/');
+		setcookie('timerminute',  $minutes, time()+$this->cookietime, '/');
+		setcookie('timersecond',  $seconds, time()+$this->cookietime, '/');
 		
 		return $this;
 	}
@@ -35,9 +36,10 @@ class Timer {
 		$this->holder = 'game-timer';
 		$this->handler = null;
 		$this->time = null;
-		setcookie('timerhandler', '', time()-86400, '/');
-		setcookie('timerminute', 0, time()-86400, '/');
-		setcookie('timersecond', 0, time()-86400, '/');
+		setcookie('gametimer', $this->holder, time()+$this->cookietime, '/');
+		setcookie('timerhandler', '', time()-$this->cookietime, '/');
+		setcookie('timerminute', 0, time()-$this->cookietime, '/');
+		setcookie('timersecond', 0, time()-$this->cookietime, '/');
 		
 		return $this;
 	}

@@ -1,7 +1,7 @@
 {if !$training->isState(0)}<div class="gamer" id="gamer">
 	<div class="gamer-cards" id="gamer-cards">
 		{foreach from=$training->gamer->cards key=k item=card}
-		<div class="card{if $training->isState(1)} choose{/if}{if $training->isState(4) && $training->board->combination[$card.name]} active{/if}" data-card-name="{$card.name}" data-card-id="{$k}"><img src="/bundles/public/img/cards/{$card.name}.png" /></div> 
+		<div class="card{if $training->isState(1)} choose{/if}{if $training->isState(4) && $training->combination[$card.name]} active{/if}{if ($training->isState(2) || $training->isState(3)) && $training->gamer->combination[$card.name]} hint{/if}" data-card-name="{$card.name}" data-card-name="{$card.name}" data-card-id="{$k}"><img src="/bundles/public/img/cards/{$card.name}.png" /></div> 
 		{/foreach}
 	</div>
 	<div class="gamer-title-container">
@@ -21,7 +21,7 @@
 	<div class="game-arrow"><img src="/bundles/public/img/arrow.png" /></div>
 	<div class="game-buttons">
 		Введите сумму:
-		<input type="text" id="input_bet" value="{$training->board->minbet}">
+		<input type="text" id="input_bet" value="{$training->minbet}">
 		<button class="btn btn-warning" data-move="vabank">Ва-банк</button>
 		&nbsp;&nbsp;&nbsp;&nbsp;
 		<button class="btn btn-success" data-move="bet">Ставка</button>
