@@ -4,8 +4,10 @@ namespace Fuga\GameBundle\Model;
 
 class Board {
 	
+	public $winner;
+	public $combination;
+	public $flop;
 	private $data;
-	private $step = 1;
 	
 	public function __construct($id) {
 		$this->data = array(
@@ -15,9 +17,7 @@ class Board {
 			'maxbet'   => 0,
 			'minbet'   => 1,
 			'allin'    => 0,
-			'winner'   => array(),
-			'combination' => array(),
-			'flop'     => array(),
+			
 		);
 	}
 	
@@ -36,10 +36,6 @@ class Board {
 		return $chips;
 	}
 	
-	public function raiseMinBet() {
-		$this->minbet += $this->step;
-	}
-
 	public function __set($name, $value) 
     {
         $this->data[$name] = $value;

@@ -74,10 +74,15 @@ class Deck {
 		return $this->deck;
 	}
 	
-	public function take($quantity) {
+	public function take($quantity = null) {
 		$suite = array();
-		for ($i = 0; $i < $quantity; $i++) {
-			$suite[] = array_shift($this->deck);
+		if (!$quantity) {
+			$suite = $this->deck;
+			$this->deck = 0;
+		} else {
+			for ($i = 0; $i < $quantity; $i++) {
+				$suite[] = array_shift($this->deck);
+			}
 		}
 		
 		return $suite;

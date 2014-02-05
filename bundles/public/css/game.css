@@ -119,10 +119,10 @@ body {
 }
 
 .game-message .text {
-	margin-top: 20px;
+	margin-top: 10px;
 	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
-	font-size: 18px;
-	height: 120px;
+	font-size: 16px;
+	height: 130px;
 }
 
 .game-start .text {
@@ -222,13 +222,10 @@ body {
 
 .gamer-status {
 	font-size: 15px;
-}
-
-.gamer-status-ready {
 	color: #b2d000;
 }
 
-.gamer-status-noready {
+.gamer-status.notready {
 	color: #a9a9a9;
 }
 
@@ -355,7 +352,7 @@ body {
 	text-align: center;
 	position: absolute;
 	top: 122px;
-	left: 85px;
+	left: 17px;
 }
 
 .game-arrow {
@@ -369,11 +366,15 @@ body {
 	-webkit-border-radius: 10px;
 	   -moz-border-radius: 10px;
 	        border-radius: 10px;
-	padding: 5px 20px;
+	padding: 5px 10px;
 }
 
 .game-buttons .btn {
 	width: 99px;
+}
+
+.game-buttons .btn-buy {
+	width: 150px;
 }
 
 #input_bet {

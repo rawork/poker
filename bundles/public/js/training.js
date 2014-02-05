@@ -62,9 +62,20 @@ function onShowQuestion() {
 	}, "json");
 }
 
-function onClickAnswer(event) {
-	$('.question-footer .btn').prop('disabled', true);
+function onClickAnswer() {
 	var n = $('.question-answer i.active').attr('data-answer-id');
+	if (!n) {
+		return;
+	}
+	onAnswer(n);
+}
+
+function onClickNoAnswer() {
+	onAnswer(0);
+}
+
+function onAnswer(n) {
+	$('.question-footer .btn').prop('disabled', true);
 	stopTimer();
 	$.post('/training/answer', {answer: n},
 	function(data){
@@ -75,22 +86,7 @@ function onClickAnswer(event) {
 			enableButtons();
 			startTimer();
 		} else {
-//			window.location.reload();
-		}
-	}, "json");
-}
-
-function onClickNoAnswer(event) {
-	$('.question-footer .btn').prop('disabled', true);
-	stopTimer();
-	$.post('/training/answer', {answer: 0},
-	function(data){
-		if (data.ok) {
-			$('#table').html(data.board);
-			$('#chips').html(data.chips);
-			enableButtons();
-		} else {
-//			window.location.reload();
+			window.location.reload();
 		}
 	}, "json");
 }
@@ -108,17 +104,18 @@ function onClickNoBuy() {
 }
 
 function onBuy(n) {
+	$('.question-footer .btn').prop('disabled', true);
 	$.post('/training/buy', {answer: n},
 	function(data){
 		if (data.ok) {
 			$('#table').html(data.board);
 			$('#chips').html(data.chips);
 			if (data.last) {
-				for (i in data.cards0) {
-					$('.gamer-cards[data-bot-id='+i+']').html(data.cards0[i]);
-				}
+				updateBots(data.bots);
 				$('#gamer-cards').html(data.cards);
 				startTimer();
+			} else {
+				$('.question-footer .btn').prop('disabled', false);
 			}
 		} else {
 //			window.location.reload();
@@ -151,9 +148,7 @@ function onClickNext() {
 	function(data){
 		if (data.ok) {
 			$('#table').html(data.board);
-			for (i in data.cards0) {
-				$('.gamer-cards[data-bot-id='+i+']').html(data.cards0[i]);
-			}
+			updateBots(data.bots)
 			$('#gamer-cards').html(data.cards);
 			startTimer();
 		} else {
@@ -183,13 +178,14 @@ function onClickChange() {
 	if (!n) {
 		return;
 	}
-	$('.game-message .btn').prop('disabled', true);
-	$('#gamer-cards .card').css('cursor', 'default');
 	stopTimer();
 	var cards = [];
 	$('.card.active').each(function( index ) {
 		cards.push($( this ).attr('data-card-id'));
 	});
+	$('#gamer-cards .card').removeClass('choose');
+	$('#gamer-cards .card').removeClass('active');
+	$('.game-message .btn').prop('disabled', true);
 	
 	$.post('/training/change', {cards: cards},
 	function(data){
@@ -210,17 +206,12 @@ function onClickCheck() {
 }
 
 function onClickFold() {
+	enableButtons(4);
 	$.post('/training/fold', {},
 	function(data){
 		if (data.ok) {
-			enableButtons();
+			updateBots(data.bots);
 			$('#table').html(data.board);
-			for (i in data.chips0) {
-				$('.gamer-chips[data-bot-id='+i+']').html(data.chips0[i]);
-			}
-			for (i in data.cards0) {
-				$('.gamer-cards[data-bot-id='+i+']').html(data.cards0[i]);
-			}
 			$('#gamer-cards').empty();
 			$('.gamer-container').append(data.winner);
 			$('.game-main-bank').html(data.bank);
@@ -283,10 +274,6 @@ function onClickStop() {
 function onClickVaBank() {
 	$('#input_bet').val(+$('#chips').text());
 	var chips = +($('#input_bet').val());
-	if (chips < +$('#min-bet').html()) {
-		alert('Ставка должна быть не меньше минимальной ставки за столом');
-		return;
-	}
 	onBet(chips);
 }
 
@@ -296,16 +283,12 @@ function onBet(chips) {
 	function(data){
 		if (data.ok) {
 			$('#table').html(data.board);
+			$('#bet').html(data.bet);
 			$('#chips').html(data.chips);
 			$('#gamer-cards').html(data.cards);
 			$('.game-main-bank').html(data.bank);
 			$('.gamer-container').append(data.winner);
-			for (i in data.chips0) {
-				$('.gamer-chips[data-bot-id='+i+']').html(data.chips0[i]);
-			}
-			for (i in data.cards0) {
-				$('.gamer-cards[data-bot-id='+i+']').html(data.cards0[i]);
-			}
+			updateBots(data.bots);
 			enableButtons();
 			startTimer();
 		} else {
@@ -314,24 +297,18 @@ function onBet(chips) {
 	}, "json");
 }
 
-function onDistributeWin() {
+function onWin() {
 	$.post('/training/win', {},
 	function(data){
 		if (data.ok) {
-			$('.gamer-cards').empty();
+			updateBots(data.bots);
 			$('#gamer-cards').empty();
 			$('.game-winner').remove();
-			for (i in data.chips0) {
-				$('.gamer-chips[data-bot-id='+i+']').html(data.chips0[i]);
-			}
 			$('.game-main-bank').html(data.bank);
 			$('#chips').html(data.chips);
+			$('#bet').html(data.bet);
 			$('#table').html(data.board);
 			if (data.state == 1) {
-				$('#gamer-cards .card').css('cursor', 'pointer');
-				for (i in data.cards0) {
-					$('.gamer-cards[data-bot-id='+i+']').html(data.cards0[i]);
-				}
 				$('#gamer-cards').html(data.cards);
 			} else if (data.state == 6) {
 				$('.gamer-bot').remove();
@@ -340,6 +317,33 @@ function onDistributeWin() {
 				$('.game-main-bank').empty();
 				stopTimer();
 			}
+			enableButtons();
+			startTimer();
+		}
+	}, "json");
+}
+
+function onJoker() {
+	$.post('/training/joker', {},
+	function(data){
+		if (data.ok) {
+			updateBots(data.bots);
+			$('#gamer-cards').empty();
+			$('.game-winner').remove();
+			$('.game-main-bank').html(data.bank);
+			$('#chips').html(data.chips);
+			$('#bet').html(data.bet);
+			$('#table').html(data.board);
+			if (data.state == 1) {
+				$('#gamer-cards').html(data.cards);
+			} else if (data.state == 6) {
+				$('.gamer-bot').remove();
+				$('.gamer-cards').empty();
+				$('.game-min-bet').empty();
+				$('.game-main-bank').empty();
+				stopTimer();
+			}
+			enableButtons();
 			startTimer();
 		}
 	}, "json");
@@ -349,22 +353,49 @@ function onCheckMinBet() {
 	$.post('/training/minbet', {},
 	function(data){
 		if (data.ok) {
+			var bet = +$('#input_bet').val();
 			$('#min-bet').html(data.minbet);
-			$('#input_bet').val(data.minbet);
+			if (data.minbet > bet) {
+				$('#input_bet').val(data.minbet);
+			}
 		}
 	}, "json");
 }
 
-function enableButtons() {
-	var state = +$.cookie('gamestate');
+function updateBots(bots) {
+	for (i in bots) {
+		if (bots[i].chips !== undefined) {
+			$('.gamer-chips[data-bot-id='+i+']').html(bots[i].chips);
+		}
+		if (bots[i].cards !== undefined) {
+			$('.gamer-cards[data-bot-id='+i+']').html(bots[i].cards);
+		}
+		if (bots[i].active) {
+			$('.gamer-status[data-bot-id='+i+']').removeClass('notready').html('Активен');
+		} else {
+			$('.gamer-status[data-bot-id='+i+']').addClass('notready').html('Не активен');
+		}
+		if (bots[i].bet !== undefined) {
+			$('.gamer-bet[data-bot-id='+i+']').html(bots[i].bet);
+		}
+	}
+}
+
+function enableButtons(state) {
+	var state = state || +$.cookie('gamestate');
 	switch (state) {
 		case 2:
 			$('.game-buttons button').prop('disabled', false);
 			$('.game-buttons button[data-move=check]').prop('disabled', true);
+			$('.game-buttons button[data-move=buy]').prop('disabled', true);
 			break;
 		case 3:
 			$('.game-buttons button').prop('disabled', false);
+			$('.game-buttons button[data-move=buy]').prop('disabled', true);
 			break;
+		case 42:
+			$('.game-buttons button').prop('disabled', true);
+			$('.game-buttons button[data-move=buy]').prop('disabled', false);
 		default:
 			$('.game-buttons button').prop('disabled', true);
 	}
@@ -387,7 +418,6 @@ function initTraining() {
 	$(document).on('click', 'button[data-move=check]', onClickCheck);
 	$(document).on('click', 'button[data-move=fold]', onClickFold);
 	$(document).on('click', 'button[data-move=new]', onClickStart);
-	$('#gamer-cards .card').css('cursor', 'pointer');
 	enableButtons();
 	startTimer();
 	setInterval(onCheckMinBet, 5000);
@@ -428,8 +458,6 @@ function startTimer() {
 		clearTimeout(eventtimerId);
 	}
 	var timerName = $.cookie('gametimer') || 'game-timer';
-	
-//	console.log($.cookie());
 	
 	if (!$.cookie('timerhandler')) {
 		$('#' + timerName).empty();

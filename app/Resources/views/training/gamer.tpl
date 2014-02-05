@@ -28,6 +28,7 @@
 		<button class="btn btn-primary" data-move="check">Чек</button>
 		<button class="btn btn-danger" data-move="fold">Пас</button>
 		&nbsp;&nbsp;&nbsp;&nbsp;
+		<button class="btn btn-primary btn-buy" data-move="buy">Покупка фишек</button>
 		<button class="btn btn-warning" data-move="new">Заново</button>
 	</div>
 </div>{/if}

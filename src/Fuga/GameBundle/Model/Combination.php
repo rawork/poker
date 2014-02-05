@@ -199,6 +199,10 @@ class Combination {
 			return false;
 		}
 		
+		if (count($cards['cards']) > 5) {
+			$cards['cards'] = array_splice($cards['cards'], 0, 5);
+		}
+		
 		return $cards;
 	}
 	
