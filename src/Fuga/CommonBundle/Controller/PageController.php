@@ -2,6 +2,8 @@
 
 namespace Fuga\CommonBundle\Controller;
 
+use Fuga\Component\Exception\NotFoundHttpException;
+
 class PageController extends Controller {
 	
 	public $node;
@@ -31,10 +33,14 @@ class PageController extends Controller {
 					$node['module_id_value']['item']['path'].':'.$this->get('router')->getParam('action'), 
 					$this->get('router')->getParam('params')
 				);
-			} catch (\Exception $e) {
-				$this->get('log')->write($e->getMessage());
+			} catch (NotFoundHttpException $e) {
+				$this->get('log')->write('Error:'.$e->getMessage());
 				$this->get('log')->write($e->getTraceAsString());
 				throw $this->createNotFoundException($e->getMessage());
+			} catch (\Exception $e) {
+				$this->get('log')->write('Error:'.$e->getMessage());
+				$this->get('log')->write($e->getTraceAsString());
+				throw new \Exception($e->getMessage());
 			}
 		}
 		return '';

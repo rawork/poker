@@ -3,6 +3,7 @@
 namespace Fuga\Component;
 
 use Fuga\CommonBundle\Security\SecurityHandler;
+use Fuga\Component\Exception\NotFoundHttpException;
 
 class Container 
 {
@@ -342,7 +343,8 @@ class Container
 		$obj = new \ReflectionClass($this->getControllerClass($path));
 		$action .= 'Action'; 	
 		if (!$obj->hasMethod($action)) {
-			return $this->get('util')->error('Не найден обработчик ссылки '.$path);
+			$this->get('log')->write('Не найден обработчик ссылки '.$path);
+			throw new NotFoundHttpException('Несуществующая страница');
 		}
 		return $obj->getMethod($action)->invoke($this->createController($path), $params);	
 	}

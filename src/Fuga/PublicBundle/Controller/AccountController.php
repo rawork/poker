@@ -186,31 +186,49 @@ class AccountController extends PublicController {
 				$_SESSION['account'] = json_encode($account);
 				$this->get('router')->reload();
 			} else {
-				$userId = $this->get('container')->getTable('user_user')->insertGlobals();
-				$this->get('container')->updateItem('user_user',
-						array('is_active' => 1, 'email' => $user['login']),
-						array('id' => $userId)
-				);
-				if ($userId) {
-					$accountId = $this->get('container')->getTable('account_member')->insertGlobals();
-					$this->get('container')->updateItem('account_member',
-						array('user_id' => $userId),
-						array('id' => $accountId)
+				$accountId = null;
+				$this->get('connection')->beginTransaction();
+				try{
+					$userId = $this->get('container')->getTable('user_user')->insertGlobals();
+					$this->get('container')->updateItem('user_user',
+							array('is_active' => 1, 'email' => $user['login']),
+							array('id' => $userId)
+					);
+					if ($userId) {
+						$accountId = $this->get('container')->getTable('account_member')->insertGlobals();
+						$this->get('container')->updateItem('account_member',
+							array('user_id' => $userId),
+							array('id' => $accountId)
+						);
+					}
+
+					$this->get('connection')->commit();
+				} catch(\Exception $e) {
+					$this->get('connection')->rollback();
+					$this->get('log')->write('Account:register Error:'.$e->getMessage());
+					$this->get('log')->write('Account:register Error:'.$e->getTraceAsString());
+					$errors[] = $e->getMessage();
+					$_SESSION['danger'] = implode('<br>', $errors);
+					$_SESSION['register'] = json_encode($user);
+					$_SESSION['account'] = json_encode($account);
+					$this->get('router')->reload();
+				}
+				
+				if ($accountId) {
+					$account = $this->get('container')->getItem('account_member', $accountId);
+
+					$this->get('mailer')->send(
+						'Вы зарегистрировались на сайте клуба Чертова дюжина',
+						$this->render('mail/register.tpl', compact('user', 'account')),
+						$user['login']
+					);
+					$this->get('mailer')->send(
+						'Новый участник на сайте клуба Чертова дюжина',
+						$this->render('mail/register.admin.tpl', compact('user', 'account')),
+						ADMIN_EMAIL
 					);
 				}
 				
-				$account = $this->get('container')->getItem('account_member', $accountId);
-					
-				$this->get('mailer')->send(
-					'Вы зарегистрировались на сайте клуба Чертова дюжина',
-					$this->render('mail/register.tpl', compact('user', 'account')),
-					$user['login']
-				);
-				$this->get('mailer')->send(
-					'Новый участник на сайте клуба Чертова дюжина',
-					$this->render('mail/register.admin.tpl', compact('user', 'account')),
-					ADMIN_EMAIL
-				);
 				unset($_SESSION['register']);
 				unset($_SESSION['account']);
 				$this->get('security')->login($user['login'], $user['password']);
@@ -310,11 +328,22 @@ class AccountController extends PublicController {
 				$_SESSION['danger'] = implode('<br>', $errors);
 				$this->get('router')->reload();
 			} else {
-				$this->get('container')->updateItem('user_user',
+				$this->get('connection')->beginTransaction();
+				try{
+					$this->get('container')->updateItem('user_user',
 						array('name' => $user['name'], 'lastname' => $user['lastname']),
 						array('id' => $user['id'])
-				);
-				$this->get('container')->getTable('account_member')->updateGlobals();
+					);
+					$this->get('container')->getTable('account_member')->updateGlobals();
+					$this->get('connection')->commit();
+				} catch(\Exception $e) {
+					$this->get('connection')->rollback();
+					$this->get('log')->write('Account:edit Error:'.$e->getMessage());
+					$this->get('log')->write('Account:edit Error:'.$e->getTraceAsString());
+					$errors[] = $e->getMessage();
+					$_SESSION['danger'] = implode('<br>', $errors);
+					$this->get('router')->reload();
+				}
 					
 				$this->get('mailer')->send(
 					'Вы зарегистрировались на сайте клуба Чертова дюжина',
