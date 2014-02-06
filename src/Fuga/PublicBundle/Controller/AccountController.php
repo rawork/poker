@@ -39,7 +39,7 @@ class AccountController extends PublicController {
 				$page
 		);
 		$paginator->setTemplate('public');
-		$members = $this->get('container')->getitems('account_member', implode(' AND ', $criteria), 'prizes,rounds,lastname,name', $paginator->limit);
+		$members = $this->get('container')->getitems('account_member', implode(' AND ', $criteria), 'prizes DESC,rounds DESC,lastname,name', $paginator->limit);
 		foreach ($members as &$member) {
 			$member['group'] = $this->get('container')->getItem('user_group', $member['user_id_value']['item']['group_id']);
 		}
