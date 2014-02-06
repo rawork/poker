@@ -29,14 +29,12 @@ class Action extends Controller {
 					default:
 						$this->search_url = $this->dataTable->getSearchURL();
 						parse_str($this->search_url, $this->tableParams);
-						$this->get('log')->write($this->search_url);
-						$this->get('log')->write(json_encode($this->tableParams, JSON_UNESCAPED_UNICODE ));
-						$_SESSION[$this->dataTable->dbName()] = json_encode($this->tableParams, JSON_UNESCAPED_UNICODE);
+						$_SESSION[$this->dataTable->dbName()] = serialize($this->tableParams);
 				}
 				$this->get('router')->redirect($this->baseRef);
 			} else {
 				$tableParams = $this->get('util')->session($this->dataTable->dbName());
-				$this->tableParams = json_decode(stripslashes($tableParams), true);
+				$this->tableParams = unserialize($tableParams);
 			}
 			if (is_array($this->tableParams)) {
 				foreach ($this->tableParams as $key => $value) {
