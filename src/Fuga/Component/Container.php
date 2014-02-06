@@ -384,6 +384,7 @@ class Container
 						'host'		=> DB_HOST,
 						'driver'	=> DB_TYPE,
 						'charset'	=> 'utf8',
+						'collate'   => 'utf8_general_ci',
 						'driverOptions' => array(
 							1002=>'SET NAMES utf8'
 						)
