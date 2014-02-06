@@ -5,32 +5,45 @@ namespace Fuga\GameBundle\Model\State;
 use Fuga\GameBundle\Model\GameInterface;
 use Fuga\GameBundle\Model\Combination;
 
-class PreflopState extends AbstractState {
+class FlopState extends AbstractState {
 	
 	public function __construct(GameInterface $game) {
 		parent::__construct($game);
 	}
 	
 	public function makeBet($chips) {
+		$this->game->maxbet = $this->game->acceptBet($this->game->gamer->bet($chips, $this->game->maxbet));
+
+		foreach ($this->game->bots as $bot) {
+			if ($bot->isActive()) {
+				$isBet = $this->game->gamer->allin ? rand(1,3) == 2 : true;
+				if ($isBet) {
+					$this->game->acceptBet($bot->bet($chips, $this->game->maxbet));
+				} else {
+					$bot->cards = null;
+				}
+			}
+		}
+		$this->game->confirmBets();
+		$this->setWinner();
+		$this->game->setState(AbstractState::STATE_SHOWDOWN);
 		
+		return $this->game->getStateNo();
 	}
 	
 	public function checkBet(){
-		
-	}
-	
-	public function allinBet() {
-		
+		$this->setWinner();
+		$this->game->setState(AbstractState::STATE_SHOWDOWN);
 	}
 	
 	public function foldCards() {
 		$this->game->gamer->cards = null;
 		foreach ($this->game->bots as $bot) {
-			$this->acceptBet($bot->bet($this->game->minbet));
+			$this->game->acceptBet($bot->bet($this->game->minbet));
 		}
 		$this->game->confirmBets();
 		$this->setWinner();
-		$this->setState(self::STATE_SHOWDOWN);
+		$this->game->setState(AbstractState::STATE_SHOWDOWN);
 	}
 	
 	private function setWinner() {

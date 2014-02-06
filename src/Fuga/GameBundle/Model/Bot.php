@@ -10,11 +10,11 @@ class Bot extends AbstractGamer {
 			'avatar'  => '/bundles/public/img/avatar_computer.png',
 			'name'    => 'Компьютер '.$options['id'],
 			'lastname'=> '',
-			'chips'   => isset($options['chips']) ? $options['chips'] : 10,
 			'bet'     => 0,
 			'seat'    => $options['id'],
 			'positon' => $options['id'],
 		);
+		$this->chips = isset($options['chips']) ? intval($options['chips']) : 10;
 	}
 		
 }

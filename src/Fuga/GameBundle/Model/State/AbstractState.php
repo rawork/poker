@@ -16,6 +16,7 @@ class AbstractState implements StateInterface {
 	const STATE_PREBUY    = 42;
 	const STATE_BUY       = 5;
 	const STATE_END       = 6;
+	const STATE_ROUND_END = 7;
 	
 	protected $game;
 	
@@ -50,55 +51,86 @@ class AbstractState implements StateInterface {
 	}
 	
 	public function changeCards($cardNo, $question) {
-		return -1;
+		throw new \Exception('abstract changeCards');
 	}
 	
 	public function noChangeCards() {
-		return -1;
+		throw new \Exception('abstract noChangeCards');
 	}
 	
 	public function answerQuestion($answerNo, $question) {
-		return -1;
+		throw new \Exception('abstract answerQuestion');
 	}
 	
 	public function makeBet($chips) {
-		return -1;
+		throw new \Exception('abstract makeBet');
 	}
 	
 	public function checkBet(){
-		return -1;
+		throw new \Exception('abstract checkBet');
 	}
 	
 	public function allinBet() {
-		return -1;
+		throw new \Exception('abstract allinBet');
 	}
 	
 	public function foldCards() {
-		return -1;
+		throw new \Exception('abstract foldCards');
 	}
 	
 	public function distributeWin($questions) {
-		return -1;
+		throw new \Exception('abstract distributeWin');
 	}
 	
 	public function buyChips() {
-		return -1;
+		throw new \Exception('abstract buyChips');
 	}
 	
 	public function answerBuyQuestion($answerNo) { 
-		return -1;
+		throw new \Exception('abstract answeBuyQuestion');
 	}
 	
 	public function endGame() {
-		return -1;
+		$this->game->timer->stop();
+		$this->game->stopTime();
+		$this->game->winner = null;
+		$this->game->combination = null;
+		$this->game->gamer->cards = array();
+		$this->game->setState(self::STATE_END);
+		
+		return $this->game->getStateNo();
 	}
 	
 	public function stopGame() {
-		return -1;
+		$this->game->timer->stop();
+		$this->game->stopTime();
+		$this->game->setState(self::STATE_BEGIN);
+		
+		return $this->game->getStateNo();
 	}
 	
 	public function nextGame() {
-		return -1;
+		$this->game->timer->stop();
+		$this->game->gamer->buying = null;
+		$this->game->gamer->combination = null;
+		$this->game->gamer->question = null;
+		$this->game->deck->make();
+		$this->game->gamer->cards = $this->game->deck->take(4);
+		foreach ($this->game->bots as $bot) {
+			$bot->cards = $bot->isActive() ? $this->game->deck->take(4) : null;
+		}
+		$this->game->flop = $this->game->deck->take(3);
+		$this->game->setTimer('change');
+		$this->game->setState(self::STATE_CHANGE);
+		
+		return $this->game->getStateNo();
+	}
+	
+	public function endRound() {
+		$this->game->setTimer('next');
+		$this->game->setState(self::STATE_ROUND_END);
+		
+		return $this->game->getStateNo();
 	}
 	
 }

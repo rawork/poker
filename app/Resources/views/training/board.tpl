@@ -55,7 +55,7 @@
 {elseif $training->isState(2) || $training->isState(3) || $training->isState(4)}
 <div class="game-flop">	
 	{foreach from=$training->flop item=card}
-	<div class="card{if $training->isState(4) && $training->combination[$card.name]} active{/if}" data-card-name="{$card.name}">
+	<div class="card{if $training->isState(4) && $training->combination[$card.name]} active{/if}{if ($training->isState(2) || $training->isState(3)) && $training->gamer->combination[$card.name]} hint{/if}" data-card-name="{$card.name}">
 		{if $training->isState(3) || $training->isState(4)}<img src="/bundles/public/img/cards/{$card.name}.png" />
 		{else}
 		<img src="/bundles/public/img/shirt.png" />
@@ -127,6 +127,20 @@
 				<button class="btn btn-primary" data-action="start">Начать заново</button>
 				<button class="btn btn-danger" data-action="stop">Выйти</button>
 				<div class="timer" id="change-timer"></div>
+			</div>
+		</div>
+	</div>
+</div>
+{elseif $training->isState(7)}
+<div class="game-message-container">
+	<div class="game-message game-end">
+		<div class="row-fluid">
+			<div class="span4"><img src="/bundles/public/img/joker.jpg"></div>
+			<div class="span8">
+				<div class="text">Раунд завершен. Можно продолжить тренироваться или выйти из игры</div>
+				<button class="btn btn-primary" data-action="next">Продолжить</button>
+				<button class="btn btn-danger" data-action="stop">Выйти</button>
+				<div class="timer" id="round-end-timer"></div>
 			</div>
 		</div>
 	</div>

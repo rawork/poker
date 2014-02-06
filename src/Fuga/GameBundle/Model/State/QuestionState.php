@@ -22,14 +22,6 @@ class QuestionState extends AbstractState {
 		$this->game->gamer->change = null;
 		$this->game->gamer->question = null;
 		if ($this->game->gamer->chips > 0 && $this->game->changes > 0) {
-			$combination = new Combination();
-			$cards = $combination->get($this->game->gamer->cards);
-			$combinations = array();
-			foreach ($cards['cards'] as $card) {
-				$combinations[$card['name']] = 1;
-			}
-			$this->game->gamer->rank = $combination->rankName($cards['rank']);
-			$this->game->gamer->combination = $combinations;
 			$this->game->setTimer('change');
 			$this->game->setState(AbstractState::STATE_CHANGE);
 		} elseif ($this->game->gamer->chips > 0) {
@@ -45,9 +37,7 @@ class QuestionState extends AbstractState {
 			$this->game->setTimer('bet');
 			$this->game->setState(AbstractState::STATE_PREFLOP);
 		} else {
-			$this->game->stopTime();
-			$this->game->gamer->cards = array();
-			$this->game->setState(AbstractState::STATE_END);
+			return $this->endGame();
 		}
 		
 		return true;

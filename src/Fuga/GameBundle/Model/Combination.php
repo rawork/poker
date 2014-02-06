@@ -422,7 +422,7 @@ class Combination {
 		);
 		
 		foreach ($suite as $card) {
-			if ($cards['cards']) {
+			if (0 == count($cards['cards'])) {
 				$cards['cards'][] = $card;
 			}
 			$cards['weight'] += $card['weight'];

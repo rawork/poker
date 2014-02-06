@@ -5,22 +5,23 @@ namespace Fuga\GameBundle\Model;
 class AbstractGamer {
 	
 	public $cards;
+	public $chips = 0;
 	public $active = false;
 	public $allin = false;
 	
 	protected $data = array();
 	
-	public function bet($bet, $allin = false) {
+	public function bet($bet, $maxbet = 1) {
 		if ($this->chips <= 0) {
 			$this->chips = 0;
-			$this->active = false;
 			return 0;
 		}
-		if ( $allin && $bet > $this->chips ) {
+		if ( $maxbet >= $this->chips || $maxbet >= $bet ) {
+			$this->allin = true;
 			$bet = $this->chips;
-		} elseif ( $bet > $this->chips ) {
-			$this->active = false;
-			return 0;
+		} elseif ($bet > $this->chips) {
+			$this->allin = true;
+			$bet = $this->chip;
 		}
 		$this->chips -= $bet;
 		$this->bet += $bet;

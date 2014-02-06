@@ -16,11 +16,11 @@ class TrainingGamer extends AbstractGamer {
 			'avatar'  => isset($gamer['avatar_value']['extra']) ? $gamer['avatar_value']['extra']['main']['path'] : '/bundles/public/img/avatar_empty.png',
 			'name'    => $gamer['name'],
 			'lastname'=> $gamer['lastname'],
-			'chips'   => isset($options['chips']) ? $options['chips'] : 10,
 			'bet'     => 0,
 			'seat'    => 6,
 			'position'=> 0,
 		);
+		$this->chips = isset($options['chips']) ? intval($options['chips']) : 10;
 	}
 	
 }

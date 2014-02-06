@@ -4,7 +4,7 @@ namespace Fuga\GameBundle\Model;
 
 class Training implements GameInterface {
 	
-	const STATE_BEGIN    = 0;
+	const STATE_BEGIN     = 0;
 	const STATE_CHANGE    = 1;
 	const STATE_QUESTION  = 11;
 	const STATE_PREFLOP   = 2;
@@ -14,6 +14,7 @@ class Training implements GameInterface {
 	const STATE_PREBUY    = 42;
 	const STATE_BUY       = 5;
 	const STATE_END       = 6;
+	const STATE_ROUND_END = 7;
 	
 	public $deck;
 	public $flop;
@@ -45,8 +46,9 @@ class Training implements GameInterface {
 		'bet'        => array('handler' => 'onFold', 'holder' => 'game-timer', 'time' => 31),
 		'distribute' => array('handler' => 'onDistribute', 'holder' => 'game-timer', 'time' => 14),
 		'prebuy'     => array('handler' => 'onShowPrebuy', 'holder' => 'joker-timer', 'time' => 14),
-		'nobuy'      => array('handler' => 'onNext', 'holder' => 'prebuy-timer', 'time' => 14),
-		'buy'        => array('handler' => 'onNext', 'holder' => 'buy-timer', 'time' => 121),
+		'nobuy'      => array('handler' => 'onEndRound', 'holder' => 'prebuy-timer', 'time' => 31),
+		'buy'        => array('handler' => 'onEndRound', 'holder' => 'buy-timer', 'time' => 121),
+		'next'		 => array('handler' => 'onNext', 'holder' => 'round-end-timer', 'time' => 121),
 	);
 	
 	private $log;
@@ -113,49 +115,6 @@ class Training implements GameInterface {
 	
 	public function setBank($value) {
 		$this->bank = $value;
-	}
-	
-	public function showdown() {
-		if ($this->isState(self::STATE_SHOWDOWN)) {
-			$combination = new Combination();
-			$suites = array();
-			$this->log->write('SHOWDOWN');
-			$this->log->write('FLOP');
-			$this->log->write(serialize($this->board->flop));
-			foreach ($this->bots as $bot) {
-				if (!$bot->cards) {
-					continue;
-				}
-				$this->log->write('BOT'.$bot->id);
-				$this->log->write(serialize($bot->cards));
-				$cards = $combination->get(array_merge($bot->cards, $this->board->flop));
-				$cards['position'] = $bot->position;
-				$cards['name'] = $combination->rankName($cards['rank']);
-				$this->log->write(serialize($cards));
-				$suites[] = $cards;
-			}
-			$this->log->write('GAMER');
-			$this->log->write(serialize($this->gamer->cards));
-			$cards = $combination->get(array_merge($this->gamer->cards, $this->board->flop));
-			$cards['position'] = $this->gamer->position;
-			$cards['name'] = $combination->rankName($cards['rank']);
-			$this->log->write(serialize($cards));
-			$suites[] = $cards;
-			$winners = $combination->compare($suites);
-			$this->board->winner = $winners;
-			$combinations = array();
-			foreach ($winners as $winner) {
-				foreach ($winner['cards'] as $card) {
-					$combinations[$card['name']] = 1;
-				}
-			}
-			$this->board->combination = $combinations;
-			if ($this->timers['win']) {
-				$this->timer->set('onWin', 'game-timer', $this->timers['win']);
-			}
-		}
-		
-		return $this;
 	}
 	
 	public function minbet() {
@@ -262,8 +221,11 @@ class Training implements GameInterface {
 			$this->state = new State\BuyState($this);
 		} elseif ($state == self::STATE_END) {
 			$this->state = new State\EndState($this);
+		} elseif ($state == self::STATE_ROUND_END) {
+			$this->state = new State\RoundEndState($this);
 		} 
 		setcookie('gamestate', $state, time() + $this->cookietime, '/');
+		setcookie('gamemaxbet', $this->maxbet, time() + $this->cookietime, '/');
 		$this->syncTime();
 		$this->minbet();
 	}
@@ -300,10 +262,6 @@ class Training implements GameInterface {
 		return $this->state->makeBet($chips);
 	}
 	
-	public function allin() {
-		return $this->state->allinBet();
-	}
-	
 	public function check() {
 		return $this->state->checkBet();
 	}
@@ -330,6 +288,10 @@ class Training implements GameInterface {
 	
 	public function next() {
 		return $this->state->nextGame();
+	}
+	
+	public function endround() {
+		return $this->state->endRound();
 	}
 	
 	public function stop() {

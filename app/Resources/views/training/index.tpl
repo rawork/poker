@@ -20,12 +20,9 @@
 	{$gamer}
 	{$winner}
 	{$hint}
-	{$training->getStateNo()}
 </div>
 <div class="game-combinations"><img src="{$theme_ref}/public/img/combinations4.jpg"></div>
 <script type="text/javascript">
-	var gamemaxbet = {$training->maxbet};
-	var gamerbet = {$training->gamer->bet};
 	var cardimages = {$deck};
 </script>
 

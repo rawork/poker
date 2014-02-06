@@ -16,6 +16,7 @@ interface StateInterface {
 	public function buyChips();
 	public function answerBuyQuestion($answerNo);
 	public function nextGame();
+	public function endRound();
 	public function endGame();
 	public function stopGame();
 	

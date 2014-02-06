@@ -301,6 +301,52 @@ class TrainingController extends PublicController {
 			'bet'   => $training->gamer->bet,
 			'bots'  => $bots,
 			'winner'=> $this->render('training/winner.tpl', compact('training')),
+			'hint'  => $this->render('training/hint.tpl', compact('training')),
+			'timer' => $training->timer->start(),
+		));
+	}
+	
+	public function checkAction() {
+		if (!$this->get('router')->isXmlHttpRequest()) {
+			$this->get('router')->redirect('/training');
+		}
+		
+		$user = $this->get('security')->getCurrentUser();
+		
+		if (!$user) 
+		{
+			return json_encode(array('ok' => false));
+		}
+		
+		$trainingData = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
+		$training = unserialize($trainingData['state']);
+		$training->check();
+		
+		$this->get('container')->updateItem('training_training', 
+			array('state'   => serialize($training)),
+			array('user_id' => $user['id'])
+		);
+		
+		$bots = array();
+		foreach ($training->bots as $gamer) {
+			$bots[$gamer->id] = array(
+				'chips' => $gamer->chips,
+				'cards' => $this->render('training/botcards.tpl', compact('gamer', 'training')),
+				'bet'   => $gamer->bet,
+				'active' => $gamer->isActive(),
+			);
+		}
+		
+		return json_encode(array(
+			'ok' => true,
+			'board' => $this->render('training/board.tpl', compact('training')),
+			'bank'  => $this->render('training/bank.tpl', compact('training')),
+			'chips' => $training->gamer->chips,
+			'cards' => $this->render('training/cards.tpl', compact($training)),
+			'bet'   => $training->gamer->bet,
+			'bots'  => $bots,
+			'winner'=> $this->render('training/winner.tpl', compact('training')),
+			'hint'  => $this->render('training/hint.tpl', compact('training')),
 			'timer' => $training->timer->start(),
 		));
 	}
@@ -416,6 +462,33 @@ class TrainingController extends PublicController {
 			'timer' => $training->timer->start(),
 		));
 	}
+	
+	public function endroundAction() {
+		if (!$this->get('router')->isXmlHttpRequest()) {
+			$this->get('router')->redirect('/training');
+		}
+		
+		$user = $this->get('security')->getCurrentUser();
+		
+		if (!$user) 
+		{
+			return json_encode(array('ok' => false));
+		}
+		
+		$trainingData = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
+		$training = unserialize($trainingData['state']);
+		$training->endround();
+		
+		$this->get('container')->updateItem('training_training', 
+			array('state'   => serialize($training)),
+			array('user_id' => $user['id'])
+		);
+		
+		return json_encode(array(
+			'ok' => true,
+			'board' => $this->render('training/board.tpl', compact('training')),
+		));
+	}
 		
 	public function stopAction() {
 		if (!$this->get('router')->isXmlHttpRequest()) {
@@ -432,12 +505,11 @@ class TrainingController extends PublicController {
 		$trainingData = $this->get('container')->getItem('training_training', 'user_id='.$user['id']);
 		$training = unserialize($trainingData['state']);
 		$training->stop();
-		$this->get('container')->deleteItem('training_training', 'user_id='.$user['id']);
 		
-//		$this->get('container')->updateItem('training_training', 
-//			array('state'   => serialize($training)),
-//			array('user_id' => $user['id'])
-//		);
+		$this->get('container')->updateItem('training_training', 
+			array('state'   => serialize($training)),
+			array('user_id' => $user['id'])
+		);
 		
 		return json_encode(array(
 			'ok' => true,
