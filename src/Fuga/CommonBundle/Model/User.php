@@ -21,6 +21,7 @@ class User {
 				'title' => 'Логин',
 				'type' => 'string',
 				'width' => '25%',
+				'search' => true,
 			),
 			'password' => array (
 				'name' => 'password',
@@ -36,19 +37,22 @@ class User {
 				'name' => 'name',
 				'title' => 'Имя',
 				'type' => 'string',
-				'width' => '15%'
+				'width' => '15%',
+				'search' => true,
 			),
 			'lastname' => array (
 				'name' => 'lastname',
 				'title' => 'Фамилия',
 				'type' => 'string',
-				'width' => '15%'
+				'width' => '15%',
+				'search' => true,
 			),
 			'email' => array (
 				'name' => 'email',
 				'title' => 'Эл. почта',
 				'type' => 'string',
-				'width' => '20%'
+				'width' => '20%',
+				'search' => true,
 			),
 			'group_id' => array (
 				'name' => 'group_id',
@@ -56,7 +60,8 @@ class User {
 				'type' => 'select',
 				'l_table' => 'user_group',
 				'l_field' => 'title',
-				'width' => '25%'
+				'width' => '25%',
+				'search' => true,
 			),
 			'is_admin' => array (
 				'name' => 'is_admin',
@@ -70,7 +75,8 @@ class User {
 				'title' => 'Активен',
 				'type' => 'checkbox',
 				'width' => '1%',
-				'group_update' => true
+				'group_update' => true,
+				'search' => true,
 			)	
 		));
 
@@ -100,7 +106,6 @@ class User {
 				'type' => 'select_list',
 				'l_table' => 'config_module',
 				'l_field' => 'title',
-				'search' => true,
 				'width' => '60%'
 			)
 		));
