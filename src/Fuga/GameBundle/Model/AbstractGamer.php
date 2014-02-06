@@ -11,12 +11,13 @@ class AbstractGamer {
 	
 	protected $data = array();
 	
-	public function bet($bet, $maxbet = 1) {
+	public function bet($bet, $maxbet = 0) {
+		$this->allin = false;
 		if ($this->chips <= 0) {
 			$this->chips = 0;
 			return 0;
 		}
-		if ( $maxbet >= $this->chips || $maxbet >= $bet ) {
+		if ( $maxbet > $this->chips ) {
 			$this->allin = true;
 			$bet = $this->chips;
 		} elseif ($bet >= $this->chips) {

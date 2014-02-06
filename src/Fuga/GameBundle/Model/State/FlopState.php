@@ -25,6 +25,8 @@ class FlopState extends AbstractState {
 			}
 		}
 		$this->game->confirmBets();
+		$this->game->gamer->allin = false;
+		$this->game->maxbet = 0;
 		$this->setWinner();
 		$this->game->setState(AbstractState::STATE_SHOWDOWN);
 		

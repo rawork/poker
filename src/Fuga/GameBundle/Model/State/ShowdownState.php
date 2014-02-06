@@ -34,9 +34,7 @@ class ShowdownState extends AbstractState {
 		$this->game->flop   = null;
 		$this->game->bets   = 0;
 		$this->game->maxbet = 0;
-		$this->game->gamer->allin = false;
 		foreach ($this->game->bots as $bot) {
-			$bot->allin = false;
 			$bot->cards = null;
 			$bot->emptyBet();
 			$bot->active = $bot->chips > 0;

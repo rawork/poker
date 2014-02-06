@@ -26,6 +26,7 @@ class PreflopState extends AbstractState {
 		}
 		$this->game->confirmBets();
 		if ($this->game->gamer->allin) {
+			$this->game->maxbet = 0;
 			$this->setWinner();
 			$this->game->setState(AbstractState::STATE_SHOWDOWN);
 		} else {
