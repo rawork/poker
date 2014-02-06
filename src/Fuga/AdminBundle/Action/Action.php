@@ -29,6 +29,8 @@ class Action extends Controller {
 					default:
 						$this->search_url = $this->dataTable->getSearchURL();
 						parse_str($this->search_url, $this->tableParams);
+						$this->get('log')->write($this->search_url);
+						$this->get('log')->write(json_encode($this->tableParams, JSON_UNESCAPED_UNICODE ));
 						$_SESSION[$this->dataTable->dbName()] = json_encode($this->tableParams, JSON_UNESCAPED_UNICODE);
 				}
 				$this->get('router')->redirect($this->baseRef);
