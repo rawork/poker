@@ -112,7 +112,7 @@ class Type {
 
 	public function getSearchURL($name = '') {
 		if ($value = $this->getSearchValue($name)) {
-			return urlencode($this->getSearchName($name)).'='.urlencode($value);
+			return $this->getSearchName($name).'='.$value;
 		}
 		
 		return '';
