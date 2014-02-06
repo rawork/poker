@@ -107,7 +107,7 @@
 		<div class="question-footer">
 			<button class="btn btn-warning" data-action="buyanswer">ОТВЕТИТЬ</button> <a data-action="nobuyanswer">без ответа</a> 
 			<div class="row-fluid">
-				<div class="span6 question-timer">Время на ответ: <span id="answer-timer"></span></div>
+				<div class="span6 question-timer">Время на ответ: <span id="buy-timer"></span></div>
 				<div class="span6 question-times">Попытка <span id="question-times">{$training->gamer->question.number}</span> из <span id="question-max-times">3</span></div>
 			</div>
 		</div>

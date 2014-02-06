@@ -31,6 +31,7 @@ class AbstractState implements StateInterface {
 		$this->game->gamer->chips = 10;
 		$this->game->gamer->active = true;
 		$this->game->gamer->bet = 0;
+		$this->game->gamer->allin = false;
 		$this->game->setBank(0);
 		$this->game->bets = 0;
 		$this->game->minbet = 0;
@@ -39,6 +40,7 @@ class AbstractState implements StateInterface {
 			$bot->chips = 10;
 			$bot->active = 1;
 			$bot->bet = 0;
+			$bot->allin = false;
 		}
 		
 		$this->game->flop = $this->game->deck->take(3);

@@ -19,9 +19,9 @@ class AbstractGamer {
 		if ( $maxbet >= $this->chips || $maxbet >= $bet ) {
 			$this->allin = true;
 			$bet = $this->chips;
-		} elseif ($bet > $this->chips) {
+		} elseif ($bet >= $this->chips) {
 			$this->allin = true;
-			$bet = $this->chip;
+			$bet = $this->chips;
 		}
 		$this->chips -= $bet;
 		$this->bet += $bet;
