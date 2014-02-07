@@ -50,7 +50,7 @@
 	};
 })(jQuery);
 
-var gametimers = {};
+var gametimer;
 
 function onClickAnswer() {
 	var n = $('.question-answer i.active').attr('data-answer-id');
@@ -511,8 +511,8 @@ function startTime() {
 }
 
 function startTimer() {
-	if (eventtimerId) {
-		clearTimeout(eventtimerId);
+	if (gametimer) {
+		clearTimeout(gametimer);
 	}
 	var timerName = $.cookie('gametimer') || 'game-timer';
 	
@@ -550,7 +550,7 @@ function startTimer() {
 	
 	$('#'+ timerName).html( minutes + ":" + seconds );
 	
-	gametimers[$.cookie('timerhandler')] = setTimeout(startTimer, 950);
+	gametimer = setTimeout(startTimer, 950);
 }
 
 function stopTimer() {
@@ -558,9 +558,7 @@ function stopTimer() {
 	$.removeCookie('timerhandler');
 	$.removeCookie('timerminute');
 	$.removeCookie('timersecond');
-	for (var i in gametimers) {
-		clearTimeout(gametimers[i]);
-	}
+	clearTimeout(gametimer);
 }
 
 $(document).ready(function(){
