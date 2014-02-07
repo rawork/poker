@@ -4,7 +4,7 @@
 <input type="hidden" name="user_id" value="{$account.user_id}">
 <div class="row-fluid register-card">
 	<div class="span6">
-		<div class="register-title">Выберите статус *</div>
+		{*<div class="register-title">Выберите статус *</div>
 		<div class="register-field">
 			<label>
 				<select name="group_id">
@@ -16,7 +16,7 @@
 					{/if}
 				</select>
 			</label>	
-		</div>
+		</div>*}
 		<div class="register-title">Имя *</div>
 		<div class="register-field">
 			<input type="text" name="name" value="{$account.name}">

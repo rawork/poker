@@ -141,8 +141,9 @@ class AccountController extends PublicController {
 		}
 		
 		if ('POST' == $_SERVER['REQUEST_METHOD']) {
+			
 			$user = array();
-			$user['group_id'] = $this->get('util')->post('group_id');
+			$user['group_id'] = $this->get('util')->post('group_id', true, 0);
 			$user['login']    = $this->get('util')->post('login');
 			$user['password'] = $this->get('util')->post('password');
 			$user['name']     = $this->get('util')->post('name');
@@ -300,9 +301,9 @@ class AccountController extends PublicController {
 		if (!$user) {
 			$this->get('router')->redirect('/members');
 		}
-		
+		$groupId = $user['group_id'];
 		if ('POST' == $_SERVER['REQUEST_METHOD']) {
-			$user['group_id'] = $this->get('util')->post('group_id');
+			$user['group_id'] = $this->get('util')->post('group_id', true, 0);
 			$user['name']     = $this->get('util')->post('name');
 			$user['lastname'] = $this->get('util')->post('lastname');
 			
@@ -315,7 +316,7 @@ class AccountController extends PublicController {
 			
 			$errors = array();
 			if (empty($user['group_id']) || !in_array($user['group_id'], array(2,3))) {
-				$user['group_id'] = 3;
+				$user['group_id'] = $groupId;
 			}
 			if (empty($user['name'])) {
 				$errors[] = 'Не заполнено имя';

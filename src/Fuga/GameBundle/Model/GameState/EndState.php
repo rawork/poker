@@ -1,10 +1,10 @@
 <?php
 
-namespace Fuga\GameBundle\Model\State;
+namespace Fuga\GameBundle\Model\GameState;
 
 use Fuga\GameBundle\Model\GameInterface;
 
-class BeginState extends AbstractState {
+class EndState extends AbstractState {
 	
 	public function __construct(GameInterface $game) {
 		parent::__construct($game);

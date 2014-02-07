@@ -19,7 +19,7 @@ class Training implements GameInterface {
 	public $deck;
 	public $flop;
 	
-	public $minbet = 1;
+	public $minbet = 0;
 	public $bots;
 	public $gamer;
 	public $bets = 0;
@@ -202,27 +202,27 @@ class Training implements GameInterface {
 	public function setState($state) {
 		$this->stateNo = $state;
 		if ($state == self::STATE_BEGIN) {
-			$this->state = new State\BeginState($this);
+			$this->state = new TrainingState\BeginState($this);
 		} elseif ($state == self::STATE_CHANGE) {
-			$this->state = new State\ChangeState($this);
+			$this->state = new TrainingState\ChangeState($this);
 		} elseif ($state == self::STATE_QUESTION) {
-			$this->state = new State\QuestionState($this);
+			$this->state = new TrainingState\QuestionState($this);
 		} elseif ($state == self::STATE_PREFLOP) {
-			$this->state = new State\PreflopState($this);
+			$this->state = new TrainingState\PreflopState($this);
 		} elseif ($state == self::STATE_FLOP) {
-			$this->state = new State\FlopState($this);
+			$this->state = new TrainingState\FlopState($this);
 		} elseif ($state == self::STATE_SHOWDOWN) {
-			$this->state = new State\ShowdownState($this);
+			$this->state = new TrainingState\ShowdownState($this);
 		} elseif ($state == self::STATE_JOKER) {
-			$this->state = new State\JokerState($this);
+			$this->state = new TrainingState\JokerState($this);
 		} elseif ($state == self::STATE_PREBUY) {
-			$this->state = new State\PrebuyState($this);
+			$this->state = new TrainingState\PrebuyState($this);
 		} elseif ($state == self::STATE_BUY) {
-			$this->state = new State\BuyState($this);
-		} elseif ($state == self::STATE_END) {
-			$this->state = new State\EndState($this);
+			$this->state = new TrainingState\BuyState($this);
 		} elseif ($state == self::STATE_ROUND_END) {
-			$this->state = new State\RoundEndState($this);
+			$this->state = new TrainingState\RoundEndState($this);
+		} elseif ($state == self::STATE_END) {
+			$this->state = new TrainingState\EndState($this);
 		} 
 		setcookie('gamestate', $state, time() + $this->cookietime, '/');
 		setcookie('gamemaxbet', $this->maxbet, time() + $this->cookietime, '/');

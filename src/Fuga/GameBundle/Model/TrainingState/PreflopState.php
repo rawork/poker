@@ -1,11 +1,11 @@
 <?php
 
-namespace Fuga\GameBundle\Model\State;
+namespace Fuga\GameBundle\Model\TrainingState;
 
 use Fuga\GameBundle\Model\GameInterface;
 use Fuga\GameBundle\Model\Combination;
 
-class FlopState extends AbstractState {
+class PreflopState extends AbstractState {
 	
 	public function __construct(GameInterface $game) {
 		parent::__construct($game);
@@ -16,8 +16,7 @@ class FlopState extends AbstractState {
 
 		foreach ($this->game->bots as $bot) {
 			if ($bot->isActive()) {
-//				$isBet = $this->game->gamer->allin ? rand(1,3) == 2 : true;
-				$isBet = rand(1,3) != 2;
+				$isBet = $this->game->gamer->allin ? rand(1,3) == 2 : true;
 				if ($isBet) {
 					$this->game->acceptBet($bot->bet($chips, $this->game->maxbet));
 				} else {
@@ -26,17 +25,24 @@ class FlopState extends AbstractState {
 			}
 		}
 		$this->game->confirmBets();
-		$this->game->gamer->allin = false;
-		$this->game->maxbet = 0;
-		$this->setWinner();
-		$this->game->setState(AbstractState::STATE_SHOWDOWN);
+		$combination = new Combination();
+		$cards = $combination->get(array_merge($this->game->gamer->cards, $this->game->flop));
+		$combinations = array();
+		foreach ($cards['cards'] as $card) {
+			$combinations[$card['name']] = 1;
+		}
+		$this->game->gamer->rank = $combination->rankName($cards['rank']);
+		$this->game->gamer->combination = $combinations;
+		if ($this->game->gamer->allin) {
+			$this->game->maxbet = 0;
+			$this->setWinner();
+			$this->game->setState(AbstractState::STATE_SHOWDOWN);
+		} else {
+			$this->game->maxbet = 0;
+			$this->game->setState(AbstractState::STATE_FLOP);
+		}
 		
 		return $this->game->getStateNo();
-	}
-	
-	public function checkBet(){
-		$this->setWinner();
-		$this->game->setState(AbstractState::STATE_SHOWDOWN);
 	}
 	
 	public function foldCards() {

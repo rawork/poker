@@ -1,6 +1,6 @@
 <?php
 
-namespace Fuga\GameBundle\Model\State;
+namespace Fuga\GameBundle\Model\GameState;
 
 use Fuga\GameBundle\Model\GameInterface;
 use Fuga\GameBundle\Model\Combination;

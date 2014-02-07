@@ -1,6 +1,6 @@
 <?php
 
-namespace Fuga\GameBundle\Model\State;
+namespace Fuga\GameBundle\Model\TrainingState;
 
 interface StateInterface {
 	
