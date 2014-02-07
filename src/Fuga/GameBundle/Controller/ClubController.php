@@ -51,7 +51,8 @@ class ClubController extends PublicController {
 			));
 		}
 		
-		$message = $this->get('util')->post('message');
+		$message = strip_tags($this->get('util')->post('message'), '<img>');
+		
 		if (!$message) {
 			return json_encode(array(
 				'ok' => false,
@@ -62,7 +63,7 @@ class ClubController extends PublicController {
 		$account = $this->get('container')->getItem('account_member', 'user_id='.$user['id']);
 		
 		$messageId = $this->get('container')->addItem('club_message', array(
-			'message' => '',
+			'message' => $message,
 			'message_id' => 0,
 			'member_id' => $account['id'],
 			'publish' => 1,
@@ -70,7 +71,6 @@ class ClubController extends PublicController {
 			'updated' => '0000-00-00 00:00:00',
 			'likes'   => 0,
 		));
-		$this->get('connection')->query("UPDATE club_message SET message='".$message."' WHERE id =".$messageId);
 		$this->get('mailer')->send(
 			'Новое сообщение на сайте клуба Чертова дюжина',
 			$this->render('mail/message.admin.tpl', compact('account', 'message', 'messageId')),
@@ -98,8 +98,9 @@ class ClubController extends PublicController {
 			));
 		}
 		
-		$message = $this->get('util')->post('message');
+		$message = strip_tags($this->get('util')->post('message'), '<img>');
 		$messageId = $this->get('util')->post('message_id');
+		
 		if (!$message) {
 			return json_encode(array(
 				'ok' => false,
@@ -110,7 +111,7 @@ class ClubController extends PublicController {
 		$account = $this->get('container')->getItem('account_member', 'user_id='.$user['id']);
 		
 		$commentId = $this->get('container')->addItem('club_message', array(
-			'message' => '',
+			'message' => $message,
 			'message_id' => $messageId,
 			'member_id' => $account['id'],
 			'publish' => 1,
@@ -118,7 +119,6 @@ class ClubController extends PublicController {
 			'updated' => '0000-00-00 00:00:00',
 			'likes'   => 0,
 		));
-		$this->get('connection')->query("UPDATE club_message SET message='".$message."' WHERE id =".$commentId);
 		$this->get('mailer')->send(
 			'Новый комментарий на сайте клуба Чертова дюжина',
 			$this->render('mail/comment.admin.tpl', compact('account', 'message', 'commentId')),

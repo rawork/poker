@@ -237,7 +237,7 @@ class Util {
 	
 	public function post($key, $is_num = false, $default = ''){
 		if (isset($_POST[$key])) {
-			return $is_num ? intval($_POST[$key]) : (is_array($_POST[$key]) ? $_POST[$key] : addslashes($_POST[$key]));
+			return $is_num ? intval($_POST[$key]) : (is_array($_POST[$key]) ? $_POST[$key] : $_POST[$key]);
 		} else {
 			return $default;
 		}
