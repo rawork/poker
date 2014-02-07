@@ -331,7 +331,7 @@ class AccountController extends PublicController {
 				$this->get('connection')->beginTransaction();
 				try{
 					$this->get('container')->updateItem('user_user',
-						array('name' => $user['name'], 'lastname' => $user['lastname']),
+						array('name' => $user['name'], 'lastname' => $user['lastname'], 'group_id' => $user['group_id']),
 						array('id' => $user['id'])
 					);
 					$this->get('container')->getTable('account_member')->updateGlobals();
