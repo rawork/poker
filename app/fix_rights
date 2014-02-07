@@ -23,6 +23,8 @@ chmod -R 777 cache/
 chmod 644 cache/.gitkeep
 chmod 644 cache/smarty/.gitkeep
 chmod 644 cache/twig/.gitkeep
+chmod 644 cache/proxies/.gitkeep
+chmod 644 cache/hydrators/.gitkeep
 chmod -R 777 ../files/
 chmod 644 ../files/.htaccess
 chmod -R 777 ../thumbs/

@@ -4,16 +4,19 @@ namespace Fuga\GameBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/** @ODM\Document(db="holdem", collection="decks") */
-class Deck
+/** @ODM\Document(db="holdem", collection="cards") */
+class Card
 {
 	/** @ODM\Id */
     private $id;
 	
 	/** @ODM\String */
-    private $board;
+    private $name;
+
+	/** @ODM\Int */
+	private $weight;
 	
-	/** @ODM\Collection */
-	private $cards = array();
+	/** @ODM\Int */
+	private $suite;
 
 }

@@ -16,7 +16,10 @@ class Container
 	private $managers = array();
 	private $tempmodules = array();
 	
-	public function __construct() {
+	private $loader;
+	
+	public function __construct($loader) {
+		$this->loader = $loader;
 		$this->tempmodules = array(
 			'user' => array(
 				'name'  => 'user',
@@ -393,6 +396,10 @@ class Container
 					);
 					$this->services[$name] = \Doctrine\DBAL\DriverManager::getConnection($connectionParams, $config);
 					$this->services[$name]->getDatabasePlatform()->registerDoctrineTypeMapping('DECIMAL(14,2)', 'money');
+					break;
+				case 'mongo':
+					$mongo = new \MongoClient(sprintf("mongodb://%s:%s@%s/%s", MONGO_USER, MONGO_PASS, MONGO_HOST, MONGO_BASE));
+					$this->services[$name] = $mongo->selectDB('holdem');
 					break;
 				case 'filestorage':
 					$this->services[$name] = new Storage\FileStorage(UPLOAD_REF, UPLOAD_DIR);

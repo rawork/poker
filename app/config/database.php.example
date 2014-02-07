@@ -5,3 +5,8 @@ define('DB_USER', '');
 define('DB_HOST', 'localhost');
 define('DB_PASS', '');
 define('DB_TYPE', 'pdo_mysql');
+
+define('MONGO_BASE', '');
+define('MONGO_USER', '');
+define('MONGO_HOST', 'localhost');
+define('MONGO_PASS', '');

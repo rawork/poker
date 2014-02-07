@@ -76,7 +76,7 @@ $GLOBALS['cur_page_id'] = preg_replace('/(\/|-|\.|:|\?|[|])/', '_', str_replace(
 
 //Registry::init('app/config/parameters.yml');
 
-$container = new Container();
+$container = new Container($loader);
 
 // инициализация переменных
 $params = array();

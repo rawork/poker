@@ -4,7 +4,7 @@ namespace Fuga\GameBundle\Controller;
 
 use Fuga\CommonBundle\Controller\PublicController;
 use Fuga\GameBundle\Model\Training;
-use Fuga\GameBundle\Model\Combination;
+use Fuga\GameBundle\Model\Deck;
 
 class TrainingController extends PublicController {
 	
@@ -254,6 +254,7 @@ class TrainingController extends PublicController {
 		return json_encode(array(
 			'ok' => true,
 			'board' => $this->render('training/board.tpl', compact('training')),
+			'cards' => $this->render('training/cards.tpl', compact($training)),
 			'winner' => $this->render('training/winner.tpl', compact('training')),
 			'bots' => $bots,
 			'bank' => $this->render('training/bank.tpl', compact('training')),
@@ -487,6 +488,7 @@ class TrainingController extends PublicController {
 		return json_encode(array(
 			'ok' => true,
 			'board' => $this->render('training/board.tpl', compact('training')),
+			'timer' => $training->timer->start(),
 		));
 	}
 		

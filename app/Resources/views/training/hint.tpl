@@ -1,3 +1,3 @@
-{if $training->isState(2) || $training->isState(3)}
-<div class="game-winner winner0">&laquo;{$training->gamer->rank}&raquo;</div>
+{if ($training->isState(2) || $training->isState(3) || $training->isState(4)) && $training->gamer->rank}
+<div class="gamer-hint hint0">{if $training->gamer->cards}&laquo;{$training->gamer->rank}&raquo;{/if}</div>
 {/if}

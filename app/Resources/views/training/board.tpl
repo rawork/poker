@@ -55,7 +55,7 @@
 {elseif $training->isState(2) || $training->isState(3) || $training->isState(4)}
 <div class="game-flop">	
 	{foreach from=$training->flop item=card}
-	<div class="card{if $training->isState(4) && $training->combination[$card.name]} active{/if}{if ($training->isState(2) || $training->isState(3)) && $training->gamer->combination[$card.name]} hint{/if}" data-card-name="{$card.name}">
+	<div class="card{if ($training->isState(2) || $training->isState(3) || $training->isState(4)) && $training->gamer->combination[$card.name]} hint{/if}{if $training->isState(4) && $training->combination[$card.name]} active{/if}" data-card-name="{$card.name}">
 		{if $training->isState(3) || $training->isState(4)}<img src="/bundles/public/img/cards/{$card.name}.png" />
 		{else}
 		<img src="/bundles/public/img/shirt.png" />
@@ -71,6 +71,7 @@
 			<div class="span4"><img src="/bundles/public/img/joker.jpg"></div>
 			<div class="span8">
 				<div class="text">Поскольку я выпал игроку за этим столом, все получают приз! Поздравляю!</div>
+				<button class="btn btn-primary" data-action="prebuy">Продолжить</button>
 				<div class="timer" id="joker-timer"></div>
 			</div>
 		</div>

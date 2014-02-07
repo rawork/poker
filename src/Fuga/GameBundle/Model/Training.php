@@ -44,11 +44,11 @@ class Training implements GameInterface {
 		'change'     => false, // array('handler' => 'onClickNoChange', 'holder' => 'change-timer', 'time' => 14)
 		'answer'     => array('handler' => 'onNoAnswer', 'holder' => 'answer-timer', 'time' => 14),
 		'bet'        => array('handler' => 'onFold', 'holder' => 'game-timer', 'time' => 31),
-		'distribute' => array('handler' => 'onDistribute', 'holder' => 'game-timer', 'time' => 14),
+		'distribute' => array('handler' => 'onDistribute', 'holder' => 'game-timer', 'time' => 61),
 		'prebuy'     => array('handler' => 'onShowPrebuy', 'holder' => 'joker-timer', 'time' => 14),
 		'nobuy'      => array('handler' => 'onEndRound', 'holder' => 'prebuy-timer', 'time' => 31),
 		'buy'        => array('handler' => 'onEndRound', 'holder' => 'buy-timer', 'time' => 121),
-		'next'		 => array('handler' => 'onNext', 'holder' => 'round-end-timer', 'time' => 121),
+		'next'		 => false,//array('handler' => 'onNext', 'holder' => 'round-end-timer', 'time' => 121),
 	);
 	
 	private $log;

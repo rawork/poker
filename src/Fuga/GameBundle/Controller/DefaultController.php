@@ -189,5 +189,29 @@ class DefaultController extends PublicController {
 	public function givecardsAction() {
 		
 	}
+	
+	public function testAction() {
+		$deck = new Deck();
+		$collection = $this->get('mongo')->decks;
+		echo microtime().'<br>';
+		for ($i = 0; $i < 5; $i++) {
+			$deck->make();
+			$item = array(
+				'board_id' => 1,
+				'cards'    => $deck->take(),
+			);
+			$collection->insert($item);
+		}
+		echo microtime().'<br>';
+		for ($i = 0; $i < 5; $i++) {
+			$deck->make();
+			$this->get('container')->addItem('training_training', array(
+				'user_id' => 0,
+				'state' => serialize($deck),
+			));
+		}
+		echo microtime().'<br>';
+		return 'mongo';
+	}
 
 }

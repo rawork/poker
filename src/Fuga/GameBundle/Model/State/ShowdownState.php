@@ -29,6 +29,9 @@ class ShowdownState extends AbstractState {
 		$this->game->gamer->checkActive();
 		$this->game->gamer->emptyBet();
 		$this->game->gamer->cards  = null;
+		$this->game->gamer->rank = null;
+		$this->game->gamer->combination = null;
+		$this->game->gamer->winner = false;
 		$this->game->winner = null;
 		$this->game->combination = null;
 		$this->game->flop   = null;

@@ -9,7 +9,9 @@
 			{else}
 			<img src="/bundles/public/img/shirt.png" />
 			{/if}
-		</div> 
+		</div>
+		{foreachelse}
+		{if $training->isState(2) || $training->isState(3) || $training->isState(4)}<div class="pass">ПАС</div>{/if}
 		{/foreach}
 	</div>
 	{/if}
@@ -37,6 +39,8 @@
 			<img src="/bundles/public/img/shirt.png" />
 			{/if}
 		</div> 
+		{foreachelse}
+		{if $training->isState(2) || $training->isState(3) || $training->isState(4)}<div class="pass">ПАС</div>{/if}
 		{/foreach}
 	</div>
 	{/if}

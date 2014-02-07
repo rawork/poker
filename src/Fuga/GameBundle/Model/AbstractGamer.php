@@ -8,6 +8,7 @@ class AbstractGamer {
 	public $chips = 0;
 	public $active = false;
 	public $allin = false;
+	public $winner = false;
 	
 	protected $data = array();
 	

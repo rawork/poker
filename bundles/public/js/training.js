@@ -222,7 +222,7 @@ function onClickChange() {
 function onClickCheck() {
 	enableButtons(4);
 	$('.gamer-card-zoom').hide();
-	$('.game-winner').remove();
+	$('.gamer-hint').remove();
 	$('#input_bet').val($('#min-bet').html());
 	$.post('/training/check', {},
 	function(data){
@@ -245,14 +245,14 @@ function onClickCheck() {
 
 function onFold() {
 	$('.gamer-card-zoom').hide();
-	$('.game-winner').remove();
+	$('.gamer-hint').remove();
 	enableButtons(4);
 	$.post('/training/fold', {},
 	function(data){
 		if (data.ok) {
 			updateBots(data.bots);
 			$('#table').html(data.board);
-			$('#gamer-cards').empty();
+			$('#gamer-cards').html(data.cards);
 			$('.gamer-container').append(data.winner);
 			$('.game-main-bank').html(data.bank);
 			startTimer();
@@ -321,7 +321,7 @@ function onClickAllIn() {
 function onBet(chips) {
 	enableButtons(4);
 	$('.gamer-card-zoom').hide();
-	$('.game-winner').remove();
+	$('.gamer-hint').remove();
 	$('#input_bet').val($('#min-bet').html());
 	$.post('/training/bet', {chips: chips},
 	function(data){
@@ -349,6 +349,7 @@ function onDistribute() {
 			updateBots(data.bots);
 			$('#gamer-cards').empty();
 			$('.game-winner').remove();
+			$('.gamer-hint').remove();
 			$('.game-main-bank').html(data.bank);
 			$('#chips').html(data.chips);
 			$('#bet').html(data.bet);
@@ -368,12 +369,14 @@ function onDistribute() {
 }
 
 function onShowPrebuy() {
+	stopTimer();
 	$.post('/training/prebuy', {},
 	function(data){
 		if (data.ok) {
 			updateBots(data.bots);
 			$('#gamer-cards').empty();
 			$('.game-winner').remove();
+			$('.gamer-hint').remove();
 			$('.game-main-bank').html(data.bank);
 			$('#chips').html(data.chips);
 			$('#bet').html(data.bet);
@@ -385,7 +388,6 @@ function onShowPrebuy() {
 				$('.gamer-cards').empty();
 				$('.game-min-bet').empty();
 				$('.game-main-bank').empty();
-				stopTimer();
 			}
 			enableButtons();
 			startTimer();
@@ -430,47 +432,48 @@ function enableButtons(state) {
 	switch (state) {
 		case 2:
 			$('.game-buttons button').prop('disabled', false);
-			$('.game-buttons button[data-move=check]').prop('disabled', true);
-			$('.game-buttons button[data-move=buy]').prop('disabled', true);
+			$('.game-buttons button[data-action=check]').prop('disabled', true);
+			$('.game-buttons button[data-action=buy]').prop('disabled', true);
 			var minbet = $('#min-bet').html();
 			var maxbet = $.cookie('gamemaxbet');
 			var chips = $('#chips').html();
 			if (minbet > chips && maxbet > chips) {
-				$('.game-buttons button[data-move=bet]').prop('disabled', true);
+				$('.game-buttons button[data-action=bet]').prop('disabled', true);
 			}
 			break;
 		case 3:
 			$('.game-buttons button').prop('disabled', false);
-			$('.game-buttons button[data-move=buy]').prop('disabled', true);
+			$('.game-buttons button[data-action=buy]').prop('disabled', true);
 			break;
 		case 42:
 			$('.game-buttons button').prop('disabled', true);
-			$('.game-buttons button[data-move=buy]').prop('disabled', false);
+			$('.game-buttons button[data-action=buy]').prop('disabled', false);
 			break;
 		default:
 			$('.game-buttons button').prop('disabled', true);
 	}
-	$('.game-buttons button[data-move=new]').prop('disabled', false);
+	$('.game-buttons button[data-action=new]').prop('disabled', false);
 }
 
 function initTraining() {
-	setInterval(startTime, 990);
-	$(document).on('click', 'button[data-action=change]', onClickChange);
-	$(document).on('click', 'button[data-action=nochange]', onClickNoChange);
+	setInterval(startTime, 980);
 	$(document).on('click', '.choose', onChooseCard);
+	$(document).on('click', 'a[data-action=nobuyanswer]',    onClickNoBuyAnswer);
+	$(document).on('click', '.question-answer',              onChooseAnswer);
+	$(document).on('click', 'button[data-action=change]',    onClickChange);
+	$(document).on('click', 'button[data-action=nochange]',  onClickNoChange);
 	$(document).on('click', 'button[data-action=buyanswer]', onClickBuyAnswer);
-	$(document).on('click', 'a[data-action=nobuyanswer]', onClickNoBuyAnswer);
-	$(document).on('click', '.question-answer', onChooseAnswer);
-	$(document).on('click', 'button[data-action=start]', onClickStart);
-	$(document).on('click', 'button[data-action=stop]', onClickStop);
-	$(document).on('click', 'button[data-action=next]', onNext);
-	$(document).on('click', 'button[data-action=answer]', onClickAnswer);
-	$(document).on('click', 'button[data-move=vabank]', onClickAllIn);
-	$(document).on('click', 'button[data-move=bet]', onClickBet);
-	$(document).on('click', 'button[data-move=check]', onClickCheck);
-	$(document).on('click', 'button[data-move=fold]', onFold);
-	$(document).on('click', 'button[data-move=buy]', onBuy);
-	$(document).on('click', 'button[data-move=new]', onClickStart);
+	$(document).on('click', 'button[data-action=start]',     onClickStart);
+	$(document).on('click', 'button[data-action=stop]',      onClickStop);
+	$(document).on('click', 'button[data-action=next]',      onNext);
+	$(document).on('click', 'button[data-action=answer]',    onClickAnswer);
+	$(document).on('click', 'button[data-action=vabank]',    onClickAllIn);
+	$(document).on('click', 'button[data-action=bet]',       onClickBet);
+	$(document).on('click', 'button[data-action=check]',     onClickCheck);
+	$(document).on('click', 'button[data-action=fold]',      onFold);
+	$(document).on('click', 'button[data-action=prebuy]',    onShowPrebuy);
+	$(document).on('click', 'button[data-action=buy]',       onBuy);
+	$(document).on('click', 'button[data-action=new]',       onClickStart);
 	enableButtons();
 	startTimer();
 	setInterval(onCheckMinBet, 5000);

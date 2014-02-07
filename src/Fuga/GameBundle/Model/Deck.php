@@ -78,10 +78,15 @@ class Deck {
 		$suite = array();
 		if (!$quantity) {
 			$suite = $this->deck;
-			$this->deck = 0;
+			$this->deck = null;
 		} else {
 			for ($i = 0; $i < $quantity; $i++) {
-				$suite[] = array_shift($this->deck);
+				if (count($this->deck) > 0) {
+					$suite[] = array_shift($this->deck);
+				} else {
+					$this->deck = null;
+					return array();
+				}
 			}
 		}
 		

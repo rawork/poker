@@ -86,12 +86,12 @@ body {
 	margin: 1px;
 }
 
-.game-flop .active {
-	border-color: #fb4e0c;
-}
-
 .game-flop .hint {
 	border-color: #4fafeb;
+}
+
+.game-flop .active {
+	border-color: #fb4e0c;
 }
 
 .game-flop .card img {
@@ -285,6 +285,22 @@ body {
 	height: 57px;
 }
 
+.gamer-cards .pass {
+	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
+	line-height: 40px;
+	text-align: center;
+	color: #666;
+	font-size: 40px;
+}
+
+#gamer-cards .pass {
+	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
+	line-height: 125px;
+	text-align: center;
+	color: #666;
+	font-size: 40px;
+}
+
 #gamer-cards {
 	height: 95px;
 }
@@ -297,12 +313,12 @@ body {
 	cursor: pointer;
 }
 
-.gamer-cards .active {
-	border-color: #fb4e0c;
-}
-
 .gamer-cards .hint {
 	border-color: #4fafeb;
+}
+
+.gamer-cards .active {
+	border-color: #fb4e0c;
 }
 
 .gamer-card-zoom {
@@ -319,7 +335,8 @@ body {
 	position: absolute;
 	width: 300px;
 	text-align: center;
-	font-size: 16px;
+	font-size: 20px;
+	color: #fb4e0c;
 }
 
 .winner1 {
@@ -328,17 +345,17 @@ body {
 }
 
 .winner2 {
-	top: -260px;
+	top: -255px;
 	left: 18px;
 }
 
 .winner3 {
-	top: -260px;
+	top: -255px;
 	left: 320px;
 }
 
 .winner4 {
-	top: -260px;
+	top: -255px;
 	left: 622px;
 }
 
@@ -348,6 +365,19 @@ body {
 }
 
 .winner0 {
+	top: -55px;
+	left: 320px;
+}
+
+.gamer-hint {
+	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
+	position: absolute;
+	width: 300px;
+	text-align: center;
+	font-size: 18px;
+}
+
+.hint0 {
 	top: -55px;
 	left: 320px;
 }

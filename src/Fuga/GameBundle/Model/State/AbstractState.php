@@ -3,6 +3,7 @@
 namespace Fuga\GameBundle\Model\State;
 
 use Fuga\GameBundle\Model\GameInterface;
+use Fuga\GameBundle\Model\Combination;
 
 class AbstractState implements StateInterface {
 	
@@ -32,6 +33,7 @@ class AbstractState implements StateInterface {
 		$this->game->gamer->active = true;
 		$this->game->gamer->bet = 0;
 		$this->game->gamer->allin = false;
+		$this->game->gamer->winner = false;
 		$this->game->setBank(0);
 		$this->game->bets = 0;
 		$this->game->minbet = 0;
@@ -133,6 +135,40 @@ class AbstractState implements StateInterface {
 		$this->game->setState(self::STATE_ROUND_END);
 		
 		return $this->game->getStateNo();
+	}
+	
+	protected function setWinner() {
+		$combination = new Combination();
+		$suites = array();
+		foreach ($this->game->bots as $bot) {
+			if (!$bot->cards) {
+				continue;
+			}
+			$cards = $combination->get(array_merge($bot->cards, $this->game->flop));
+			$cards['position'] = $bot->position;
+			$cards['name'] = $combination->rankName($cards['rank']);
+			$suites[] = $cards;
+		}
+		if ($this->game->gamer->cards) {
+			$cards = $combination->get(array_merge($this->game->gamer->cards, $this->game->flop));
+			$cards['position'] = $this->game->gamer->position;
+			$cards['name'] = $combination->rankName($cards['rank']);
+			$suites[] = $cards;
+		}
+		$winners = $combination->compare($suites);
+		$this->game->winner = $winners;
+		$combinations = array();
+		foreach ($winners as $winner) {
+			if ($winner['position'] == 0) {
+				$this->game->gamer->rank = null;
+				$this->game->gamer->winner = true;
+			}
+			foreach ($winner['cards'] as $card) {
+				$combinations[$card['name']] = 1;
+			}
+		}
+		$this->game->combination = $combinations;
+		$this->game->setTimer('distribute');
 	}
 	
 }
