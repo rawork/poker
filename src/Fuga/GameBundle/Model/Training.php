@@ -60,7 +60,9 @@ class Training implements GameInterface {
 		$this->user_id = $gamer['user_id'];
 		$this->createGamer(new TrainingGamer($gamer));
 		$this->createBots(3);
+		var_dump(5);
 		$this->setState(self::STATE_BEGIN);
+		var_dump(6);
 	}
 	
 	public function createGamer(TrainingGamer $gamer) {
@@ -296,5 +298,17 @@ class Training implements GameInterface {
 	
 	public function stop() {
 		return $this->state->stopGame();
+	}
+	
+	public function registerObserver(ObserverInterface $o) {
+		throw new Exception\GameException('registerObserver not implemented');
+	}
+	
+	public function removeObserver(ObserverInterface $o) {
+		throw new Exception\GameException('removeObserver not implemented');
+	}
+	
+	public function notifyObservers() {
+		throw new Exception\GameException('notifyObserver not implemented');
 	}
 }

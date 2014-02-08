@@ -77,7 +77,7 @@ function onAnswer(n) {
 			enableButtons();
 			startTimer();
 		} else {
-			window.location.reload();
+//			window.location.reload();
 		}
 	}, "json");
 }
@@ -337,7 +337,7 @@ function onBet(chips) {
 			enableButtons();
 			startTimer();
 		} else {
-			window.location.reload();
+//			window.location.reload();
 		}
 	}, "json");
 }
@@ -428,22 +428,29 @@ function updateBots(bots) {
 }
 
 function enableButtons(state) {
-	var state = state || +$.cookie('gamestate');
+	var state = state || + $.cookie('gamestate');
 	switch (state) {
 		case 2:
 			$('.game-buttons button').prop('disabled', false);
 			$('.game-buttons button[data-action=check]').prop('disabled', true);
 			$('.game-buttons button[data-action=buy]').prop('disabled', true);
-			var minbet = $('#min-bet').html();
-			var maxbet = $.cookie('gamemaxbet');
-			var chips = $('#chips').html();
-			if (minbet > chips && maxbet > chips) {
+			var minbet = +$('#min-bet').html();
+			var maxbet = +$.cookie('gamemaxbet');
+			var chips = +$('#chips').html();
+			if (minbet > chips || maxbet > chips) {
 				$('.game-buttons button[data-action=bet]').prop('disabled', true);
 			}
 			break;
 		case 3:
 			$('.game-buttons button').prop('disabled', false);
 			$('.game-buttons button[data-action=buy]').prop('disabled', true);
+			var minbet = +$('#min-bet').html();
+			var maxbet = +$.cookie('gamemaxbet');
+			var chips = +$('#chips').html();
+			if (minbet > chips || maxbet > chips) {
+				$('.game-buttons button[data-action=check]').prop('disabled', true);
+				$('.game-buttons button[data-action=bet]').prop('disabled', true);
+			}
 			break;
 		case 42:
 			$('.game-buttons button').prop('disabled', true);
@@ -535,7 +542,7 @@ function startTimer() {
 	if (seconds < 0 || minutes < 0) {
 		$('#'+ timerName).html( "00:00" );
 		var timerhandler = $.cookie('timerhandler');
-		console.log(timerhandler);
+//		console.log(timerhandler);
 		$.removeCookie('timerhandler');
 		stopTimer();
 		window[timerhandler]();

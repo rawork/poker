@@ -2,7 +2,7 @@
 
 namespace Fuga\GameBundle\Model;
 
-class Game {
+class Game implements GameInterface, ObserverInterface {
 	
 	const STATE_BEGIN     = 0;
 	const STATE_CHANGE    = 1;
@@ -43,6 +43,10 @@ class Game {
 	);
 	
 	private $log;
+	
+	public function __construct($board, $deck) {
+		
+	}
 	
 	public function startTime() {
 		$this->fromtime = new \DateTime();
@@ -107,5 +111,21 @@ class Game {
 		setcookie('gamemaxbet', $this->maxbet, time() + $this->cookietime, '/');
 		$this->syncTime();
 		$this->minbet();
+	}
+	
+	public function registerObserver(ObserverInterface $o) {
+		;
+	}
+	
+	public function removeObserver(ObserverInterface $o) {
+		;
+	}
+	
+	public function notifyObserver() {
+		;
+	}
+	
+	public function update() {
+		;
 	}
 }

@@ -14,6 +14,7 @@ class RealGamer {
 	public $rank;
 	public $combination;
 	public $allin;
+	public $dealer;
 	public $timer;
 	
 	private $bet;
@@ -39,16 +40,31 @@ class RealGamer {
 		$this->seat     = intval($gamer['seat']);
 		$this->position = 0;
 		$this->chips    = intval($gamer['chips']);
+		$this->active   = $gamer['status'] == 1;
+		$this->dealer   = $gamer['dealer'] == 1;
 	}
 	
-	public function getRivalPosition($rivalSeat) {
+	public function getRivalPosition($rivalSeat, $numOfSeats = 6) {
+		switch($numOfSeats){
+			case 1:
+				throw new Exception\GamerException('За столом только один игрок');
+			case 2:
+				return 3;
+			case 3:
+			case 4:
+				$offset = 7;
+				break;
+			default:
+				$offset = 6;
+				break;
+		}
 		if ($rivalSeat == $this->seat) {
 			throw new Exception\RivalException('Ошибка посадки игроков. Два игрока на одном месте');
 		}
 		if ($rivalSeat > $this->seat) {
 			$position = $rivalSeat - $this->seat;
 		} else {
-			$position = 6 - ($this->seat - $rivalSeat);
+			$position = $offset - ($this->seat - $rivalSeat);
 		}
 		return $position;
 	}

@@ -124,11 +124,11 @@ class TrainingController extends PublicController {
 				'active' => $gamer->isActive(),
 			);
 		}
-		
+				
 		return json_encode(array(
 			'ok' => true,
 			'board' => $this->render('training/board.tpl', compact('training')),
-			'cards' => $this->render('training/cards.tpl', compact($training)),
+			'cards' => $this->render('training/cards.tpl', compact('training')),
 			'bet'   => $training->gamer->bet,
 			'bots'  => $bots,
 			'timer' => $training->timer->start(),
@@ -254,7 +254,7 @@ class TrainingController extends PublicController {
 		return json_encode(array(
 			'ok' => true,
 			'board' => $this->render('training/board.tpl', compact('training')),
-			'cards' => $this->render('training/cards.tpl', compact($training)),
+			'cards' => $this->render('training/cards.tpl', compact('training')),
 			'winner' => $this->render('training/winner.tpl', compact('training')),
 			'bots' => $bots,
 			'bank' => $this->render('training/bank.tpl', compact('training')),
@@ -298,7 +298,7 @@ class TrainingController extends PublicController {
 			'board' => $this->render('training/board.tpl', compact('training')),
 			'bank'  => $this->render('training/bank.tpl', compact('training')),
 			'chips' => $training->gamer->chips,
-			'cards' => $this->render('training/cards.tpl', compact($training)),
+			'cards' => $this->render('training/cards.tpl', compact('training')),
 			'bet'   => $training->gamer->bet,
 			'bots'  => $bots,
 			'winner'=> $this->render('training/winner.tpl', compact('training')),
@@ -343,7 +343,7 @@ class TrainingController extends PublicController {
 			'board' => $this->render('training/board.tpl', compact('training')),
 			'bank'  => $this->render('training/bank.tpl', compact('training')),
 			'chips' => $training->gamer->chips,
-			'cards' => $this->render('training/cards.tpl', compact($training)),
+			'cards' => $this->render('training/cards.tpl', compact('training')),
 			'bet'   => $training->gamer->bet,
 			'bots'  => $bots,
 			'winner'=> $this->render('training/winner.tpl', compact('training')),
@@ -411,7 +411,7 @@ class TrainingController extends PublicController {
 			'ok' => true,
 			'board' => $this->render('training/board.tpl', compact('training')),
 			'chips' => $training->gamer->chips,
-			'cards' => $this->render('training/cards.tpl', compact($training)),
+			'cards' => $this->render('training/cards.tpl', compact('training')),
 			'bet'   => $training->gamer->bet,
 			'bots'  => $bots,
 			'bank'	=> $this->render('training/bank.tpl', compact('training')),
@@ -455,7 +455,7 @@ class TrainingController extends PublicController {
 			'ok' => true,
 			'board' => $this->render('training/board.tpl', compact('training')),
 			'chips' => $training->gamer->chips,
-			'cards' => $this->render('training/cards.tpl', compact($training)),
+			'cards' => $this->render('training/cards.tpl', compact('training')),
 			'bet'   => $training->gamer->bet,
 			'bots'  => $bots,
 			'bank'	=> $this->render('training/bank.tpl', compact('training')),
@@ -554,7 +554,7 @@ class TrainingController extends PublicController {
 			'ok' => true,
 			'board' => $this->render('training/board.tpl', compact('training')),
 			'chips' => $training->gamer->chips,
-			'cards' => $this->render('training/cards.tpl', compact($training)),
+			'cards' => $this->render('training/cards.tpl', compact('training')),
 			'bet'   => $training->gamer->bet,
 			'bots'  => $bots,
 			'bank'	=> $this->render('training/bank.tpl', compact('training')),

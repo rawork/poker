@@ -4,11 +4,8 @@ namespace Fuga\GameBundle\Model;
 
 interface GameInterface {
 	
-	public function setState($state);
-	public function getState();
-	public function startTime();
-	public function stopTime();
-	public function syncTime();
-	public function setTimer($name);
+	public function registerObserver(ObserverInterface $o);
+	public function removeObserver(ObserverInterface $o);
+	public function notifyObservers();
 	
 }

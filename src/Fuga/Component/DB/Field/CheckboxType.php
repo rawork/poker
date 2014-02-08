@@ -6,6 +6,12 @@ class CheckboxType extends Type {
 	public function __construct(&$params, $entity = null) {
 		parent::__construct($params, $entity);
 	}
+	
+	public function getValue($name = '') {
+		$name = $name ? $name : $this->getName();
+		$value = isset($_REQUEST[$name]) ? $_REQUEST[$name] : null;
+		return $value;
+	}
 
 	public function getSQLValue($name = '') {
 		$value = intval($this->getValue($name));

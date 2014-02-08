@@ -365,6 +365,8 @@ class Table {
 	
 	function insertArray($entity) {
 		$values = array();
+		$entity['created'] = date('Y-m-d H:i:s');
+		$entity['updated'] = '0000-00-00 00:00:00';
 		foreach ($this->fields as $field) {
 			foreach ($entity as $fieldName => $fieldValue) {
 				if (empty($fieldValue)) {

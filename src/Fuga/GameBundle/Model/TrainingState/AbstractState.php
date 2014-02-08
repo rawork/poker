@@ -5,7 +5,7 @@ namespace Fuga\GameBundle\Model\TrainingState;
 use Fuga\GameBundle\Model\GameInterface;
 use Fuga\GameBundle\Model\Combination;
 
-class AbstractState implements StateInterface {
+abstract class AbstractState implements StateInterface {
 	
 	const STATE_BEGIN    = 0;
 	const STATE_CHANGE    = 1;
