@@ -44,14 +44,13 @@ class Game implements GameInterface, ObserverInterface {
 	
 	private $log;
 	
-	public function __construct($board, $deck) {
-		
-	}
-	
-	public function startTime() {
-		$this->fromtime = new \DateTime();
-		$this->stopbuytime = new \DateTime();
+	public function __construct($board, Deck $deck) {
+		$this->fromtime = new \DateTime($board['fromtime']);
+		$this->stopbuytime = clone $this->fromtime;
 		$this->stopbuytime->add(new \DateInterval('PT35M'));
+		
+		$this->setState($board['state']);
+		$this->deck = $deck;
 		$this->syncTime();
 	}
 	

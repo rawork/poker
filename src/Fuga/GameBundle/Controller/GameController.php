@@ -5,8 +5,9 @@ namespace Fuga\GameBundle\Controller;
 use Fuga\CommonBundle\Controller\PublicController;
 use Fuga\GameBundle\Model\Combination;
 use Fuga\GameBundle\Model\Deck;
+use Fuga\GameBundle\Model\Game;
 
-class DefaultController extends PublicController {
+class GameController extends PublicController {
 	
 	public function __construct() {
 		parent::__construct('game');
@@ -17,10 +18,15 @@ class DefaultController extends PublicController {
 		$date = new \DateTime('2014-02-17 00:00:01');
 		if ($date > $now) {
 			$this->get('router')->redirect('/victorina');
+		} else {
+			$this->get('router')->redirect('/game/game');
 		}
 		
+	}
+	
+	public function gameIndex() {
 		$user = $this->get('security')->getCurrentUser();
-		
+		$now = new \DateTime();
 		$date = new \DateTime($this->getParam('access_date').' 00:00:01');
 		
 		if ( $date > $now  ) {
@@ -31,15 +37,29 @@ class DefaultController extends PublicController {
 			}	
 		} elseif ( !$user ) {
 			$error = $this->call('Fuga:Public:Account:login');
-			return $this->render('quiz/error.tpl', compact('error'));
+			return $this->render('game/error.tpl', compact('error'));
 		}
 		
 		$gamer0 = $this->get('container')->getItem('account_member', 'user_id='.$user['id']);
-		if (!$gamer0) {
-			return 'Вы не являетесь DEMO игроком. Войдите на сайт с логином demo и паролем demo<br>'.$this->call('Fuga:Public:Account:login');
+		if (!$gamer0 || 
+			(!$this->get('security')->isGroup('admin') && !$this->get('security')->isGroup('gamer'))) {
+			$error = 'Вы не являетесь игроком. Для участия в игре войдите на сайт с логином и паролем игрока<br>'.$this->call('Fuga:Public:Account:login');
+			return $this->render('game/error.tpl', compact('error'));
 		}
+		
 		$board = $this->get('container')->getItem('game_board', $gamer0['board_id']);
-		$gamers0 = $this->get('container')->getItems('account_member', 'id<>'.$gamer0['id'].' AND board_id='.$board['id']);
+		if (!$board) {
+			$error = 'Вам не назначен зал для игры. Обратитесь к администратору';
+			return $this->render('game/error.tpl', compact('error'));
+		}
+		
+		$game = new Game($board, $deck);
+		$fromtime = new \DateTime($board['fromtime']);
+		if ($fromtime > $now) {
+			$error = 'До начала игры осталось <span id="before-timer"></span>';
+			return $this->render('game/before.tpl', compact('error'));
+		}
+		$gamers = $this->get('container')->getItems('account_member', 'id<>'.$gamer0['id'].' AND board_id='.$board['id']);
 		//  TODO Для тестов игру запускаем автоматически, потом надо запускать по готовности игроков.
 		if ($board['fromtime'] != '0000-00-00 00:00:00') {
 			$fromtime = new \DateTime($board['fromtime']);
@@ -120,7 +140,7 @@ class DefaultController extends PublicController {
 			);
 		}
 		
-		return $this->render('game/index.tpl', compact('gamers', 'gamer0', 'board', 'suits')) ;
+		return $this->render('game/index.tpl', compact('gamers', 'gamer0', 'board'));
 	}
 	
 	public function calcAction() {
@@ -152,42 +172,6 @@ class DefaultController extends PublicController {
 		}
 		
 		return $this->render('game/test.tpl', compact('suite', 'cards', 'rank'));
-	}
-	
-	public function startgameAction() {
-		
-	}
-	
-	public function activateAction() {
-		
-	}
-	
-	public function deactivateAction() {
-		
-	}
-	
-	public function moveAction() {
-		
-	}
-	
-	public function renewAction() {
-		
-	}
-	
-	public function buyAction() {
-		
-	}
-	
-	public function changeAction() {
-		
-	}
-	
-	public function winnerAction() {
-		
-	}
-	
-	public function givecardsAction() {
-		
 	}
 	
 	public function testAction() {

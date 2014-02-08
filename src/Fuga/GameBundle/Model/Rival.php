@@ -13,8 +13,9 @@ class Rival {
 	public $seat;
 	public $position;
 	public $chips;
+	public $cards;
 	
-	public function __construct(array $rival, RealGamer $gamer) {
+	public function __construct(array $rival) {
 		$this->id       = $rival['user_id'];
 		$this->avatar   =  isset($rival['avatar_value']['extra']) 
 				? $rival['avatar_value']['extra']['main']['path'] 
@@ -23,7 +24,12 @@ class Rival {
 		$this->lastname = $rival['lastname'];
 		$this->bet      = $rival['bet'];
 		$this->seat     = intval($rival['seat']);
-		$this->position = $gamer->getRivalPosition($this->seat);
+		$this->position = 0;
 		$this->chips    = intval($rival['chips']);
+		$this->cards    = unserialize($rival['cards']);
+	}
+	
+	public function getPosition() {
+		return $this->position;
 	}
 }
