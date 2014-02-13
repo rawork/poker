@@ -10,51 +10,80 @@ class ShowdownState extends AbstractState {
 		parent::__construct($game);
 	}
 	
-	public function distributeWin($questions) {
+	public function distributeWin($gamer) {
+		if (!$this->game->lock($gamer->getId())) {
+			return $this->game->getStateNo();
+		}
+			
 		$bank = $this->game->takeBank();
-		$numWin = count($this->game->winner);
-		$share = $numWin ? ceil($bank / $numWin) : $bank;
-		foreach ($this->game->winner as $winner) {
-			if ($winner['position'] == 0) {
-				$this->game->gamer->giveChips($share);
-				break;
-			}
-			foreach ($this->game->bots as $bot) {
-				if ($bot->position == $winner['position']) {
-					$bot->giveChips($share);
+		$numWin = count($this->game->getWinner());
+		if ($numWin > 1) {
+			$nextBank = $bank % $numWin;
+			$share = ($bank - $nextBank) / $numWin;
+			$this->game->setBank($nextBank);
+		} else {
+			$share = $bank;
+		}
+		$gamers = $this->game->container->get('odm')
+				->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+				->field('board')->equals($this->game->getId())
+				->field('active')->equals(true)
+				->getQuery()->execute();
+		foreach ($gamers as $doc) {
+			foreach ($this->game->getWinner() as $winner) {
+				if ($doc->getUser() == $winner['user']) {
+					$doc->setChips( $doc->getChips() + $share );
 					break;
 				}
 			}
+			$doc->setActive($doc->getChips() > 0);
+			$doc->setBet(0);
+			$doc->setCards(array());
+			$doc->setRank('');
+			$doc->setCombination(array());
+			$doc->setWinner(false);
+			$query = '1=1';
+			if ($denied = $doc->getDenied()) {
+				$query = 'id NOT IN('.implode(',', $denied).')';
+			}
+			$questions = $this->game->container->getItems('game_poll', $query);
+			shuffle($questions);
+			$buy = array_slice($questions, 0, 3);
+			foreach ($buy as $question) {
+				$denied[] = $question['id'];
+			}
+			$doc->setBuy($buy);
+			$doc->setDenied($denied);
 		}
-		$this->game->gamer->checkActive();
-		$this->game->gamer->emptyBet();
-		$this->game->gamer->cards  = null;
-		$this->game->gamer->rank = null;
-		$this->game->gamer->combination = null;
-		$this->game->gamer->winner = false;
-		$this->game->winner = null;
-		$this->game->combination = null;
-		$this->game->flop   = null;
-		$this->game->bets   = 0;
-		$this->game->maxbet = 0;
-		foreach ($this->game->bots as $bot) {
-			$bot->cards = null;
-			$bot->emptyBet();
-			$bot->active = $bot->chips > 0;
-		}
+		
+		$this->game->emptyWinner();
+		$this->game->setFlop(array());
+		$this->game->setBets(0);
+		$this->game->setMaxbet(0);
+		$this->game->save();
+		
 		$now = new \DateTime();
-		$this->game->gamer->buying = $questions;
-		if (!$this->game->existsBots()) {
-			$this->endGame();
-		} elseif (!$this->game->existsJoker()) {
+		if (!$this->game->existsJoker()) {
 			$this->game->setTimer('prebuy');
+			$this->game->startTimer();
 			$this->game->setState(AbstractState::STATE_JOKER);
 		} elseif ($now > $this->game->stopbuytime) {
-			return $this->endRound();
+			if (!$this->game->existsGamers()) {
+				$this->game->removeTimer();
+				$this->game->stopTime();
+				$this->game->setState(self::STATE_END);
+			} else {
+				$this->game->setTimer('next');
+				$this->game->startTimer();
+				$this->game->setState(self::STATE_ROUND_END);
+			}
 		} else {
-			$this->game->setTimer('nobuy');
-			$this->game->setState(AbstractState::STATE_PREBUY);
+			$this->game->setTimer('buy');
+			$this->game->startTimer();
+			$this->game->setState(AbstractState::STATE_BUY);
 		}
+		$this->game->save();
+		$this->game->unlock($gamer->getId());
 		
 		return $this->game->getStateNo();
 	}

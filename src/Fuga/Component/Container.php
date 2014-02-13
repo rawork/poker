@@ -380,9 +380,10 @@ class Container
 				case 'templating1':
 					$this->services[$name] = new Templating\TwigTemplating();
 					break;
-				case 'connection':
-					$config = new \Doctrine\DBAL\Configuration();
-					$connectionParams = array(
+				case 'em':
+					$isDevMode = true;
+					$config = \Doctrine\ORM\Tools\Setup::createAnnotationMetadataConfiguration(array(__DIR__."/../src/Fuga/GameBundle/Entity"), $isDevMode);
+					$conn = array(
 						'dbname'	=> DB_BASE,
 						'user'		=> DB_USER,
 						'password'	=> DB_PASS,
@@ -394,8 +395,44 @@ class Container
 							1002=>'SET NAMES utf8'
 						)
 					);
-					$this->services[$name] = \Doctrine\DBAL\DriverManager::getConnection($connectionParams, $config);
+					
+					$this->services[$name] = \Doctrine\ORM\EntityManager::create($conn, $config);
+					break;
+				case 'connection':
+					\Doctrine\DBAL\Types\Type::addType('money', 'Fuga\Component\DBAL\Types\MoneyType');
+					$config = new \Doctrine\DBAL\Configuration();
+					$conn = array(
+						'dbname'	=> DB_BASE,
+						'user'		=> DB_USER,
+						'password'	=> DB_PASS,
+						'host'		=> DB_HOST,
+						'driver'	=> DB_TYPE,
+						'charset'	=> 'utf8',
+						'collate'   => 'utf8_general_ci',
+						'driverOptions' => array(
+							1002=>'SET NAMES utf8'
+						)
+					);
+					$this->services[$name] = \Doctrine\DBAL\DriverManager::getConnection($conn, $config);
 					$this->services[$name]->getDatabasePlatform()->registerDoctrineTypeMapping('DECIMAL(14,2)', 'money');
+					break;
+				case 'odm':
+					$this->loader->add('Document', __DIR__.'/../GameBundle');
+					
+					$connection = new \Doctrine\MongoDB\Connection(sprintf("mongodb://%s:%s@%s:%s/%s", MONGO_USER, MONGO_PASS, MONGO_HOST, MONGO_PORT, MONGO_BASE));
+					$config = new \Doctrine\ODM\MongoDB\Configuration();
+					
+					$config->setProxyDir(__DIR__ . '/../../../app/cache/proxies');
+					$config->setProxyNamespace('Proxies');
+					$config->setHydratorDir(__DIR__ . '/../../../app/cache/hydrators');
+					$config->setHydratorNamespace('Hydrators');
+					$config->setDefaultDB(MONGO_BASE);
+					
+					$config->setMetadataDriverImpl(\Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver::create(__DIR__ . '/../GameBundle/Document'));
+
+					\Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver::registerAnnotationClasses();
+					
+					$this->services[$name] = \Doctrine\ODM\MongoDB\DocumentManager::create($connection, $config);
 					break;
 				case 'mongo':
 					$mongo = new \MongoClient(sprintf("mongodb://%s:%s@%s/%s", MONGO_USER, MONGO_PASS, MONGO_HOST, MONGO_BASE));

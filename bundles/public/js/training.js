@@ -486,7 +486,6 @@ function initTraining() {
 	setInterval(onCheckMinBet, 5000);
 	$('.gamer-container').zoomcard();
 	$('.game-board-container').preloadImages(cardimages);
-	console.log($.cookie('timerhandler'));
 }
 
 function startTime() {

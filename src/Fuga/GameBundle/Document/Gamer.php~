@@ -1,0 +1,70 @@
+<?php
+
+namespace Fuga\GameBundle\Document;
+
+use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+
+/** @ODM\Document(collection="gamer") */
+class Gamer {
+	
+	/** @ODM\Id */
+    private $id;
+	
+	/** @ODM\String */
+    private $name;
+	
+	/** @ODM\String */
+    private $lastname;
+	
+	/** @ODM\String */
+    private $avatar;
+	
+	/** @ODM\Int */
+    private $user;
+	
+	/** @ODM\Int */
+    private $board;
+	
+	/** @ODM\Int */
+    private $bet;
+	
+	/** @ODM\Int */
+    private $chips;
+	
+	/** @ODM\Int */
+    private $seat;
+	
+	/** @ODM\Int */
+    private $times = 2;
+	
+	/** @ODM\Int */
+    private $state = 1;
+	
+	/** @ODM\String */
+    private $card;
+	
+	/** @ODM\Boolean */
+    private $allin = false;
+	
+	/** @ODM\Boolean */
+    private $active = true;
+	
+	/** @ODM\Collection */
+    private $cards = array();
+	
+	/** @ODM\Collection */
+    private $denied = array();
+	
+	/** @ODM\Collection */
+    private $question = array();
+	
+	/** @ODM\Collection */
+    private $buy = array();
+	
+	/** @ODM\String */
+    private $rank;
+	
+	/** @ODM\Collection */
+    private $combination = array();
+	
+}

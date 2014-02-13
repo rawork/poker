@@ -60,9 +60,7 @@ class Training implements GameInterface {
 		$this->user_id = $gamer['user_id'];
 		$this->createGamer(new TrainingGamer($gamer));
 		$this->createBots(3);
-		var_dump(5);
 		$this->setState(self::STATE_BEGIN);
-		var_dump(6);
 	}
 	
 	public function createGamer(TrainingGamer $gamer) {

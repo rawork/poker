@@ -1,0 +1,65 @@
+<?php
+
+namespace Fuga\GameBundle\Document;
+
+use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+
+/** @ODM\Document(collection="board") */
+class Board
+{
+	/** @ODM\Id */
+    private $id;
+
+    /** @ODM\Increment */
+    private $prizes = 0;
+
+    /** @ODM\Collection */
+    private $flop = array();
+	
+	/** @ODM\Collection */
+    private $winner = array();
+	
+	/** @ODM\Collection */
+    private $combination = array();
+
+    /** @ODM\String */
+    private $name;
+	
+	/** @ODM\Int */
+    private $board;
+	
+	/** @ODM\Int */
+    private $bank = 0;
+
+    /** @ODM\Int */
+    private $bets = 0;
+	
+	/** @ODM\Int */
+    private $maxbet = 0;
+	
+	/** @ODM\Int */
+    private $dealer = 0;
+	
+	/** @ODM\Int */
+    private $mover = 1;
+	
+	/** @ODM\Int */
+	private $state = 0;
+	
+	/** @ODM\Int */
+	private $gamer;
+
+    /** @ODM\Date */
+    private $fromtime;
+
+    /** @ODM\Date */
+    private $endtime;
+	
+	/** @ODM\Collection */
+    private $cards = array();
+	
+	/** @ODM\Collection */
+	private $timers = array();
+	
+}
+

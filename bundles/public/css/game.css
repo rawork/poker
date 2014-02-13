@@ -52,7 +52,7 @@ body {
 	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
 	height:280px;
 	text-align: center;
-	padding-top: 100px;
+	padding-top: 70px;
 	font-size: 16px;
 	line-height: 32px;
 }
@@ -408,6 +408,7 @@ body {
 }
 
 .game-buttons .btn {
+	padding: 4px 1px;
 	width: 99px;
 }
 
@@ -658,3 +659,23 @@ body {
 	border-bottom: 0;
 }
 
+
+.gamer-out {
+	position: absolute;
+	width: 940px;
+	height: 286px;
+	top: -291px;
+	border: 3px solid #fb4e0c;
+	border-radius: 20px;
+	background-color: #b2d000;
+	z-index: 500;
+
+}
+
+.gamer-out .text {
+	margin-top: 95px;
+	text-align: center;
+	font-size: 40px;
+	line-height: 50px;
+	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
+}

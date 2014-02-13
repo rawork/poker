@@ -1,5 +1,5 @@
-{if $training->isState(4)}
-{foreach from=$training->winner item=combination}
-	<div class="game-winner winner{$combination.position}">Победитель &laquo;{$combination.name}&raquo;</div>
+{if $game->isState(4)}
+{foreach from=$game->getWinner() item=winner}
+	<div class="game-winner winner{$gamer->getRivalPosition($winner.seat, $winner.numOfGamers)}">Победитель &laquo;{$winner.name}&raquo;</div>
 {/foreach}
 {/if}

@@ -3,9 +3,11 @@
 namespace Fuga\GameBundle\Controller;
 
 use Fuga\CommonBundle\Controller\PublicController;
-use Fuga\GameBundle\Model\Combination;
-use Fuga\GameBundle\Model\Deck;
 use Fuga\GameBundle\Model\Game;
+use Fuga\GameBundle\Model\RealGamer;
+use Fuga\GameBundle\Model\Rival;
+use Fuga\GameBundle\Model\Deck;
+use Fuga\GameBundle\Model\Exception\GameException;
 
 class GameController extends PublicController {
 	
@@ -24,123 +26,646 @@ class GameController extends PublicController {
 		
 	}
 	
-	public function gameIndex() {
+	public function gameAction() {
 		$user = $this->get('security')->getCurrentUser();
 		$now = new \DateTime();
 		$date = new \DateTime($this->getParam('access_date').' 00:00:01');
 		
-		if ( $date > $now  ) {
-			if (!$user || $user['group_id'] != 1) {
-				$error = 'Игровой зал открыт<br> только в период проведения игры.<br> Расписание игр 
-размещено<br> в рубрике <a href="/rules">"Правила"</a>.';
-				return $this->render('quiz/error.tpl', compact('error'));
-			}	
-		} elseif ( !$user ) {
-			$error = $this->call('Fuga:Public:Account:login');
-			return $this->render('game/error.tpl', compact('error'));
-		}
-		
-		$gamer0 = $this->get('container')->getItem('account_member', 'user_id='.$user['id']);
-		if (!$gamer0 || 
-			(!$this->get('security')->isGroup('admin') && !$this->get('security')->isGroup('gamer'))) {
-			$error = 'Вы не являетесь игроком. Для участия в игре войдите на сайт с логином и паролем игрока<br>'.$this->call('Fuga:Public:Account:login');
-			return $this->render('game/error.tpl', compact('error'));
-		}
-		
-		$board = $this->get('container')->getItem('game_board', $gamer0['board_id']);
-		if (!$board) {
-			$error = 'Вам не назначен зал для игры. Обратитесь к администратору';
-			return $this->render('game/error.tpl', compact('error'));
-		}
-		
-		$game = new Game($board, $deck);
-		$fromtime = new \DateTime($board['fromtime']);
-		if ($fromtime > $now) {
-			$error = 'До начала игры осталось <span id="before-timer"></span>';
-			return $this->render('game/before.tpl', compact('error'));
-		}
-		$gamers = $this->get('container')->getItems('account_member', 'id<>'.$gamer0['id'].' AND board_id='.$board['id']);
-		//  TODO Для тестов игру запускаем автоматически, потом надо запускать по готовности игроков.
-		if ($board['fromtime'] != '0000-00-00 00:00:00') {
-			$fromtime = new \DateTime($board['fromtime']);
-			$now = new \DateTime();
-			$diff = $now->diff($fromtime);
-			$board['hour'] = intval($diff->format('%H'));
-			$board['minute'] = intval($diff->format('%i'));
-			$board['second'] = intval($diff->format('%s'));
-		} else {
-			$board['fromtime'] = date('Y-m-d H:i:s');
-			$this->get('container')->updateItem('game_board', 
-				array('fromtime' => $board['fromtime']),
-				array('id' => $board['id'])
-			);
-			$board['hour'] = 0;
-			$board['minute'] = 0;
-			$board['second'] = 0;
-		}
-		if ($board['deck']) {
-			$deck = unserialize($board['deck']);
-		} else {
-			$deck = new Deck();
-		}
-		$gamers = array();
-		// TODO Для теста раздаем карты сразу, потом карты надо раздавать по готовности всех игроков
-		$gamerQuantity = count($gamers0) + 1;
-		foreach ($gamers0 as &$gamer) {
-			if ($gamer['cards']) {
-				$gamer['cards'] = unserialize($gamer['cards']);
-			} else {
-				$gamer['cards'] = $deck->take(4);
-				$this->get('container')->updateItem('account_member', 
-					array('cards' => serialize($gamer['cards'])),
-					array('id' => $gamer['id'])
-				);
+		try {
+			if ( $date > $now  ) {
+				if (!$user || !$this->get('security')->isGroup('admin')) {
+					throw new GameException('Игровой зал открыт<br> только в период 
+						проведения игры.<br> Расписание игр 
+						размещено<br> в рубрике <a href="/rules">"Правила"</a>.');
+				}	
+			} elseif ( !$user ) {
+				throw new GameException($this->call('Fuga:Public:Account:login'));
 			}
-			if ($gamerQuantity == $gamer0['seat'] || 1 == $gamer0['seat']) {
-				$key =  - $gamer0['seat'];
-			} else {
-				$key = $gamer['seat'] - $gamer0['seat'];
-				if ($key < 0) {
-					$key = $gamerQuantity + $key; 
-				}
+
+			$gamer0 = $this->get('container')->getItem('account_member', 'user_id='.$user['id']);
+			if (!$gamer0 || 
+				(!$this->get('security')->isGroup('admin') && !$this->get('security')->isGroup('gamer'))) {
+				throw new GameException('Вы не являетесь игроком. Для участия в игре войдите на сайт с логином и паролем игрока<br>'.$this->call('Fuga:Public:Account:login'));
+			}
+
+			$board = $this->get('container')->getItem('game_board', $gamer0['board_id']);
+			if (!$board) {
+				throw new GameException('Вам не назначен зал для игры. Обратитесь к администратору');
 			}
 			
-			$gamers[$key] = $gamer;
+			$fromtime = new \DateTime($board['fromtime']);
+			if ($now->getTimestamp() - $fromtime->getTimestamp() < -3600) {
+				throw new GameException('Игра еще не началась');
+			}
+			
+			$game = new Game($board['id'], $this->get('container'));
+			$gamer = new RealGamer($user['id'], $this->get('container'));
+			
+			if ($game->isState(Game::STATE_BEGIN)) {
+				$game->start($gamer);
+			}
+			$rivalsdoc = $this->get('odm')
+					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+					->field('board')->equals($game->getId())
+					->field('user')->notEqual($gamer->getId())
+					->getQuery()->execute();
+			$rivals = array();
+			$numOfGamers = count($rivalsdoc) + 1;
+			foreach ($rivalsdoc as $rivaldoc) {
+				$rivals[] = new Rival($rivaldoc, $gamer->getRivalPosition($rivaldoc->getSeat(), $numOfGamers));
+			}
+
+			if ($game->isMover($gamer->getSeat()) || in_array($game->getStateNo(), array(4, 41, 5, 7))) {
+				$game->startTimer();
+			}
+			if ($game->isState(1)) {
+				$gamer->startTimer();
+			}
+			
+		} catch (GameException $e) {
+			$error = $e->getMessage();
+			return $this->render('game/error.tpl', compact('error'));
+		} catch (\Exception $e) {
+			throw new \Exception($e->getMessage());
 		}
-		unset($gamer);
-		unset($gamers0);
-		if ($gamer0['cards']) {
-			$gamer0['cards'] = unserialize($gamer0['cards']);
-		} else {
-			$gamer0['cards'] = $deck->take(4);
-			$this->get('container')->updateItem('account_member', 
-				array('cards' => serialize($gamer0['cards'])),
-				array('id' => $gamer0['id'])
-			);
+		
+		$this->get('container')->setVar('javascript', 'game');
+		
+		return $this->render('game/index.tpl', array(
+			'game'   => $game,
+			'gamer'  => $gamer,
+			'table'  => $this->render('game/table.tpl', compact('game', 'gamer')),
+			'rivals' => $this->render('game/rivals.tpl', compact('rivals', 'game')),
+			'gamerData'  => $this->render('game/gamer.tpl',  compact('gamer', 'game')),
+			'minbet' => $this->render('game/minbet.tpl', compact('game')),
+			'bank'   => $this->render('game/bank.tpl',   compact('game')),
+			'winner' => $this->render('game/winner.tpl', compact('game')),
+			'hint'   => $this->render('game/hint.tpl',   compact('gamer', 'game')),
+			'deck'   => new Deck(),
+		));
+	}
+	
+	public function answerAction() {
+		if (!$this->get('router')->isXmlHttpRequest()) {
+			$this->get('router')->redirect('/game/game');
 		}
-		$suits = array(
-			1 => 'diams',
-			2 => 'hearts',
-			4 => 'spades',
-			8 => 'clubs'
-		);
-		if ($board['flop']) {
-			$board['flop'] = unserialize($board['flop']);
-		} else {
-			$board['flop'] = $deck->take(3);
-			$this->get('container')->updateItem('game_board', 
-				array('flop' => serialize($board['flop'])),
-				array('id' => $board['id'])
-			);
+		
+		$user = $this->get('security')->getCurrentUser();
+		if (!$user) 
+		{
+			return json_encode(array('ok' => false));
 		}
-		if (!$board['deck']) {
-			$this->get('container')->updateItem('game_board', 
-				array('deck' => serialize($deck)),
-				array('id' => $board['id'])
+		
+		try {
+			$answerNo = $this->get('util')->post('answer', true, 0);
+			$gamer = new RealGamer($user['id'], $this->get('container'));
+			$game = new Game($gamer->getBoard(), $this->get('container'));
+			$gamer->answerQuestion($answerNo, $game);
+			$game->change($gamer);
+		} catch (GameException $e) {
+			$this->get('log')->write($e->getMessage());
+			$this->get('log')->write($e->getTraceAsString());
+		}
+		
+		return json_encode(array(
+			'ok' => true,
+			'table' => $this->render('game/table.tpl', compact('game', 'gamer')),
+			'chips' => $gamer->getChips(),
+			'cards' => $this->render('game/cards.tpl', compact('game', 'gamer')),
+			'hint'  => $this->render('game/hint.tpl', compact('game', 'gamer')),
+			'change_times' => $gamer->getTimes(),
+		));
+	}
+	
+	public function changeAction(){
+		if (!$this->get('router')->isXmlHttpRequest()) {
+			$this->get('router')->redirect('/game/game');
+		}
+		
+		$user = $this->get('security')->getCurrentUser();
+		
+		if (!$user) 
+		{
+			return json_encode(array('ok' => false));
+		}
+		
+		try {
+			$card = $this->get('util')->post('card_no', true, 0);
+			$gamer = new RealGamer($user['id'], $this->get('container'));
+			$game = new Game($gamer->getBoard(), $this->get('container'));
+			$gamer->changeCard($card);
+		} catch (GameException $e) {
+			$this->get('log')->write($e->getMessage());
+			$this->get('log')->write($e->getTraceAsString());
+		}
+		
+		return json_encode(array(
+			'ok' => true,
+			'table' => $this->render('game/table.tpl', compact('game', 'gamer')),
+		));
+	}
+	
+	public function nochangeAction(){
+		if (!$this->get('router')->isXmlHttpRequest()) {
+			$this->get('router')->redirect('/game/game');
+		}
+		
+		$user = $this->get('security')->getCurrentUser();
+		
+		if (!$user) 
+		{
+			return json_encode(array('ok' => false));
+		}
+		
+		try {
+			$gamer = new RealGamer($user['id'], $this->get('container'));
+			$game = new Game($gamer->getBoard(), $this->get('container'));
+			
+			$gamer->nochangeCard();
+			$game->nochange($gamer);
+		} catch (GameException $e) {
+			$this->get('log')->write($e->getMessage());
+			$this->get('log')->write($e->getTraceAsString());
+		}
+		
+		return json_encode(array(
+			'ok' => true,
+			'table' => $this->render('game/table.tpl', compact('game', 'gamer')),
+			'hint' => $this->render('game/hint.tpl', compact('game', 'gamer')),
+		));
+	}
+	
+	public function foldAction(){
+		if (!$this->get('router')->isXmlHttpRequest()) {
+			$this->get('router')->redirect('/game/game');
+		}
+		
+		$user = $this->get('security')->getCurrentUser();
+		
+		if (!$user) 
+		{
+			return json_encode(array('ok' => false));
+		}
+		
+		try {
+			$gamer = new RealGamer($user['id'], $this->get('container'));
+			$game = new Game($gamer->getBoard(), $this->get('container'));
+			$game->fold($gamer);
+		} catch (GameException $e) {
+			$this->get('log')->write($e->getMessage());
+			$this->get('log')->write($e->getTraceAsString());
+		}
+		
+		return json_encode(array(
+			'ok' => true,
+			'table' => $this->render('game/table.tpl', compact('game', 'gamer')),
+			'cards' => $this->render('game/cards.tpl', compact('game', 'gamer')),
+			'winner'=> $this->render('game/winner.tpl', compact('game', 'gamer')),
+		));
+	}
+	
+	public function betAction() {
+		if (!$this->get('router')->isXmlHttpRequest()) {
+			$this->get('router')->redirect('/game/game');
+		}
+		
+		$user = $this->get('security')->getCurrentUser();
+		
+		if (!$user) 
+		{
+			return json_encode(array('ok' => false));
+		}
+		
+		try {
+			$chips = $this->get('util')->post('chips', true, 0);
+			$gamer = new RealGamer($user['id'], $this->get('container'));
+			$game = new Game($gamer->getBoard(), $this->get('container'));
+			$game->bet($gamer, $chips);
+		} catch (GameException $e) {
+			$this->get('log')->write($e->getMessage());
+			$this->get('log')->write($e->getTraceAsString());
+		}
+		
+		return json_encode(array(
+			'ok' => true,
+			'table' => $this->render('game/table.tpl', compact('game', 'gamer')),
+			'cards' => $this->render('game/cards.tpl', compact('game', 'gamer')),
+			'bank'  => $game->getBank(),
+			'bets'  => $game->getBets(),
+			'chips' => $gamer->getChips(),
+			'bet'   => $gamer->getBet(),
+			'hint'  => $this->render('game/hint.tpl', compact('game', 'gamer')),
+			'winner'=> $this->render('game/winner.tpl', compact('game', 'gamer')),
+		));
+	}
+	
+	public function checkAction() {
+		if (!$this->get('router')->isXmlHttpRequest()) {
+			$this->get('router')->redirect('/game/game');
+		}
+		
+		$user = $this->get('security')->getCurrentUser();
+		
+		if (!$user) 
+		{
+			return json_encode(array('ok' => false));
+		}
+		
+		try {
+			$gamer = new RealGamer($user['id'], $this->get('container'));
+			$game = new Game($gamer->getBoard(), $this->get('container'));
+			$game->check($gamer);
+		} catch (GameException $e) {
+			$this->get('log')->write($e->getMessage());
+			$this->get('log')->write($e->getTraceAsString());
+		}
+		
+		return json_encode(array(
+			'ok' => true,
+			'table' => $this->render('game/table.tpl', compact('game', 'gamer')),
+			'cards' => $this->render('game/cards.tpl', compact('game', 'gamer')),
+			'bank'  => $game->getBank(),
+			'bets'  => $game->getBets(),
+			'chips' => $gamer->getChips(),
+			'bet'   => $gamer->getBet(),
+			'hint'  => $this->render('game/hint.tpl', compact('game', 'gamer')),
+			'winner'=> $this->render('game/winner.tpl', compact('game', 'gamer')),
+		));
+	}
+	
+	public function distributeAction() {
+		if (!$this->get('router')->isXmlHttpRequest()) {
+			$this->get('router')->redirect('/game/game');
+		}
+		
+		$user = $this->get('security')->getCurrentUser();
+		
+		if (!$user) 
+		{
+			return json_encode(array('ok' => false));
+		}
+		
+		try {
+			$gamer = new RealGamer($user['id'], $this->get('container'));
+			$game = new Game($gamer->getBoard(), $this->get('container'));
+			$game->distribute($gamer);
+			$rivalsdoc = $this->get('odm')
+					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+					->field('board')->equals($game->getId())
+					->field('user')->notEqual($gamer->getId())
+					->getQuery()->execute();
+			$rivals = array();
+			$numOfGamers = count($rivalsdoc) + 1;
+			foreach ($rivalsdoc as $rivaldoc) {
+				$rivals[] = new Rival($rivaldoc, $gamer->getRivalPosition($rivaldoc->getSeat(), $numOfGamers));
+			}
+		} catch (GameException $e) {
+			$this->get('log')->write($e->getMessage());
+			$this->get('log')->write($e->getTraceAsString());
+		}
+		
+		$rivalsData = array();
+		if (isset($rivals)) {
+			foreach ($rivals as $rival) {
+				$rivalsData[$rival->id] = array(
+					'chips' => $rival->chips,
+					'cards' => $this->render('game/rivalcards.tpl', compact('rival', 'game')),
+					'bet'   => $rival->bet,
+					'active' => $rival->isHere(),
+				);
+			}
+		}
+		
+		return json_encode(array(
+			'ok' => true,
+			'table' => $gamer->question ? null : $this->render('game/table.tpl', compact('game', 'gamer')),
+			'cards' => $game->isState(1)? null : $this->render('game/cards.tpl', compact('game', 'gamer')),
+			'hint' => $this->render('game/hint.tpl', compact('game', 'gamer')),
+			'winner' => $this->render('game/winner.tpl', compact('game', 'gamer')),
+			'state' => $game->getStateNo(),
+			'maxbet'=> $game->getMaxbet(),
+			'gamerstate' => $gamer->getState(),
+			'mover' => $game->isMover($gamer->getSeat()) ? 1 : 0,
+			'rivals' => $rivalsData,
+		));
+	}
+	
+	public function endroundAction() {
+		if (!$this->get('router')->isXmlHttpRequest()) {
+			$this->get('router')->redirect('/game/game');
+		}
+		
+		$user = $this->get('security')->getCurrentUser();
+		
+		if (!$user) 
+		{
+			return json_encode(array('ok' => false));
+		}
+		
+		try {
+			$gamer = new RealGamer($user['id'], $this->get('container'));
+			$game = new Game($gamer->getBoard(), $this->get('container'));
+			$game->endround($gamer);
+		} catch (GameException $e) {
+			$this->get('log')->write($e->getMessage());
+			$this->get('log')->write($e->getTraceAsString());
+		}
+		
+		return json_encode(array(
+			'ok' => true,
+			'table' => $this->render('game/table.tpl', compact('game', 'gamer')),
+			'state' => $game->getStateNo(),
+		));
+	}
+	
+	public function nextAction() {
+		if (!$this->get('router')->isXmlHttpRequest()) {
+			$this->get('router')->redirect('/game/game');
+		}
+		
+		$user = $this->get('security')->getCurrentUser();
+		
+		if (!$user) 
+		{
+			return json_encode(array('ok' => false));
+		}
+		
+		try {
+			$gamer = new RealGamer($user['id'], $this->get('container'));
+			$game = new Game($gamer->getBoard(), $this->get('container'));
+			$game->next($gamer);
+			$rivalsdoc = $this->get('odm')
+					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+					->field('board')->equals($game->getId())
+					->field('user')->notEqual($gamer->getId())
+					->getQuery()->execute();
+			$rivals = array();
+			$numOfGamers = count($rivalsdoc) + 1;
+			foreach ($rivalsdoc as $rivaldoc) {
+				$rivals[] = new Rival($rivaldoc, $gamer->getRivalPosition($rivaldoc->getSeat(), $numOfGamers));
+			}
+			if ($game->isMover($gamer->getSeat()) || in_array($game->getStateNo(), array(4, 41, 5, 7))) {
+				$game->startTimer();
+			}
+			$gamer->startTimer();
+		} catch (Exception\GameException $e) {
+			
+		}
+		
+		$rivalsData = array();
+		foreach ($rivals as $rival) {
+			$rivalsData[$rival->id] = array(
+				'chips' => $rival->chips,
+				'cards' => $this->render('game/rivalcards.tpl', compact('rival', 'game')),
+				'bet'   => $rival->bet,
+				'active' => $rival->isHere(),
 			);
 		}
 		
-		return $this->render('game/index.tpl', compact('gamers', 'gamer0', 'board'));
+		return json_encode(array(
+			'ok' => true,
+			'table' => $this->render('game/table.tpl', compact('game', 'gamer')),
+			'cards' => $this->render('game/cards.tpl', compact('game', 'gamer')),
+			'hint' => $this->render('game/hint.tpl', compact('game', 'gamer')),
+			'winner' => $this->render('game/winner.tpl', compact('game', 'gamer')),
+			'state' => $game->getStateNo(),
+			'maxbet'=> $game->getMaxbet(),
+			'gamerstate' => $gamer->getState(),
+			'mover' => $game->isMover($gamer->getSeat()) ? 1 : 0,
+			'rivals' => $rivalsData,
+		));
+	}
+	
+	public function prebuyAction(){
+		if (!$this->get('router')->isXmlHttpRequest()) {
+			$this->get('router')->redirect('/game/game');
+		}
+		
+		$user = $this->get('security')->getCurrentUser();
+		
+		if (!$user) 
+		{
+			return json_encode(array('ok' => false));
+		}
+		
+		try {
+			$gamer = new RealGamer($user['id'], $this->get('container'));
+			$game = new Game($gamer->getBoard(), $this->get('container'));
+			$game->prebuy($gamer);
+		} catch (GameException $e) {
+			$this->get('log')->write($e->getMessage());
+			$this->get('log')->write($e->getTraceAsString());
+		}
+		
+		return json_encode(array(
+			'ok' => true,
+			'table' => $this->render('game/table.tpl', compact('game', 'gamer')),
+		));
+	}
+	
+	
+	public function buyAction(){
+		if (!$this->get('router')->isXmlHttpRequest()) {
+			$this->get('router')->redirect('/game/game');
+		}
+		
+		$user = $this->get('security')->getCurrentUser();
+		
+		if (!$user) 
+		{
+			return json_encode(array('ok' => false));
+		}
+		
+		try {
+			$gamer = new RealGamer($user['id'], $this->get('container'));
+			$game = new Game($gamer->getBoard(), $this->get('container'));
+			$gamer->buyChips();
+		} catch (GameException $e) {
+			$this->get('log')->write($e->getMessage());
+			$this->get('log')->write($e->getTraceAsString());
+		}
+		
+		return json_encode(array(
+			'ok' => true,
+			'table' => $this->render('game/table.tpl', compact('game', 'gamer')),
+		));
+	}
+	
+	public function buyanswerAction(){
+		if (!$this->get('router')->isXmlHttpRequest()) {
+			$this->get('router')->redirect('/game/game');
+		}
+		
+		$user = $this->get('security')->getCurrentUser();
+		
+		if (!$user) 
+		{
+			return json_encode(array('ok' => false));
+		}
+		
+		try {
+			$answer = $this->get('util')->post('answer', true, 0);
+			$gamer = new RealGamer($user['id'], $this->get('container'));
+			$game = new Game($gamer->getBoard(), $this->get('container'));
+			$gamer->answerBuyQuestion($answer, $game);
+		} catch (GameException $e) {
+			$this->get('log')->write($e->getMessage());
+			$this->get('log')->write($e->getTraceAsString());
+		}
+		
+		return json_encode(array(
+			'ok' => true,
+			'table' => $this->render('game/table.tpl', compact('game', 'gamer')),
+			'chips' => $gamer->getChips(),
+		));
+	}
+	
+	public function updateAction() {
+		if (!$this->get('router')->isXmlHttpRequest()) {
+			$this->get('router')->redirect('/game/game');
+		}
+		
+		$user = $this->get('security')->getCurrentUser();
+		
+		if (!$user) 
+		{
+			return json_encode(array('ok' => false));
+		}
+		
+		try {
+			$gamer = new RealGamer($user['id'], $this->get('container'));
+			$game = new Game($gamer->getBoard(), $this->get('container'));
+			$rivalsdoc = $this->get('odm')
+					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+					->field('board')->equals($game->getId())
+					->field('user')->notEqual($gamer->getId())
+					->getQuery()->execute();
+			$rivals = array();
+			$numOfGamers = count($rivalsdoc) + 1;
+			foreach ($rivalsdoc as $rivaldoc) {
+				$rivals[] = new Rival($rivaldoc, $gamer->getRivalPosition($rivaldoc->getSeat(), $numOfGamers));
+			}
+			if ($game->isMover($gamer->getSeat()) || in_array($game->getStateNo(), array(4, 41, 5, 7))) {
+				$game->startTimer();
+			}
+			$gamer->startTimer();
+		} catch (Exception\GameException $e) {
+			
+		}
+		
+		$rivalsData = array();
+		foreach ($rivals as $rival) {
+			$rivalsData[$rival->id] = array(
+				'chips' => $rival->chips,
+				'cards' => $this->render('game/rivalcards.tpl', compact('rival', 'game')),
+				'bet'   => $rival->bet,
+				'active' => $rival->isHere(),
+			);
+		}
+		
+		return json_encode(array(
+			'ok' => true,
+			'table' => $gamer->question ? null : $this->render('game/table.tpl', compact('game', 'gamer')),
+			'cards' => $game->isState(1)? null : $this->render('game/cards.tpl', compact('game', 'gamer')),
+			'bank'  => $game->getBank(),
+			'bets'  => $game->getBets(),
+			'hint' => $this->render('game/hint.tpl', compact('game', 'gamer')),
+			'winner' => $this->render('game/winner.tpl', compact('game', 'gamer')),
+			'state' => $game->getStateNo(),
+			'maxbet'=> $game->getMaxbet(),
+			'gamerstate' => $gamer->getState(),
+			'mover' => $game->isMover($gamer->getSeat()) ? 1 : 0,
+			'rivals' => $rivalsData,
+		));
+	}
+	
+	public function startAction() {
+		if (!$this->get('router')->isXmlHttpRequest()) {
+			$this->get('router')->redirect('/game/game');
+		}
+		
+		$user = $this->get('security')->getCurrentUser();
+		
+		if (!$user) 
+		{
+			return json_encode(array('ok' => false));
+		}
+		
+		try {
+			$gamer = new RealGamer($user['id'], $this->get('container'));
+			$game = new Game($gamer->getBoard(), $this->get('container'));
+			$game->removeTimer();
+		} catch (GameException $e) {
+			$this->get('log')->write($e->getMessage());
+			$this->get('log')->write($e->getTraceAsString());
+		}
+		
+		return json_encode(array(
+			'ok' => true,
+			'state' => 1,
+		));
+	}
+	
+	public function minbetAction(){
+		if (!$this->get('router')->isXmlHttpRequest()) {
+			$this->get('router')->redirect('/game/game');
+		}
+		
+		$user = $this->get('security')->getCurrentUser();
+		
+		if (!$user) 
+		{
+			return json_encode(array('ok' => false));
+		}
+		
+		try {
+			$gamer = new RealGamer($user['id'], $this->get('container'));
+			$game = new Game($gamer->getBoard(), $this->get('container'));
+			$game->setMinbet();
+		} catch (Exception\GameException $e) {
+			return json_encode(array(
+				'ok' => false,
+				'error' => $e->getMessage(),
+			));
+		}
+		
+		return json_encode(array(
+			'ok' => true,
+			'minbet' => $game->minbet,
+		));
+	}
+	
+	public function outAction() {
+		if (!$this->get('router')->isXmlHttpRequest()) {
+			$this->get('router')->redirect('/game/game');
+		}
+		
+		$user = $this->get('security')->getCurrentUser();
+		if (!$user) 
+		{
+			return json_encode(array('ok' => false));
+		}
+		
+		$state = $this->get('util')->post('state', true, 0);
+		
+		try {
+			$this->get('odm')
+				->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+				->findAndUpdate()
+				->field('user')->equals(intval($user['id']))
+				->field('state')->set($state)
+				->getQuery()->execute();
+		} catch (Exception\GameException $e) {
+			return json_encode(array(
+				'ok' => false,
+				'error' => $e->getMessage(),
+			));
+		}
+		
+		return json_encode(array(
+			'ok' => true,
+			'state' => $state,
+		));
 	}
 	
 	public function calcAction() {
@@ -174,28 +699,37 @@ class GameController extends PublicController {
 		return $this->render('game/test.tpl', compact('suite', 'cards', 'rank'));
 	}
 	
-	public function testAction() {
-		$deck = new Deck();
-		$collection = $this->get('mongo')->decks;
-		echo microtime().'<br>';
-		for ($i = 0; $i < 5; $i++) {
-			$deck->make();
-			$item = array(
-				'board_id' => 1,
-				'cards'    => $deck->take(),
-			);
-			$collection->insert($item);
+	public function clearAction($params) {
+		$user = $this->get('security')->getCurrentUser();
+		if (!$user || !$this->get('security')->isGroup('admin') ) {
+			$this->get('router')->redirect('/game');
 		}
-		echo microtime().'<br>';
-		for ($i = 0; $i < 5; $i++) {
-			$deck->make();
-			$this->get('container')->addItem('training_training', array(
-				'user_id' => 0,
-				'state' => serialize($deck),
-			));
+		
+		$gameId = array_shift($params);
+		if (!$gameId) {
+			$this->get('router')->redirect('/game');
 		}
-		echo microtime().'<br>';
-		return 'mongo';
+		
+		$now = new \DateTime();
+		$new = $now->add(new \DateInterval('PT15S'));
+		
+		$this->get('container')->updateItem('game_board', 
+				array('fromtime' => $new->format('Y-m-d H:i:s')),
+				array('id' => $gameId)
+		);
+		
+		$game = new Game($gameId, $this->get('container'));
+		$game->clear();
+		$game->save();
+		
+		$gamers = $this->get('container')->getItems('account_member', 'board_id='.$gameId);
+		foreach ($gamers as $gamerData) {
+			$gamer = new RealGamer($gamerData['user_id'], $this->get('container'));
+			$gamer->clear();
+			$gamer->save();
+		}
+		
+		$this->get('router')->redirect('/game/game');
 	}
 
 }

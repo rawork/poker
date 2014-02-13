@@ -2,10 +2,11 @@
 
 namespace Fuga\GameBundle\Model;
 
+use Fuga\GameBundle\Document\Gamer;
+
 class Rival {
 	
 	public $id;
-	public $avatar;
 	public $name;
 	public $lastname;
 	public $allin;
@@ -14,22 +15,29 @@ class Rival {
 	public $position;
 	public $chips;
 	public $cards;
+	public $active;
+	public $state;
 	
-	public function __construct(array $rival) {
-		$this->id       = $rival['user_id'];
-		$this->avatar   =  isset($rival['avatar_value']['extra']) 
-				? $rival['avatar_value']['extra']['main']['path'] 
-				: '/bundles/public/img/avatar_empty.png';
-		$this->name     = $rival['name'];
-		$this->lastname = $rival['lastname'];
-		$this->bet      = $rival['bet'];
-		$this->seat     = intval($rival['seat']);
-		$this->position = 0;
-		$this->chips    = intval($rival['chips']);
-		$this->cards    = unserialize($rival['cards']);
+	public function __construct(Gamer $rival, $position) {
+		$this->id       = $rival->getUser();
+		$this->avatar   = $rival->getAvatar();
+		$this->name     = $rival->getName();
+		$this->lastname = $rival->getLastname();
+		$this->bet      = $rival->getBet();
+		$this->seat     = $rival->getSeat();
+		$this->position = $position;
+		$this->chips    = $rival->getChips();
+		$this->cards    = $rival->getCards();
+		$this->active   = $rival->getActive();
+		$this->state    = $rival->getState();
 	}
 	
-	public function getPosition() {
-		return $this->position;
+	public function isActive() {
+		return $this->active;
 	}
-}
+	
+	public function isHere() {
+		return $this->isActive() && $this->state == 1;
+	}
+
+}	

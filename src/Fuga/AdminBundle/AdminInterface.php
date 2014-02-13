@@ -120,7 +120,7 @@ class AdminInterface extends Controller {
 				'modules' => $this->modules,
 				'states' => $this->states,
 				'state' => $this->currentState,
-				'version' => $GLOBALS['LIB_VERSION'],
+				'version' => LIB_VERSION,
 				'content' => $this->currentModuleName ? $this->currentModule->indexAction() : ''
 			);
 			echo $this->render('admin/layout.tpl', $params);

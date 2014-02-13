@@ -11,20 +11,28 @@ class JokerState extends AbstractState {
 		parent::__construct($game);
 	}
 	
-	public function buyChips() {
+	public function buyChips($gamer) {
+		if (!$this->game->lock($gamer->getId())) {
+			return $this->game->getStateNo();
+		}
 		$now = new \Datetime();
 		if ($now > $this->game->stopbuytime) {
-			$this->game->timer->stop();
-			$this->game->gamer->buying = null;
-			if ($this->game->gamer->chips > 0) {
-				return $this->endRound();
+			if (!$this->game->existsGamers()) {
+				$this->game->removeTimer();
+				$this->game->stopTime();
+				$this->game->setState(self::STATE_END);
 			} else {
-				return $this->endGame();
+				$this->game->setTimer('next');
+				$this->game->startTimer();
+				$this->game->setState(self::STATE_ROUND_END);
 			}
 		} else {
-			$this->game->setTimer('nobuy');
-			$this->game->setState(AbstractState::STATE_PREBUY);
+			$this->game->setTimer('buy');
+			$this->game->startTimer();
+			$this->game->setState(AbstractState::STATE_BUY);
 		}
+		$this->game->save();
+		$this->game->unlock($gamer->getId());
 		
 		return $this->game->getStateNo();
 	}

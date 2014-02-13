@@ -2,12 +2,13 @@
 
 namespace Fuga\CommonBundle\Controller;
 
+use Fuga\AdminBundle\AdminInterface;
 use Fuga\Component\Exception\NotFoundHttpException;
 
 class PageController extends Controller {
 	
 	public $node;
-
+	
 	public function getTitle() {
 		$node = $this->getManager('Fuga:Common:Page')->getCurrentNode();
 		return $node['title'];
@@ -159,14 +160,66 @@ class PageController extends Controller {
 	}
 
 	public function handle() {
+		$se_mask = "/(Yandex|Googlebot|StackRambler|Yahoo Slurp|WebAlta|msnbot)/";
+		if (preg_match($se_mask,$_SERVER['HTTP_USER_AGENT']) > 0) {
+			if (!empty($_GET[session_name()])) {
+				header($_SERVER['SERVER_PROTOCOL']." 404 Not Found");
+				exit();
+			}
+		} else {
+			session_start();
+		}
+
+		if ($_SERVER['SCRIPT_NAME'] != '/restore.php' && file_exists('/../restore.php')) {
+			throw new \Exception('Удалите файл restore.php в корне сайта');
+		}
+		// ID запрашиваемой страницы
+		define('cur_page_id', md5(str_replace('?'.$_SERVER['QUERY_STRING'], '', $_SERVER['REQUEST_URI'])));
+
+		// Включаем Роутер запросов
+		$this->get('router')->setLocale();
+		$this->get('router')->setParams();
+
+		if (!$this->get('security')->isAuthenticated() && $this->get('security')->isSecuredArea()) {
+			$controller = new SecurityController();
+			echo $controller->loginAction();
+			return;
+		} elseif (preg_match('/^'.PRJ_REF.'\/admin\/(logout|forget|password)/', $_SERVER['REQUEST_URI'], $matches))			{
+			$controller = new SecurityController();
+			$methodName = $matches[1].'Action';
+			echo $controller->$methodName();
+			return;
+		}
+		
+		if ($this->get('router')->isAdminAjax()) {
+			try {
+				$controller = $this->get('container')->createController('Fuga:Admin:AdminAjax');
+				$obj = new \ReflectionClass($this->get('container')->getControllerClass('Fuga:Admin:AdminAjax'));
+				$post = $_POST;
+				$method = array_shift($post);
+				echo $obj->getMethod($method)->invokeArgs($controller, $post);
+				return;
+			} catch (\Exception $e) {
+				$this->get('log')->write(json_encode($_POST));
+				$this->get('log')->write($e->getMessage());
+				$this->get('log')->write('Trace: '.$e->getTraceAsString());
+				echo '';
+				return;
+			}
+		} elseif ($this->get('router')->isAdmin()) {
+			$frontcontroller = new AdminInterface();
+			$frontcontroller->handle();
+			return;
+		}
+		
 		if (preg_match('/^\/fileupload/', $_SERVER['REQUEST_URI'])) {
 			echo $this->fileuploadAction();
-			exit;
+			return;
 		}
 		if ('subscribe' == $this->get('router')->getParam('node')) {
 			if ($this->get('router')->isXmlHttpRequest()) {
 				echo $this->get('container')->callAction('Fuga:Public:Common:subscriberesult');
-				exit;
+				return;
 			} elseif ($key = $this->get('util')->request('key')) {
 				$_SESSION['subscribe_message'] = $this->getManager('Fuga:Common:Maillist')->activate($key);
 				$this->get('router')->redirect($this->get('router')->generateUrl('subscribe-process'));

@@ -4,6 +4,7 @@ namespace Fuga\GameBundle\Model\GameState;
 
 use Fuga\GameBundle\Model\GameInterface;
 use Fuga\GameBundle\Model\Combination;
+use Fuga\GameBundle\Model\RealGamer;
 
 class ChangeState extends AbstractState {
 	
@@ -11,27 +12,29 @@ class ChangeState extends AbstractState {
 		parent::__construct($game);
 	}
 	
-	public function changeCards($cardNo, $question) {
-		$this->game->timer->stop();
-		$this->game->gamer->change = $cardNo;
-		$this->game->gamer->question = $question;
-		$this->game->setTimer('answer');
-		$this->game->setState(AbstractState::STATE_QUESTION);
-	}
-	
-	public function noChangeCards() {
-		$this->game->timer->stop();
-		$this->game->changes = 2;
-		$combination = new Combination();
-		$cards = $combination->get($this->game->gamer->cards);
-		$combinations = array();
-		foreach ($cards['cards'] as $card) {
-			$combinations[$card['name']] = 1;
+	public function changeCards($gamer) {
+		$gamers = $this->game->container->get('odm')
+				->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+				->field('times')->gt(0)
+				->field('state')->equals(1)
+				->field('board')->equals($this->game->getId())
+				->getQuery()->execute();
+		if (count($gamers) == 0) {
+			if (!$this->game->lock($gamer->getId())) {
+				return $this->game->getStateNo();
+			}
+			$this->game->setState(AbstractState::STATE_PREFLOP);
+			$this->game->nextDealer();
+			$this->game->nextMover();
+			$this->game->setTimer('bet');
+			$this->game->save();
+			$this->game->unlock($gamer->getId());
+			if ($this->game->isMover($gamer->getSeat())) {
+				$this->game->startTimer();
+			}
 		}
-		$this->game->gamer->rank = $combination->rankName($cards['rank']);
-		$this->game->gamer->combination = $combinations;
-		$this->game->setTimer('bet');
-		$this->game->setState(AbstractState::STATE_PREFLOP);
+		
+		return $this->game->getStateNo();
 	}
 	
 }
