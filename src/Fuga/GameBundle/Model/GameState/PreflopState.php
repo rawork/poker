@@ -21,6 +21,7 @@ class PreflopState extends AbstractState {
 		$gamers = $this->game->container->get('odm')
 				->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
 				->field('board')->equals($this->game->getId())
+				->field('active')->equals(true)
 				->field('fold')->equals(false)
 				->getQuery()->execute();
 		

@@ -12,28 +12,33 @@ class JokerState extends AbstractState {
 	}
 	
 	public function buyChips($gamer) {
+		try {
 		if (!$this->game->lock($gamer->getId())) {
 			return $this->game->getStateNo();
 		}
-		$now = new \Datetime();
-		if ($now > $this->game->stopbuytime) {
-			if (!$this->game->existsGamers()) {
-				$this->game->removeTimer();
-				$this->game->stopTime();
-				$this->game->setState(self::STATE_END);
+			$now = new \Datetime();
+			if ($now > $this->game->stopbuytime) {
+				if (!$this->game->existsGamers()) {
+					$this->game->removeTimer();
+					$this->game->stopTime();
+					$this->game->setState(self::STATE_END);
+				} else {
+					$this->game->setTimer('next');
+					$this->game->startTimer();
+					$this->game->setState(self::STATE_ROUND_END);
+				}
 			} else {
-				$this->game->setTimer('next');
+				$this->game->setTimer('buy');
 				$this->game->startTimer();
-				$this->game->setState(self::STATE_ROUND_END);
+				$this->game->setState(AbstractState::STATE_BUY);
 			}
-		} else {
-			$this->game->setTimer('buy');
-			$this->game->startTimer();
-			$this->game->setState(AbstractState::STATE_BUY);
+			$this->game->save();
+			
+			$this->game->unlock($gamer->getId());
+		} catch (\Exception $e) {
+			$this->game->container->get('log')->write('STATE:'.$e->getMessage());
+			$this->game->unlock($gamer->getId());
 		}
-		$this->game->save();
-		$this->game->unlock($gamer->getId());
-		
 		return $this->game->getStateNo();
 	}
 }

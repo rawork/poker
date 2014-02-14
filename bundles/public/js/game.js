@@ -50,7 +50,9 @@
 	};
 })(jQuery);
 
-var gametimer;
+var gameTimerId;
+var gameTimeId;
+var gameUpdateId;
 
 function onUpdate() {
 	var state = +$.cookie('gamestate');
@@ -67,14 +69,14 @@ function onUpdate() {
 				$('#table').html(data.table);
 			}
 			if (data.cards){
-				$('#gamer-cards').html(data.cards);
+				if (+data.state != 1 || !$('#gamer-cards').html()){
+					$('#gamer-cards').html(data.cards);
+				}
 			}
-			if (data.bank){
-				$('#bank').html(data.bank);
-			}
-			if (data.bets){
-				$('#bets').html(data.bets);
-			}
+			$('#bank').html(data.bank);
+			$('#bets').html(data.bets);
+			$('#chips').html(data.chips);
+			$('#bet').html(data.bet);
 			$('.game-winner').remove();
 			if (data.winner){
 				$('.gamer-container').append(data.winner);
@@ -126,7 +128,7 @@ function onClickChange() {
 	function(data){
 		if (data.ok) {
 			$('#table').html(data.table);
-			setInterval(startTimer, 990);
+			gameTimerId = setInterval(startTimer, 990);
 		}
 	}, "json");
 }
@@ -142,7 +144,7 @@ function onClickNoChange() {
 			if (data.hint){
 				$('.gamer-container').append(data.hint);
 			}
-			setInterval(startTimer, 990);
+			gameTimerId = setInterval(startTimer, 990);
 		}  else {
 //			window.location.reload();
 		}
@@ -173,7 +175,7 @@ function onAnswer(n) {
 			if (data.hint){
 				$('.gamer-container').append(data.hint);
 			}
-			setInterval(startTimer, 990);
+			gameTimerId = setInterval(startTimer, 990);
 		} else {
 //			window.location.reload();
 		}
@@ -265,7 +267,7 @@ function onFold() {
 			$('#table').html(data.table);
 			$('#gamer-cards').html(data.cards);
 			$('.gamer-hint').remove();
-			setInterval(startTimer, 990);
+			gameTimerId = setInterval(startTimer, 990);
 		} else {
 //			window.location.reload();
 		}
@@ -294,9 +296,10 @@ function onDistribute() {
 				$('.game-main-bank').empty();
 			}
 			enableButtons();
-			startTimer();
+			gameTimerId = setInterval(startTimer, 990);
 		} else {
-			startTimer();
+			enableButtons();
+			gameTimerId = setInterval(startTimer, 990);
 		}
 	}, "json");
 }
@@ -316,7 +319,7 @@ function onShowBuy() {
 			}
 			updateRivals(data.rivals);
 			enableButtons();
-			startTimer();
+			gameTimerId = setInterval(startTimer, 990);
 		}
 	}, "json");
 }
@@ -328,7 +331,7 @@ function onBuy() {
 	function(data){
 		if (data.ok) {
 			$('#table').html(data.table);
-			startTimer();
+			gameTimerId = setInterval(startTimer, 990);
 		} else {
 //			window.location.reload();
 		}
@@ -355,7 +358,7 @@ function onBuyAnswer(n) {
 			$('#table').html(data.table);
 			$('#chips').html(data.chips);
 			enableButtons();
-			startTimer();
+			gameTimerId = setInterval(startTimer, 990);
 		} else {
 //			window.location.reload();
 		}
@@ -368,7 +371,7 @@ function onEndRound() {
 	function(data){
 		if (data.ok) {
 			$('#table').html(data.table);
-			startTimer();
+			gameTimerId = setInterval(startTimer, 990);
 		} else {
 //			window.location.reload();
 		}
@@ -376,6 +379,7 @@ function onEndRound() {
 }
 
 function onNext() {
+	stopTimer();
 	$.post('/game/next', {},
 	function(data){
 		if (data.ok) {
@@ -393,13 +397,10 @@ function onNext() {
 			if (data.hint){
 				$('.gamer-container').append(data.hint);
 			}
-			$.cookie('gamerstate', +data.gamerstate, {path: '/'});
-			$.cookie('gamestate', +data.state, {path: '/'});
-			$.cookie('gamemaxbet', +data.maxbet, {path: '/'});
 			$.cookie('gamermover', +data.mover, {path: '/'});
 			enableButtons();
 			updateRivals(data.rivals);
-			startTimer();
+			gameTimerId = setInterval(startTimer, 990);
 		} else {
 //			window.location.reload();
 		}
@@ -524,12 +525,8 @@ function stopTimer() {
 	$.removeCookie('timerhandler', {path: '/'});
 	$.removeCookie('timerholder', {path: '/'});
 	$.removeCookie('timerstop', {path: '/'});
-	var highestIntervalId = setInterval(";");
-	for (var i = 0 ; i <= highestIntervalId ; i++) {
-		clearInterval(i); 
-	}
-	setInterval(startTime, 980);
-	setInterval(onUpdate, 2000);
+	clearInterval(gameTimerId); 
+	gameTimerId = null;
 }
 
 function updateRivals(rivals) {

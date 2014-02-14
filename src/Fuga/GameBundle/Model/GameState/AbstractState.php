@@ -52,73 +52,33 @@ class AbstractState implements StateInterface {
 		throw new GameException('abstract answeBuyQuestion');
 	}
 	
-	public function endGame($gamer) {
-		if (!$this->game->lock($gamer->getId())) {
-			return $this->game->getStateNo();
-		}
-		$this->game->stopTimer();
-		$this->game->stopTime();
-		$this->game->setState(self::STATE_END);
-		$this->game->save();
-		$this->game->unlock($gamer->getId());
-		
-		return $this->game->getStateNo();
-	}
-	
 	public function nextGame($gamer) {
-		try {
-			if (!$this->game->lock($gamer->getId())) {
-				return $this->game->getStateNo();
-			}
-			$this->game->stopTimer();
-			$this->game->newDeck();
-			if (!$this->game->existsGamers()) {
-				$this->game->stopTimer();
-				$this->game->stopTime();
-				$this->game->setState(self::STATE_END);
-			} else {
-				$gamers = $this->game->container->get('odm')
-					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
-					->field('board')->equals($this->game->getId())
-					->field('active')->equals(true)
-					->getQuery()->execute();
-				foreach ($gamers as $doc) {
-					$doc->setCards($this->game->getCards(4));
-					$doc->setBet(0);
-					$doc->setAllin(false);
-					$doc->setWinner(false);
-					$doc->setFold(false);
-					$doc->setTimes(2);
-					$doc->setQuestion(array());
-					$doc->setBuy(array());
-				}
-				$this->game->setBank(0);
-				$this->game->setBets(0);
-				$this->game->setFlop($this->game->getCards(3));
+		throw new GameException('abstract nextGame');;
+	}
 
-				$this->game->setTimer('change');
-				$this->game->startTimer();
-				$this->game->setState(AbstractState::STATE_CHANGE);
-				$this->game->save();
-			}
-		} catch (\Exception $e) {	
-			$this->game->unlock($gamer->getId());
+		public function endGame($gamer) {
+		try {
+			$this->game->removeTimer();
+			$this->game->stopTime();
+			$this->game->setState(self::STATE_END);
+			$this->game->save();
+		} catch (\Exception $e) {
+			$this->game->container->get('log')->write('STATE:'.$e->getMessage());
 		}
 		
 		return $this->game->getStateNo();
 	}
 	
 	public function endRound($gamer) {
-		if (!$this->game->lock($gamer->getId())) {
-			return $this->game->getStateNo();
+		try {
+			$this->game->setTimer('next');
+			$this->game->startTimer();
+			$this->game->setState(self::STATE_ROUND_END);
+			$this->game->save();
+			
+		} catch (\Exception $e) {
+			$this->game->container->get('log')->write('STATE:'.$e->getMessage());
 		}
-		
-		$this->game->setTimer('next');
-		$this->game->startTimer();
-		$this->game->setState(self::STATE_ROUND_END);
-		$this->game->save();
-		
-		$this->game->unlock($gamer->getId());
 		
 		return $this->game->getStateNo();
 	}

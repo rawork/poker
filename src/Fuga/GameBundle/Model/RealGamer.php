@@ -34,23 +34,7 @@ class RealGamer {
 				->findOneByUser(intval($userId));
 		
 		if (!$this->doc) {
-			$gamer = $this->container->getItem('account_member', 'user_id='.$userId);
-			if (!$gamer) {
-				throw new Exception\GameException('Ошибка создания игрока');
-			}
-			$this->doc = new Gamer();
-			$this->doc->setMember($gamer['id']);
-			$this->doc->setUser($userId);
-			$this->doc->setBoard($gamer['board_id']);
-			$this->doc->setName($gamer['name']);
-			$this->doc->setLastname($gamer['lastname']);
-			$this->doc->setSeat($gamer['seat']);
-			$this->doc->setChips($gamer['chips']);
-			$this->doc->setAvatar(isset($gamer['avatar_value']['extra']) 
-				? $gamer['avatar_value']['extra']['main']['path'] 
-				: '/bundles/public/img/avatar_empty.png');
-			$this->container->get('odm')->persist($this->doc);
-			$this->save();
+			throw new Exception\GameException('Ошибка создания игрока. Обратитесь к администратору.');
 		}
 		
 		if ($this->isState(0)) {

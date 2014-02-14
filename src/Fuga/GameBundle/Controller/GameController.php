@@ -8,6 +8,8 @@ use Fuga\GameBundle\Model\RealGamer;
 use Fuga\GameBundle\Model\Rival;
 use Fuga\GameBundle\Model\Deck;
 use Fuga\GameBundle\Model\Exception\GameException;
+use Fuga\GameBundle\Document\Board;
+use Fuga\GameBundle\Document\Gamer;
 
 class GameController extends PublicController {
 	
@@ -408,8 +410,9 @@ class GameController extends PublicController {
 				$game->startTimer();
 			}
 			$gamer->startTimer();
-		} catch (Exception\GameException $e) {
-			
+		} catch (GameException $e) {
+			$this->get('log')->write($e->getMessage());
+			$this->get('log')->write($e->getTraceAsString());
 		}
 		
 		$rivalsData = array();
@@ -566,16 +569,18 @@ class GameController extends PublicController {
 		return json_encode(array(
 			'ok' => true,
 			'table' => $gamer->question ? null : $this->render('game/table.tpl', compact('game', 'gamer')),
-			'cards' => $game->isState(1)? null : $this->render('game/cards.tpl', compact('game', 'gamer')),
+			'cards' => $this->render('game/cards.tpl', compact('game', 'gamer')),
 			'bank'  => $game->getBank(),
 			'bets'  => $game->getBets(),
-			'hint' => $this->render('game/hint.tpl', compact('game', 'gamer')),
-			'winner' => $this->render('game/winner.tpl', compact('game', 'gamer')),
+			'chips' => $gamer->getChips(),
+			'bet'   => $gamer->getBet(),
+			'hint'  => $this->render('game/hint.tpl', compact('game', 'gamer')),
+			'winner'=> $this->render('game/winner.tpl', compact('game', 'gamer')),
 			'state' => $game->getStateNo(),
 			'maxbet'=> $game->getMaxbet(),
 			'gamerstate' => $gamer->getState(),
 			'mover' => $game->isMover($gamer->getSeat()) ? 1 : 0,
-			'rivals' => $rivalsData,
+			'rivals'=> $rivalsData,
 		));
 	}
 	
@@ -706,30 +711,89 @@ class GameController extends PublicController {
 		}
 		
 		$gameId = array_shift($params);
+		$time   = array_shift($params) ?: '15S';
+		
 		if (!$gameId) {
 			$this->get('router')->redirect('/game');
 		}
 		
 		$now = new \DateTime();
-		$new = $now->add(new \DateInterval('PT15S'));
+		$new = $now->add(new \DateInterval('PT'.$time));
 		
 		$this->get('container')->updateItem('game_board', 
 				array('fromtime' => $new->format('Y-m-d H:i:s')),
 				array('id' => $gameId)
 		);
 		
-		$game = new Game($gameId, $this->get('container'));
-		$game->clear();
-		$game->save();
-		
-		$gamers = $this->get('container')->getItems('account_member', 'board_id='.$gameId);
-		foreach ($gamers as $gamerData) {
-			$gamer = new RealGamer($gamerData['user_id'], $this->get('container'));
-			$gamer->clear();
-			$gamer->save();
+		try {
+			$game = new Game($gameId, $this->get('container'));
+			$game->clear();
+			$game->save();
+
+			$gamers = $this->get('container')->getItems('account_member', 'board_id='.$gameId);
+			foreach ($gamers as $gamerData) {
+				$gamer = new RealGamer($gamerData['user_id'], $this->get('container'));
+				$gamer->clear();
+				$gamer->save();
+			}
+		} catch (GameException $e) {
+			
 		}
 		
+		$this->createAction(array($gameId));
+		
 		$this->get('router')->redirect('/game/game');
+	}
+	
+	public function createAction($params) {
+		$user = $this->get('security')->getCurrentUser();
+		if (!$user || !$this->get('security')->isGroup('admin') ) {
+			$this->get('router')->redirect('/game');
+		}
+		
+		$boardId = array_shift($params);
+		if (!$boardId) {
+			$this->get('router')->redirect('/game/game');
+		}
+		
+		$game = $this->get('odm')
+				->getRepository('\Fuga\GameBundle\Document\Board')
+				->findOneByBoard(intval($boardId));
+		if (!$game) {
+			$board = $this->get('container')->getItem('game_board', $boardId);
+			$game = new Board();
+			$game->setBoard($board['id']);
+			$game->setName($board['name']);
+			$game->setFromtime(new \DateTime($board['fromtime']));
+			$this->get('odm')->persist($game);
+		}
+		
+		$gamers = $this->get('container')->getItems('account_member', 'board_id='.$boardId);
+		foreach ($gamers as $gamerData) {
+			$gamer = $this->get('odm')
+				->getRepository('\Fuga\GameBundle\Document\Gamer')
+				->findOneByUser(intval($gamerData['user_id']));
+			if ($gamer) {
+				continue;
+			}
+			$gamer = new Gamer();
+			$gamer->setMember($gamerData['id']);
+			$gamer->setUser($gamerData['user_id']);
+			$gamer->setBoard($gamerData['board_id']);
+			$gamer->setName($gamerData['name']);
+			$gamer->setLastname($gamerData['lastname']);
+			$gamer->setSeat($gamerData['seat']);
+			$gamer->setChips($gamerData['chips']);
+			$gamer->setAvatar(isset($gamerData['avatar_value']['extra']) 
+				? $gamerData['avatar_value']['extra']['main']['path'] 
+				: '/bundles/public/img/avatar_empty.png');
+			$this->get('odm')->persist($gamer);
+		}
+		
+		$this->get('odm')->flush();
+		$error = 'Игра и игроки для зала №'.$boardId.' созданы.';
+			
+		return $this->render('game/error.tpl', compact('error'));
 	}
 
 }

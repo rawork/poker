@@ -52,20 +52,12 @@ class Game implements GameInterface {
 				->findOneByBoard(intval($id));
 		
 		$board = $this->container->getItem('game_board', intval($id));
-		if (!$board) {
+		if (!$board || !$this->doc) {
 			throw new GameException('Не создан зал для игры. Обратитесь к администратору.');
 		}
-		if (!$this->doc) {
-			$this->doc = new Board();
-			$this->doc->setBoard($board['id']);
-			$this->doc->setName($board['name']);
-			$this->doc->setFromtime(new \DateTime($board['fromtime']));
-			$this->container->get('odm')->persist($this->doc);
-			$this->save();
-		} else {
-			$this->doc->setFromtime(new \DateTime($board['fromtime']));
-			$this->save();
-		}
+		
+		$this->doc->setFromtime(new \DateTime($board['fromtime']));
+		$this->save();
 		
 		if ($this->doc->getFromtime() > new \DateTime()) {
 			$this->setTimer('begin');
@@ -130,7 +122,7 @@ class Game implements GameInterface {
 	}
 	
 	public function confirmBets() {
-		$this->doc->setBank($this->doc->getBank() + $this->doc->getBets());
+		$this->doc->setBank($this->getBank() + $this->getBets());
 		$this->doc->setBets(0);
 		$this->save();
 	}
@@ -448,12 +440,12 @@ class Game implements GameInterface {
 					->field('gamer')->set($gamerId)
 					->getQuery()->execute();
 			if (!$board) {
-				throw new Exception\GameException('lock error');
+				throw new GameException('lock error');
 			}
 			
 			return true;
 		} catch (\Exception $e) {
-			
+			$this->container->get('log')->write('LOCK:'.$e->getMessage());
 		}
 		
 		return false;
@@ -470,12 +462,12 @@ class Game implements GameInterface {
 					->field('gamer')->set(0)
 					->getQuery()->execute();
 			if (!$board) {
-				throw new Exception\GameException('unlock error');
+				throw new GameException('unlock error');
 			}
 
 			return true;
 		} catch (\Exception $e) {
-			
+			$this->container->get('log')->write('UNLOCK:'.$e->getMessage());
 		}
 		
 		return false;
