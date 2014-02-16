@@ -284,6 +284,7 @@ class Game implements GameInterface {
 		
 		setcookie('gamestate', $state, time() + $this->cookietime, '/');
 		setcookie('gamemaxbet', $this->doc->getMaxbet(), time() + $this->cookietime, '/');
+		setcookie('gamemover', $this->doc->getMover(), time() + $this->cookietime, '/');
 		setcookie('gamename', $this->doc->getName(), time() + $this->cookietime, '/');
 		$this->syncTime();
 		$this->setMinbet();
@@ -494,15 +495,13 @@ class Game implements GameInterface {
 	}
 	
 	public function bet($gamer, $chips) {
-		$bet = $gamer->bet($chips, $this->getMaxbet());
-		$this->acceptBet($bet);
+		$this->acceptBet($gamer->bet($chips, $this->getMaxbet()));
 		$this->state->makeMove($gamer);
 		setcookie('gamemaxbet', $this->doc->getMaxbet(), time() + $this->cookietime, '/');
 	}
 	
 	public function check($gamer) {
-		$bet = $gamer->check($this->getMaxbet());
-		$this->acceptBet($bet);
+		$this->acceptBet($gamer->check($this->getMaxbet()));
 		$this->state->makeMove($gamer);
 		setcookie('gamemaxbet', $this->getMaxbet(), time() + $this->cookietime, '/');
 	}

@@ -24,6 +24,16 @@ class FlopState extends AbstractState {
 					$this->game->setBank2($this->game->getBank());
 				}
 			}
+			$gamers = $this->game->container->get('odm')
+					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+					->findAndUpdate()
+					->field('board')->equals($this->game->getId())
+					->field('active')->equals(true)
+					->field('state')->notEqual(1)
+					->field('fold')->set(true)
+					->field('cards')->set(array())
+					->getQuery()->execute();
+			
 			$this->game->stopTimer();
 			// Find who not FOLD
 			$gamers = $this->game->container->get('odm')
@@ -33,9 +43,7 @@ class FlopState extends AbstractState {
 					->field('fold')->equals(false)
 					->getQuery()->execute();
 
-			if (count($gamers) == 0) {
-				throw new GameException('Ошибка. Все игроки сбросили карты.');
-			} elseif (count($gamers) == 1) {
+			if (count($gamers) < 2) {
 				$this->game->confirmBets();
 				$this->game->setWinner();
 				$this->game->setTimer('distribute');
@@ -46,9 +54,10 @@ class FlopState extends AbstractState {
 						->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
 						->field('board')->equals($this->game->getId())
 						->field('active')->equals(true)
+						->field('state')->equals(1)
 						->field('fold')->equals(false)
 						->field('allin')->equals(false)
-						->field('bet')->notEqual($this->game->getMaxbet())
+						->field('bet')->lt($this->game->getMaxbet())
 						->getQuery()->execute();
 				if (count($gamers) ==  0) {
 					$this->game->confirmBets();

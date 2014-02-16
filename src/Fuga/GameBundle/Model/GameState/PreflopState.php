@@ -21,11 +21,21 @@ class PreflopState extends AbstractState {
 				$this->game->setMaxbet($gamer->getBet());
 			}
 			if ($gamer->getAllin()) {
+				// TODO надо хранить ставку allin
 				if ($this->game->getBank2() == 0) {
 					$this->game->setBank2($this->game->getBank());
 				}
 			}
 			$this->game->stopTimer();
+			$this->game->container->get('odm')
+					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+					->findAndUpdate()
+					->field('board')->equals($this->game->getId())
+					->field('active')->equals(true)
+					->field('state')->notEqual(1)
+					->field('fold')->set(true)
+					->field('cards')->set(array())
+					->getQuery()->execute();
 			// Find who not FOLD
 			$gamers = $this->game->container->get('odm')
 					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
@@ -34,9 +44,7 @@ class PreflopState extends AbstractState {
 					->field('fold')->equals(false)
 					->getQuery()->execute();
 
-			if (count($gamers) == 0) {
-				throw new GameException('Ошибка. Все игроки сбросили карты.');
-			} elseif (count($gamers) == 1) {
+			if (count($gamers) < 1) {
 				$this->game->confirmBets();
 				$this->game->setWinner();
 				$this->game->setTimer('distribute');
@@ -47,6 +55,7 @@ class PreflopState extends AbstractState {
 						->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
 						->field('board')->equals($this->game->getId())
 						->field('active')->equals(true)
+						->field('state')->equals(1)
 						->field('fold')->equals(false)
 						->field('allin')->equals(false)
 						->field('bet')->lt($this->game->getMaxbet())

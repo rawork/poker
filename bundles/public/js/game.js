@@ -63,7 +63,7 @@ function onUpdate() {
 				console.log('sdfsdfsdfds');
 				window.location.reload();
 			}
-			if (data.table) {
+			if (+data.state > 0 && data.table) {
 				$('#table').html(data.table);
 			}
 			if (+data.state != 1 || $('#gamer-cards').html() == ''){
@@ -224,6 +224,7 @@ function onClickAllIn() {
 }
 
 function onBet(chips) {
+	stopTimer();
 	enableButtons(4);
 	$('.gamer-card-zoom').hide();
 	$('.gamer-hint').remove();
@@ -246,6 +247,7 @@ function onBet(chips) {
 }
 
 function onClickCheck() {
+	stopTimer();
 	enableButtons(4);
 	$('.gamer-card-zoom').hide();
 	$('.gamer-hint').remove();
@@ -270,6 +272,7 @@ function onClickCheck() {
 }
 
 function onFold() {
+	stopTimer();
 	$('.gamer-card-zoom').hide();
 	$('.gamer-hint').remove();
 	enableButtons(4);
@@ -288,9 +291,9 @@ function onFold() {
 }
 
 function onDistribute() {
+	stopTimer();
 	$('.game-winner').remove();
 	$('.gamer-hint').remove();
-	stopTimer();
 	$.post('/game/distribute', {},
 	function(data){
 		if (data.ok) {
@@ -338,7 +341,6 @@ function onShowBuy() {
 }
 
 function onBuy() {
-	console.log('onBuy');
 	$('button[data-move=buy]').prop('disabled', true);
 	$.post('/game/buy', {},
 	function(data){
@@ -620,7 +622,7 @@ function initGame() {
 	$(document).on('change', '#input_bet', onChangeBetInput);
 	enableButtons();
 	setInterval(startTimer, 1000);
-//	setInterval(onUpdate, 3000);
+	setInterval(onUpdate, 3000);
 	$('.gamer-container').zoomcard();
 	$('.game-board-container').preloadImages(cardimages);
 	console.log($.cookie('timerhandler'));

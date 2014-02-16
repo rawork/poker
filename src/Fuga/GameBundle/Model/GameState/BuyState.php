@@ -3,7 +3,6 @@
 namespace Fuga\GameBundle\Model\GameState;
 
 use Fuga\GameBundle\Model\GameInterface;
-use Fuga\GameBundle\Model\Combination;
 
 class BuyState extends AbstractState {
 	
@@ -19,8 +18,13 @@ class BuyState extends AbstractState {
 				->field('active')->equals(true)
 				->getQuery()->execute();
 			foreach ($gamers as $doc) {
-				$doc->setActive($doc->getChips() > 0);
+				$doc->setActive($doc->getChips() >= $this->game->minbet);
+				if (!$doc->getActive()) {
+					$this->game->acceptBet($doc->getChips());
+					$doc->setChips(0);
+				}
 			}
+			$this->game->confirmBets();
 			$this->game->save();
 			if (!$this->game->existsGamers()) {
 				$this->game->removeTimer();
