@@ -98,7 +98,7 @@ function onUpdate() {
 				$('.game-main-banks').empty();
 				stopTime();
 			} else if (+data.state > 0) {
-//				gameTimerId = setInterval(startTimer, 990);
+//				gameTimerId = setInterval(startTimer, 1000);
 				startTimer();
 			}
 		}
@@ -137,7 +137,7 @@ function onClickChange() {
 	function(data){
 		if (data.ok) {
 			$('#table').html(data.table);
-			gameTimerId = setInterval(startTimer, 990);
+			gameTimerId = setInterval(startTimer, 1000);
 		}
 	}, "json");
 }
@@ -153,7 +153,7 @@ function onClickNoChange() {
 			if (data.hint){
 				$('.gamer-container').append(data.hint);
 			}
-			gameTimerId = setInterval(startTimer, 990);
+			gameTimerId = setInterval(startTimer, 1000);
 		}  else {
 //			window.location.reload();
 		}
@@ -184,7 +184,7 @@ function onAnswer(n) {
 			if (data.hint){
 				$('.gamer-container').append(data.hint);
 			}
-			gameTimerId = setInterval(startTimer, 990);
+			gameTimerId = setInterval(startTimer, 1000);
 		} else {
 //			window.location.reload();
 		}
@@ -237,7 +237,7 @@ function onBet(chips) {
 			$('#bets').html(data.bets);
 			updateRivals(data.rivals);
 			enableButtons();
-			gameTimerId = setInterval(startTimer, 990);
+			gameTimerId = setInterval(startTimer, 1000);
 		} else {
 //			window.location.reload();
 		}
@@ -262,7 +262,7 @@ function onClickCheck() {
 			$('.gamer-container').append(data.hint);
 			updateRivals(data.rivals);
 			enableButtons(4);
-			gameTimerId = setInterval(startTimer, 990);
+			gameTimerId = setInterval(startTimer, 1000);
 		} else {
 //			window.location.reload();
 		}
@@ -280,7 +280,7 @@ function onFold() {
 			$('#table').html(data.table);
 			$('#gamer-cards').html(data.cards);
 			$('.gamer-hint').remove();
-			gameTimerId = setInterval(startTimer, 990);
+			gameTimerId = setInterval(startTimer, 1000);
 		} else {
 //			window.location.reload();
 		}
@@ -309,10 +309,10 @@ function onDistribute() {
 				$('.game-main-bank').empty();
 			}
 			enableButtons();
-			gameTimerId = setInterval(startTimer, 990);
+			gameTimerId = setInterval(startTimer, 1000);
 		} else {
 			enableButtons();
-			gameTimerId = setInterval(startTimer, 990);
+			gameTimerId = setInterval(startTimer, 1000);
 		}
 	}, "json");
 }
@@ -332,7 +332,7 @@ function onShowBuy() {
 			}
 			updateRivals(data.rivals);
 			enableButtons();
-			gameTimerId = setInterval(startTimer, 990);
+			gameTimerId = setInterval(startTimer, 1000);
 		}
 	}, "json");
 }
@@ -344,7 +344,7 @@ function onBuy() {
 	function(data){
 		if (data.ok) {
 			$('#table').html(data.table);
-			gameTimerId = setInterval(startTimer, 990);
+			gameTimerId = setInterval(startTimer, 1000);
 		} else {
 //			window.location.reload();
 		}
@@ -371,7 +371,7 @@ function onBuyAnswer(n) {
 			$('#table').html(data.table);
 			$('#chips').html(data.chips);
 			enableButtons();
-			gameTimerId = setInterval(startTimer, 990);
+			gameTimerId = setInterval(startTimer, 1000);
 		} else {
 //			window.location.reload();
 		}
@@ -384,7 +384,7 @@ function onEndRound() {
 	function(data){
 		if (data.ok) {
 			$('#table').html(data.table);
-			gameTimerId = setInterval(startTimer, 990);
+			gameTimerId = setInterval(startTimer, 1000);
 		} else {
 //			window.location.reload();
 		}
@@ -406,9 +406,9 @@ function onNext() {
 			$('.gamer-hint').remove();
 			enableButtons();
 			updateRivals(data.rivals);
-			gameTimerId = setInterval(startTimer, 990);
+			gameTimerId = setInterval(startTimer, 1000);
 		} else {
-			gameTimerId = setInterval(startTimer, 990);
+			gameTimerId = setInterval(startTimer, 1000);
 		}
 	}, "json");
 }
@@ -596,7 +596,7 @@ function enableButtons(state) {
 
 function initGame() {
 	stopTime();
-	setInterval(startTime, 980);
+	setInterval(startTime, 1000);
 	$(document).on('click', '.choose', onChooseCard);
 //	$(document).on('click', 'a[data-action=nobuyanswer]',    onClickNoBuyAnswer);
 	$(document).on('click', '.question-answer',              onChooseAnswer);
@@ -611,7 +611,7 @@ function initGame() {
 	$(document).on('click', 'button[data-action=buy]',       onBuy);
 	$(document).on('click', 'button[data-action=out]',       onToggleOut);
 	enableButtons();
-	setInterval(startTimer, 990);
+	setInterval(startTimer, 1000);
 	setInterval(onUpdate, 3000);
 	$('.gamer-container').zoomcard();
 	$('.game-board-container').preloadImages(cardimages);
