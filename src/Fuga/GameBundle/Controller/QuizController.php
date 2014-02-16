@@ -267,6 +267,27 @@ class QuizController extends PublicController {
 	}
 	
 	public function importAction() {
+		$fh = fopen($_SERVER['DOCUMENT_ROOT'].'/'.'results1.csv', 'r');
+		if ($fh) {
+			$i = 1;
+			$name = '';
+			$answer1 =$answer2 = $answer3 = $answer4 = '';
+			$answer = 0;
+			while (($buffer = fgetcsv($fh, 4096, ';')) !== false) {
+				$user = $this->get('container')->getItem('user_user', 'email="'.$buffer[2].'"');
+				$account = $this->get('container')->getItem('account_member', 'user_id='.$user['id']);
+				echo 'UPDATE account_member SET chips='.$buffer[7].' WHERE id='.$account['id'].";\n<br>";
+			}
+			if (!feof($fh)) {
+//				echo "Error: unexpected fgets() fail\n";
+				exit;
+			}
+			fclose($fh);
+			exit;
+		}
+	}
+	
+	public function import2Action() {
 		$fh = fopen($_SERVER['DOCUMENT_ROOT'].'/'.'q.txt', 'r');
 		if ($fh) {
 			$i = 1;

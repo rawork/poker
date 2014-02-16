@@ -24,9 +24,9 @@
 	<div class="game-buttons">
 		Введите сумму:
 		<input type="text" id="input_bet" value="{$training->minbet}">
-		<button class="btn btn-success" data-action="bet">Ставка</button>
-		&nbsp;&nbsp;&nbsp;&nbsp;
 		<button class="btn btn-warning" data-action="vabank">Ва-банк</button>
+		&nbsp;&nbsp;&nbsp;&nbsp;
+		<button class="btn btn-success" data-action="bet">Ставка</button>
 		<button class="btn btn-primary" data-action="check">Чек</button>
 		<button class="btn btn-danger" data-action="fold">Пас</button>
 		&nbsp;&nbsp;&nbsp;&nbsp;
