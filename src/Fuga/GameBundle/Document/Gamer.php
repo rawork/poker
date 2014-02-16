@@ -41,7 +41,7 @@ class Gamer {
     private $times = 2;
 	
 	/** @ODM\Int */
-    private $state = 1;
+    private $state = 0;
 	
 	/** @ODM\Int */
     private $card = -1;

@@ -48,7 +48,7 @@ class FlopState extends AbstractState {
 						->field('active')->equals(true)
 						->field('fold')->equals(false)
 						->field('allin')->equals(false)
-						->field('move')->notEqual('check')
+						->field('bet')->notEqual($this->game->getMaxbet())
 						->getQuery()->execute();
 				if (count($gamers) ==  0) {
 					$this->game->confirmBets();

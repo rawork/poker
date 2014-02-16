@@ -321,11 +321,15 @@ class Combination {
 			return false;
 		}
 		
-		$newSuite = array_merge($triple, $pair);
-		foreach ($newSuite as $card) {
+//		$newSuite = array_merge($triple, $pair);
+		foreach ($triple as $card) {
+			$cards['weight'] += $card['weight']*100000;
+			$cards['cards'][] = $card;
+		}
+		foreach ($pair as $card) {
 			$cards['weight'] += $card['weight'];
 			$cards['cards'][] = $card;
-		}  
+		}
 		
 		if (count($cards['cards']) < 5) {
 			return false;

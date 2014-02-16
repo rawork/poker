@@ -65,6 +65,10 @@ class RealGamer {
 		return $this->doc->getRank();
 	}
 	
+	public function setRank(){
+		return $this->doc->setRank();
+	}
+	
 	public function getSeat(){
 		return $this->doc->getSeat();
 	}

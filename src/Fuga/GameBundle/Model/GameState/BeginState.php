@@ -22,6 +22,7 @@ class BeginState extends AbstractState {
 				->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
 				->field('board')->equals($this->game->getId())
 				->field('active')->equals(true)
+				->field('state')->equals(1)
 				->getQuery()->execute();
 			foreach ($gamers as $doc) {
 				$doc->setCards($this->game->getCards(4));

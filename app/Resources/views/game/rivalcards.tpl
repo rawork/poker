@@ -1,5 +1,5 @@
 {foreach from=$rival->cards item=card}
-<div class="card{if $game->isState(4) && $game->isCombination($card.name)} active{/if}" data-card-name="{$card.name}">
+<div class="card{if $game->isState(4) && $game->isCombination($card.name)} active{/if}">
 	{if $game->isState(4)}<img src="/bundles/public/img/cards/{$card.name}.png" />
 	{else}
 	<img src="/bundles/public/img/shirt.png" />
