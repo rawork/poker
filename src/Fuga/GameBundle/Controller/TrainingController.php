@@ -29,9 +29,8 @@ class TrainingController extends PublicController {
 		
 		$gamer = $this->get('container')->getItem('account_member', 'user_id='.$user['id']);
 		
-		if (!$gamer || 
-			(!$this->get('security')->isGroup('admin') && !$this->get('security')->isGroup('gamer'))) {
-			$error = 'Вы не являетесь игроком. Войдите на сайт с логином и паролем игрока<br>'.$this->call('Fuga:Public:Account:login');
+		if (!$gamer) {
+			$error = 'Ошибка создания тренировочной игры. Обратитесь к администратору клуба.<br>';
 			return $this->render('quiz/error.tpl', compact('error'));
 		}
 		
