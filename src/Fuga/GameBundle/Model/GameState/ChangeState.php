@@ -24,8 +24,6 @@ class ChangeState extends AbstractState {
 				return $this->game->getStateNo();
 			}
 			$this->game->setState(AbstractState::STATE_PREFLOP);
-			$this->game->nextDealer();
-			$this->game->nextMover();
 			$this->game->setTimer('bet');
 			$this->game->save();
 			$this->game->unlock($gamer->getId());

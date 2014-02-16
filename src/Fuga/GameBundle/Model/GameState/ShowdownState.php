@@ -24,6 +24,7 @@ class ShowdownState extends AbstractState {
 		} else {
 			$share = $bank;
 		}
+		$now = new \DateTime();
 		$gamers = $this->game->container->get('odm')
 				->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
 				->field('board')->equals($this->game->getId())
@@ -36,7 +37,9 @@ class ShowdownState extends AbstractState {
 					break;
 				}
 			}
-			$doc->setActive($doc->getChips() > 0);
+			if ($now > $this->game->stopbuytime) {
+				$doc->setActive($doc->getChips() > 0);
+			}	
 			$doc->setBet(0);
 			$doc->setCards(array());
 			$doc->setRank('');
@@ -62,7 +65,6 @@ class ShowdownState extends AbstractState {
 		$this->game->setMaxbet(0);
 		$this->game->save();
 		
-		$now = new \DateTime();
 		if (!$this->game->existsJoker()) {
 			$this->game->setTimer('prebuy');
 			$this->game->startTimer();

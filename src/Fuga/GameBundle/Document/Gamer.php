@@ -73,6 +73,9 @@ class Gamer {
 	/** @ODM\String */
     private $rank;
 	
+	/** @ODM\String */
+    private $move;
+	
 	/** @ODM\Collection */
     private $combination = array();
 	
@@ -593,5 +596,27 @@ class Gamer {
     public function getTimer()
     {
         return $this->timer;
+    }
+
+    /**
+     * Set move
+     *
+     * @param string $move
+     * @return self
+     */
+    public function setMove($move)
+    {
+        $this->move = $move;
+        return $this;
+    }
+
+    /**
+     * Get move
+     *
+     * @return string $move
+     */
+    public function getMove()
+    {
+        return $this->move;
     }
 }

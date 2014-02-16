@@ -1,4 +1,4 @@
-{if !$game->isState(0)}<div class="gamer" id="gamer">
+<div class="gamer" id="gamer">
 	<div class="gamer-cards" id="gamer-cards">
 		{foreach from=$gamer->getCards() key=k item=card}
 		<div class="card{if $game->isState(1)} choose{/if}{if !$gamer->isWinner() && ($game->isState(2) || $game->isState(3) || $game->isState(4)) && $gamer->isCombination($card.name)} hint{/if}{if $game->isState(4) && $game->isCombination($card.name)} active{/if}" data-card-name="{$card.name}" data-card-id="{$k}"><img src="/bundles/public/img/cards/{$card.name}.png" /></div> 
@@ -24,13 +24,13 @@
 	<div class="game-buttons">
 		Введите сумму:
 		<input type="text" id="input_bet" value="{$game->minbet}">
-		<button class="btn btn-warning" data-action="allin">Ва-банк</button>
+		<button disabled="true" class="btn btn-warning" data-action="allin">Ва-банк</button>
 		&nbsp;&nbsp;&nbsp;&nbsp;
-		<button class="btn btn-success" data-action="bet">Ставка</button>
-		<button class="btn btn-primary" data-action="check">Ответить</button>
-		<button class="btn btn-danger" data-action="fold">Пас</button>
+		<button disabled="true" class="btn btn-success" data-action="bet">&nbsp;</button>
+		<button disabled="true" class="btn btn-primary" data-action="check">&nbsp;</button>
+		<button disabled="true"class="btn btn-danger" data-action="fold">Пас</button>
 		&nbsp;&nbsp;&nbsp;&nbsp;
-		<button class="btn btn-primary btn-buy" data-action="buy">Покупка фишек</button>
-		<a class="btn btn-warning" data-action="out">{if $gamer->isState(3)}В игре{else}Вне игры{/if}</a>
+		<button disabled="true" class="btn btn-primary btn-buy" data-action="buy">Покупка фишек</button>
+		<button disabled="true" class="btn btn-warning" data-action="out">{if $gamer->isState(3)}В игре{else}Вне игры{/if}</button>
 	</div>
-</div>{/if}
+</div>

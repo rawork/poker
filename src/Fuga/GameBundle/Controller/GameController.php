@@ -56,7 +56,7 @@ class GameController extends PublicController {
 			}
 			
 			$fromtime = new \DateTime($board['fromtime']);
-			if ($now->getTimestamp() - $fromtime->getTimestamp() < -3600) {
+			if ($now->getTimestamp() - $fromtime->getTimestamp() < - 7200) {
 				throw new GameException('Игра еще не началась');
 			}
 			
@@ -216,6 +216,7 @@ class GameController extends PublicController {
 		} catch (GameException $e) {
 			$this->get('log')->write($e->getMessage());
 			$this->get('log')->write($e->getTraceAsString());
+			return json_encode(array('ok' => false));
 		}
 		
 		return json_encode(array(
@@ -246,6 +247,7 @@ class GameController extends PublicController {
 		} catch (GameException $e) {
 			$this->get('log')->write($e->getMessage());
 			$this->get('log')->write($e->getTraceAsString());
+			return json_encode(array('ok' => false));
 		}
 		
 		return json_encode(array(
@@ -256,6 +258,7 @@ class GameController extends PublicController {
 			'bets'  => $game->getBets(),
 			'chips' => $gamer->getChips(),
 			'bet'   => $gamer->getBet(),
+			'state' => $game->getStateNo(),
 			'hint'  => $this->render('game/hint.tpl', compact('game', 'gamer')),
 			'winner'=> $this->render('game/winner.tpl', compact('game', 'gamer')),
 		));
@@ -280,6 +283,7 @@ class GameController extends PublicController {
 		} catch (GameException $e) {
 			$this->get('log')->write($e->getMessage());
 			$this->get('log')->write($e->getTraceAsString());
+			return json_encode(array('ok' => false));
 		}
 		
 		return json_encode(array(
@@ -290,6 +294,7 @@ class GameController extends PublicController {
 			'bets'  => $game->getBets(),
 			'chips' => $gamer->getChips(),
 			'bet'   => $gamer->getBet(),
+			'state' => $game->getStateNo(),
 			'hint'  => $this->render('game/hint.tpl', compact('game', 'gamer')),
 			'winner'=> $this->render('game/winner.tpl', compact('game', 'gamer')),
 		));
@@ -324,6 +329,7 @@ class GameController extends PublicController {
 		} catch (GameException $e) {
 			$this->get('log')->write($e->getMessage());
 			$this->get('log')->write($e->getTraceAsString());
+			return json_encode(array('ok' => false));
 		}
 		
 		$rivalsData = array();
@@ -371,6 +377,7 @@ class GameController extends PublicController {
 		} catch (GameException $e) {
 			$this->get('log')->write($e->getMessage());
 			$this->get('log')->write($e->getTraceAsString());
+			return json_encode(array('ok' => false));
 		}
 		
 		return json_encode(array(
@@ -413,6 +420,7 @@ class GameController extends PublicController {
 		} catch (GameException $e) {
 			$this->get('log')->write($e->getMessage());
 			$this->get('log')->write($e->getTraceAsString());
+			return json_encode(array('ok' => false));
 		}
 		
 		$rivalsData = array();
@@ -458,6 +466,7 @@ class GameController extends PublicController {
 		} catch (GameException $e) {
 			$this->get('log')->write($e->getMessage());
 			$this->get('log')->write($e->getTraceAsString());
+			return json_encode(array('ok' => false));
 		}
 		
 		return json_encode(array(
@@ -486,6 +495,7 @@ class GameController extends PublicController {
 		} catch (GameException $e) {
 			$this->get('log')->write($e->getMessage());
 			$this->get('log')->write($e->getTraceAsString());
+			return json_encode(array('ok' => false));
 		}
 		
 		return json_encode(array(
@@ -514,6 +524,7 @@ class GameController extends PublicController {
 		} catch (GameException $e) {
 			$this->get('log')->write($e->getMessage());
 			$this->get('log')->write($e->getTraceAsString());
+			return json_encode(array('ok' => false));
 		}
 		
 		return json_encode(array(
@@ -553,7 +564,7 @@ class GameController extends PublicController {
 			}
 			$gamer->startTimer();
 		} catch (Exception\GameException $e) {
-			
+			$this->get('log')->write('UPDATE:'.$e->getMessage());
 		}
 		
 		$rivalsData = array();
@@ -581,6 +592,7 @@ class GameController extends PublicController {
 			'gamerstate' => $gamer->getState(),
 			'mover' => $game->isMover($gamer->getSeat()) ? 1 : 0,
 			'rivals'=> $rivalsData,
+			'minbet' => $game->minbet,
 		));
 	}
 	
@@ -608,35 +620,6 @@ class GameController extends PublicController {
 		return json_encode(array(
 			'ok' => true,
 			'state' => 1,
-		));
-	}
-	
-	public function minbetAction(){
-		if (!$this->get('router')->isXmlHttpRequest()) {
-			$this->get('router')->redirect('/game/game');
-		}
-		
-		$user = $this->get('security')->getCurrentUser();
-		
-		if (!$user) 
-		{
-			return json_encode(array('ok' => false));
-		}
-		
-		try {
-			$gamer = new RealGamer($user['id'], $this->get('container'));
-			$game = new Game($gamer->getBoard(), $this->get('container'));
-			$game->setMinbet();
-		} catch (Exception\GameException $e) {
-			return json_encode(array(
-				'ok' => false,
-				'error' => $e->getMessage(),
-			));
-		}
-		
-		return json_encode(array(
-			'ok' => true,
-			'minbet' => $game->minbet,
 		));
 	}
 	
@@ -711,14 +694,14 @@ class GameController extends PublicController {
 		}
 		
 		$gameId = array_shift($params);
-		$time   = array_shift($params) ?: '15S';
+		$time   = array_shift($params) ?: '10S';
 		
 		if (!$gameId) {
 			$this->get('router')->redirect('/game');
 		}
 		
 		$now = new \DateTime();
-		$new = $now->add(new \DateInterval('PT'.$time));
+		$new = $now->add(new \DateInterval('PT'.strtoupper($time)));
 		
 		$this->get('container')->updateItem('game_board', 
 				array('fromtime' => $new->format('Y-m-d H:i:s')),

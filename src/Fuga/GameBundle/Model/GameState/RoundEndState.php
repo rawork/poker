@@ -39,6 +39,8 @@ class RoundEndState extends AbstractState {
 				}
 				$this->game->setBank(0);
 				$this->game->setBets(0);
+				$this->game->nextDealer();
+				$this->game->nextMover();
 				$this->game->setFlop($this->game->getCards(3));
 
 				$this->game->setTimer('change');

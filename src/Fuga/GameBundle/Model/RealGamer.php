@@ -192,6 +192,7 @@ class RealGamer {
 		}
 		$this->doc->setChips( $this->doc->getChips() - $bet );
 		$this->doc->setBet( $this->doc->getBet() + $bet );
+		$this->doc->setMove('bet');
 		$this->save();
 		
 		return $bet;
@@ -215,6 +216,7 @@ class RealGamer {
 		
 		$this->doc->setChips( $this->doc->getChips() - $bet );
 		$this->doc->setBet( $this->doc->getBet() + $bet );
+		$this->doc->setMove('check');
 		$this->save();
 		
 		return $bet;
@@ -340,6 +342,7 @@ class RealGamer {
 		}
 		if ($answerNo == $this->question['answer']) {
 			$this->doc->setChips($this->doc->getChips() + $game->minbet);
+			$this->doc->setActive($this->doc->getChips() > 0); // TODO ???$game->minbet 
 		}
 		$buy = $this->doc->getBuy();
 		if (is_array($buy) && count($buy) > 0) {

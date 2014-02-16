@@ -11,44 +11,65 @@ class FlopState extends AbstractState {
 		parent::__construct($game);
 	}
 	
-	public function makeBet($chips) {
-		$this->game->maxbet = $this->game->acceptBet($this->game->gamer->bet($chips, $this->game->maxbet));
-
-		foreach ($this->game->bots as $bot) {
-			if ($bot->isActive()) {
-//				$isBet = $this->game->gamer->allin ? rand(1,3) == 2 : true;
-				$isBet = rand(1,3) != 2;
-				if ($isBet) {
-					$this->game->acceptBet($bot->bet($chips, $this->game->maxbet));
-				} else {
-					$bot->cards = null;
+	public function makeMove($gamer) {
+		try {
+			if (!$this->game->lock($gamer->getId())) {
+				return $this->game->getStateNo();
+			}
+			if ($gamer->getBet() > $this->game->getMaxbet()) {
+				$this->game->setMaxbet($gamer->getBet());
+			}
+			if ($gamer->getAllin()) {
+				if ($this->game->getBank2() == 0) {
+					$this->game->setBank2($this->game->getBank());
 				}
 			}
+			$this->game->stopTimer();
+			// Find who not FOLD
+			$gamers = $this->game->container->get('odm')
+					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+					->field('board')->equals($this->game->getId())
+					->field('active')->equals(true)
+					->field('fold')->equals(false)
+					->getQuery()->execute();
+
+			if (count($gamers) == 0) {
+				throw new GameException('Ошибка. Все игроки сбросили карты.');
+			} elseif (count($gamers) == 1) {
+				$this->game->confirmBets();
+				$this->game->setWinner();
+				$this->game->setTimer('distribute');
+				$this->game->startTimer();
+				$this->game->setState(AbstractState::STATE_SHOWDOWN);
+			} else {
+				$gamers = $this->game->container->get('odm')
+						->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+						->field('board')->equals($this->game->getId())
+						->field('active')->equals(true)
+						->field('fold')->equals(false)
+						->field('allin')->equals(false)
+						->field('move')->notEqual('check')
+						->getQuery()->execute();
+				if (count($gamers) ==  0) {
+					$this->game->confirmBets();
+					$this->game->setWinner();
+					$this->game->setTimer('distribute');
+					$this->game->startTimer();
+					$this->game->setState(AbstractState::STATE_SHOWDOWN);
+				} else {
+					$this->game->nextMover();
+					$this->game->setTimer('bet');
+				}
+			}
+
+			$this->game->save();
+			$this->game->unlock($gamer->getId());
+		} catch (\Exception $e) {
+			$this->game->container->get('log')->write('STATE:'.$e->getMessage());
+			$this->game->unlock($gamer->getId());
 		}
-		$this->game->confirmBets();
-		$this->game->gamer->allin = false;
-		$this->game->maxbet = 0;
-		$this->setWinner();
-		$this->game->setState(AbstractState::STATE_SHOWDOWN);
 		
 		return $this->game->getStateNo();
-	}
-	
-	public function checkBet(){
-		$this->setWinner();
-		$this->game->setState(AbstractState::STATE_SHOWDOWN);
-	}
-	
-	public function foldCards() {
-		$this->game->gamer->cards = null;
-		foreach ($this->game->bots as $bot) {
-			$this->game->acceptBet($bot->bet($this->game->minbet));
-		}
-		$this->game->confirmBets();
-		$this->game->gamer->rank = null;
-		$this->game->gamer->combination = null;
-		$this->setWinner();
-		$this->game->setState(AbstractState::STATE_SHOWDOWN);
 	}
 	
 }

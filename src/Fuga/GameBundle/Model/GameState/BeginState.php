@@ -16,7 +16,7 @@ class BeginState extends AbstractState {
 			if (!$this->game->lock($gamer->getId())) {
 				return $this->game->getStateNo();
 			}
-			$this->game->stopTimer();
+			$this->game->removeTimer();
 			$this->game->newDeck();
 			$gamers = $this->game->container->get('odm')
 				->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
@@ -27,6 +27,8 @@ class BeginState extends AbstractState {
 				$doc->setCards($this->game->getCards(4));
 			}
 			$this->game->setFlop($this->game->getCards(3));
+			$this->game->nextDealer();
+			$this->game->nextMover();
 			$this->game->setTimer('change');
 			$this->game->setState(AbstractState::STATE_CHANGE);
 			$this->game->syncTime();

@@ -44,7 +44,10 @@ class Board
     private $dealer = 0;
 	
 	/** @ODM\Int */
-    private $mover = 1;
+    private $mover = 0;
+	
+	/** @ODM\Int */
+    private $firstmover = 0;
 	
 	/** @ODM\Int */
 	private $state = 0;
@@ -469,5 +472,27 @@ class Board
     public function getTimer()
     {
         return $this->timer;
+    }
+
+    /**
+     * Set firstmover
+     *
+     * @param int $firstmover
+     * @return self
+     */
+    public function setFirstmover($firstmover)
+    {
+        $this->firstmover = $firstmover;
+        return $this;
+    }
+
+    /**
+     * Get firstmover
+     *
+     * @return int $firstmover
+     */
+    public function getFirstmover()
+    {
+        return $this->firstmover;
     }
 }

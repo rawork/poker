@@ -1,4 +1,3 @@
-{if !$game->isState(0) && !$game->isState(6)}
 {foreach from=$rivals item=rival}
 <div class="gamer-bot gamer{$rival->position}" data-bot-id="{$rival->id}">
 	{if $rival->position == 1 || $rival->position == 5}
@@ -46,4 +45,3 @@
 	{/if}
 </div>
 {/foreach}
-{/if}

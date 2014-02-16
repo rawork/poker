@@ -90,6 +90,10 @@ class Game implements GameInterface {
 	public function getMaxbet() {
 		return $this->doc->getMaxbet();
 	}
+	
+	public function setMover($value) {
+		$this->doc->setMover($value);
+	}
 
 	public function newDeck(){
 		$deck = new Deck();
@@ -132,6 +136,10 @@ class Game implements GameInterface {
 		$this->doc->setBank(0);
 		$this->save();
 		return $chips;
+	}
+	
+	public function getDealer() {
+		return $this->doc->getDealer();
 	}
 	
 	public function getBets() {
@@ -368,6 +376,7 @@ class Game implements GameInterface {
 		if (!$gamer) {
 			throw new Exception\GameException('Следующий дилер не найден.');
 		}
+		$this->doc->setMover($gamer->getSeat());
 		$this->doc->setDealer($gamer->getSeat());
 	}
 	
@@ -485,24 +494,15 @@ class Game implements GameInterface {
 	public function bet($gamer, $chips) {
 		$bet = $gamer->bet($chips, $this->getMaxbet());
 		$this->acceptBet($bet);
-		$this->doc->setMaxbet($gamer->getBet());
-		if ($gamer->getAllin()) {
-			if ($this->setBank2() == 0) {
-				$this->setBank2($this->getBank());
-			}
-		}
-		$this->save();
-		setcookie('gamemaxbet', $this->doc->getMaxbet(), time() + $this->cookietime, '/');
 		$this->state->makeMove($gamer);
+		setcookie('gamemaxbet', $this->doc->getMaxbet(), time() + $this->cookietime, '/');
 	}
 	
 	public function check($gamer) {
 		$bet = $gamer->check($this->getMaxbet());
 		$this->acceptBet($bet);
-		$this->doc->setMaxbet($gamer->getBet());
-		
-		setcookie('gamemaxbet', $this->doc->getMaxbet(), time() + $this->cookietime, '/');
 		$this->state->makeMove($gamer);
+		setcookie('gamemaxbet', $this->getMaxbet(), time() + $this->cookietime, '/');
 	}
 	
 	public function distribute($gamer) {

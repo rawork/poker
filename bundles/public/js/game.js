@@ -55,10 +55,6 @@ var gameTimeId;
 var gameUpdateId;
 
 function onUpdate() {
-	var state = +$.cookie('gamestate');
-	if (state == 0) {
-		return;
-	}
 	$.post('/game/update', {},
 	function(data){
 		if (data.ok) {
@@ -68,10 +64,8 @@ function onUpdate() {
 			if (data.table) {
 				$('#table').html(data.table);
 			}
-			if (data.cards){
-				if (+data.state != 1 || !$('#gamer-cards').html()){
-					$('#gamer-cards').html(data.cards);
-				}
+			if (+data.state != 1 || $('#gamer-cards').html() == ''){
+				$('#gamer-cards').html(data.cards);
 			}
 			$('#bank').html(data.bank);
 			$('#bets').html(data.bets);
@@ -85,13 +79,28 @@ function onUpdate() {
 			if (data.hint){
 				$('.gamer-container').append(data.hint);
 			}
+			
+			var bet = +$('#input_bet').val();
+			$('#min-bet').html(data.minbet);
+			if (data.minbet > bet) {
+				$('#input_bet').val(data.minbet);
+			}
+			
 			$.cookie('gamerstate', +data.gamerstate, {path: '/'});
 			$.cookie('gamestate', +data.state, {path: '/'});
 			$.cookie('gamemaxbet', +data.maxbet, {path: '/'});
 			$.cookie('gamermover', +data.mover, {path: '/'});
 			enableButtons();
 			updateRivals(data.rivals);
-			startTimer();
+			if (+data.state == 6) {
+				$('.gamer-cards').empty();
+				$('.game-min-bet').empty();
+				$('.game-main-banks').empty();
+				stopTime();
+			} else if (+data.state > 0) {
+//				gameTimerId = setInterval(startTimer, 990);
+				startTimer();
+			}
 		}
 	}, "json");
 }
@@ -183,21 +192,25 @@ function onAnswer(n) {
 }
 
 function onClickBet() {
-	var minbet = $('#min-bet').html();
-	var maxbet = $.cookie('gamemaxbet');
-	var chips = $('#chips').html();
+	var minbet = +$('#min-bet').html();
+	var maxbet = +$.cookie('gamemaxbet');
+	var chips = +$('#chips').html();
+	var existbet = +($('#bet').html());
 	var bet = +($('#input_bet').val());
 	if ( bet > chips ) {
-		alert('Ставка  больше, чем у вас есть');
+		alert('Ставка  больше, чем у вас есть фишек');
 		return;
 	}
-	if (minbet > bet) {
-		alert('Ставка должна быть не меньше минимальной ставки за столом');
-		return;
-	}
-	if (maxbet > bet) {
-		alert('Ставка должна быть не меньше ' + maxbet);
-		return;
+	if (maxbet > existbet) {
+		if ((maxbet - existbet) > bet) {
+			alert('Ставка должна быть не меньше ' + ((maxbet - existbet)*2));
+			return;
+		}
+	} else {
+		if (minbet > bet) {
+			alert('Ставка должна быть не меньше минимальной ставки');
+			return;
+		}
 	}
 	onBet(bet);
 }
@@ -224,7 +237,7 @@ function onBet(chips) {
 			$('#bets').html(data.bets);
 			updateRivals(data.rivals);
 			enableButtons();
-			setInterval(startTimer, 990);
+			gameTimerId = setInterval(startTimer, 990);
 		} else {
 //			window.location.reload();
 		}
@@ -248,8 +261,8 @@ function onClickCheck() {
 			$('.gamer-container').append(data.winner);
 			$('.gamer-container').append(data.hint);
 			updateRivals(data.rivals);
-			enableButtons();
-			startTimer();
+			enableButtons(4);
+			gameTimerId = setInterval(startTimer, 990);
 		} else {
 //			window.location.reload();
 		}
@@ -390,19 +403,12 @@ function onNext() {
 				$('#gamer-cards').html(data.cards);
 			}
 			$('.game-winner').remove();
-			if (data.winner){
-				$('.gamer-container').append(data.winner);
-			}
 			$('.gamer-hint').remove();
-			if (data.hint){
-				$('.gamer-container').append(data.hint);
-			}
-			$.cookie('gamermover', +data.mover, {path: '/'});
 			enableButtons();
 			updateRivals(data.rivals);
 			gameTimerId = setInterval(startTimer, 990);
 		} else {
-//			window.location.reload();
+			gameTimerId = setInterval(startTimer, 990);
 		}
 	}, "json");
 }
@@ -413,19 +419,6 @@ function onStart() {
 		if (data.ok) {
 			$.cookie('gamestate', data.state, {path: '/'});
 			window.location.reload();
-		}
-	}, "json");
-}
-
-function onCheckMinBet() {
-	$.post('/game/minbet', {},
-	function(data){
-		if (data.ok) {
-			var bet = +$('#input_bet').val();
-			$('#min-bet').html(data.minbet);
-			if (data.minbet > bet) {
-				$('#input_bet').val(data.minbet);
-			}
 		}
 	}, "json");
 }
@@ -550,67 +543,53 @@ function updateRivals(rivals) {
 
 
 function enableButtons(state) {
+	$('.game-buttons button').prop('disabled', true);
 	state = state || +$.cookie('gamestate');
 	var gamerstate = +$.cookie('gamerstate');
 	var gamermover = +$.cookie('gamermover');
-	if (state == 2 || state == 3) {
-		if (gamerstate == 3 || gamermover == 0) {
-			state = 1;
-		}
-	}
 	var minbet = +$('#min-bet').html();
 	var maxbet = +$.cookie('gamemaxbet');
 	var bet    = +$('#bet').html();
 	var chips  = +$('#chips').html();
 	switch (state) {
 		case 2:
-			$('.game-buttons button').prop('disabled', false);
-			$('.game-buttons button[data-action=buy]').prop('disabled', true);
-			if (gamermover == 1 && gamerstate == 1) {
-				if (bet == 0 && maxbet == 0) {
-					$('.game-buttons button[data-action=check]').prop('disabled', true);
-				} else if (maxbet > bet ) {
-					$('.game-buttons button[data-action=check]').html('Ответить');
-				} else {
-					$('.game-buttons button[data-action=check]').html('Чек');
-				}
-				if (minbet > chips || (maxbet-bet) > chips) {
-					$('.game-buttons button[data-action=check]').prop('disabled', true);
-					$('.game-buttons button[data-action=bet]').prop('disabled', true);
-				}
-			} else {
-				$('.game-buttons button[data-action=bet]').prop('disabled', true);
-				$('.game-buttons button[data-action=allin]').prop('disabled', true);
-				$('.game-buttons button[data-action=fold]').prop('disabled', true);
-			}
-			break;
 		case 3:
-			$('.game-buttons button').prop('disabled', false);
-			$('.game-buttons button[data-action=buy]').prop('disabled', true);
+			$('.game-buttons button[data-action=bet]').html('&nbsp;');
+			$('.game-buttons button[data-action=check]').html('&nbsp;');
 			if (gamermover == 1 && gamerstate == 1) {
-				if (maxbet > bet ) {
-					$('.game-buttons button[data-action=check]').html('Ответить');
+				$('.game-buttons button[data-action=fold]').prop('disabled', false);
+				$('.game-buttons button[data-action=allin]').prop('disabled', false);
+				if (minbet > chips || (maxbet - bet) > chips) {
+					
 				} else {
-					$('.game-buttons button[data-action=check]').html('Чек');
+					if (bet == 0 && maxbet == 0) {
+						$('.game-buttons button[data-action=bet]').html('Ставка');
+						$('.game-buttons button[data-action=check]').html('Чек');
+						$('.game-buttons button[data-action=bet]').prop('disabled', false);
+					} else if ( maxbet > bet ) {
+						if ($('#input_bet').val() < (maxbet - bet)*2) {
+							$('#input_bet').val((maxbet - bet)*2);
+						}
+						$('.game-buttons button[data-action=bet]').html('Райз ('+ ((maxbet - bet)*2) +')');
+						$('.game-buttons button[data-action=check]').html('Ответить ('+ (maxbet - bet) +')');
+						$('.game-buttons button[data-action=check]').prop('disabled', false);
+						$('.game-buttons button[data-action=bet]').prop('disabled', false);
+					} else {
+						$('#input_bet').val(minbet);
+						$('.game-buttons button[data-action=bet]').html('Ставка');
+						$('.game-buttons button[data-action=check]').html('Чек');
+						$('.game-buttons button[data-action=check]').prop('disabled', false);
+						$('.game-buttons button[data-action=bet]').prop('disabled', false);
+					}
 				}
-				if (minbet > chips || (maxbet-bet) > chips) {
-					$('.game-buttons button[data-action=check]').prop('disabled', true);
-					$('.game-buttons button[data-action=bet]').prop('disabled', true);
-				}
-			} else {
-				$('.game-buttons button[data-action=fold]').prop('disabled', true);
-				$('.game-buttons button[data-action=check]').prop('disabled', true);
-				$('.game-buttons button[data-action=bet]').prop('disabled', true);
-				$('.game-buttons button[data-action=allin]').prop('disabled', true);
 			}
-			
-			break;
+			break;	
 		case 5:
-			$('.game-buttons button').prop('disabled', true);
 			$('.game-buttons button[data-action=buy]').prop('disabled', false);
 			break;
 		default:
-			$('.game-buttons button').prop('disabled', true);
+			$('.game-buttons button[data-action=bet]').html('&nbsp;');
+			$('.game-buttons button[data-action=check]').html('&nbsp;');
 	}
 	$('.game-buttons button[data-action=out]').prop('disabled', state == 6);
 }
@@ -630,11 +609,10 @@ function initGame() {
 	$(document).on('click', 'button[data-action=check]',     onClickCheck);
 	$(document).on('click', 'button[data-action=fold]',      onFold);
 	$(document).on('click', 'button[data-action=buy]',       onBuy);
-	$(document).on('click', 'a[data-action=out]',            onToggleOut);
+	$(document).on('click', 'button[data-action=out]',       onToggleOut);
 	enableButtons();
 	setInterval(startTimer, 990);
-	setInterval(onCheckMinBet, 5000);
-	setInterval(onUpdate, 2000);
+	setInterval(onUpdate, 3000);
 	$('.gamer-container').zoomcard();
 	$('.game-board-container').preloadImages(cardimages);
 	console.log($.cookie('timerhandler'));
