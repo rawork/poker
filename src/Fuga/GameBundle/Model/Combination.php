@@ -17,24 +17,25 @@ class Combination {
 	const POKER			= 10;
 	
 	private $jokerName   = 'joker';
-	private $jokerWeight = 8192;
-	private $aceWeight   = 4096;
-	private $fiveWeight  = 8;
+	private $jokerWeight = 15;
+	private $aceWeight   = 14;
+	private $fiveWeight  = 5;
 	private $hasJoker;
 	private $weights = array(
-		1    => '2', 
-		2    => '3', 
-		4    => '4', 
-		8    => '5', 
-		16   => '6', 
-		32   => '7', 
-		64   => '8', 
-		128  => '9', 
-		256  => '10', 
-		512  => 'jack', 
-		1024 => 'queen', 
-		2048 => 'king', 
-		4096 => 'ace'
+		1  => 'ace',
+		2  => '2', 
+		3  => '3', 
+		4  => '4', 
+		5  => '5', 
+		6  => '6', 
+		7  => '7', 
+		8  => '8', 
+		9  => '9', 
+		10 => '10', 
+		11 => 'jack', 
+		12 => 'queen', 
+		13 => 'king', 
+		14 => 'ace',
 	);
 	private $suits = array(
 		1 => 'diams', 
@@ -43,17 +44,17 @@ class Combination {
 		8 => 'clubs'
 	);
 	private $ranks = array(
-		0  => 'Старшая карта',
-		1  => 'Пара',
-		2  => 'Две пары',
-		3  => 'Сет',
-		4  => 'Стрит',
-		5  => 'Флеш',
-		6  => 'Фулл-хаус',
-		7  => 'Каре',
-		8  => 'Стрит-флеш',
-		9  => 'Роял стрит флеш',
-		10 => 'Покер'
+		self::HIGH_CARD     => 'Старшая карта',
+		self::PAIR          => 'Пара',
+		self::TWO_PAIRS     => 'Две пары',
+		self::TRIPLE        => 'Сет',
+		self::STREET        => 'Стрит',
+		self::FLASH         => 'Флеш',
+		self::FULL_HOUSE    => 'Фулл-хаус',
+		self::FOUR          => 'Каре',
+		self::STREET_FLASH  => 'Стрит-флеш',
+		self::FLASH_ROYAL   => 'Роял стрит флеш',
+		self::POKER         => 'Покер',
 	);
 	
 	static public function sortByWeight($a, $b) {
@@ -117,95 +118,158 @@ class Combination {
 		return 7936 == $cards['weight'] ? $cards : false;
 	}
 	
+	private function checkDelta($weights, $numOfElements = 5, $delta = 1) {
+		if (count($weights) < $numOfElements) {
+			return array();
+		}
+		
+		for ($i = 0; $i < count($weights); $i++){
+			$newWeights = array_slice($weights, $i, $numOfElements);
+			if (count($newWeights) < $numOfElements) {
+				return array();
+			}
+			
+			$sum = array_sum($newWeights);
+			$needSum = (2*$newWeights[0] + ($numOfElements-1)*$delta) / 2 * $numOfElements;
+			
+			if ($sum == $needSum) {
+				return $newWeights;
+			}
+		
+		}
+		
+		return array();
+	}
+	
 	private function isStreet(array $suite) {
 		if (count($suite) < 4) {
 			return false;
 		}
-		$aceCard = null;
+		
 		$cards = array(
 			'rank'   => self::STREET,
 			'weight' => 0,
 			'kiker'  => 0,
 			'cards'  => array(),
-			'joker'  => false,
 		);
+		
+		$delta = -1;
+		$n = 5;
+		$aceCard = null;
+		
 		$hasJoker = $this->hasJoker;
 		$weights = array();
-		$newSuite = array();
-		$firstCard = array_shift($suite);
-		
-		if ($firstCard['weight'] < $this->jokerWeight) {
-			array_unshift($suite, $firstCard);
-		}
 		
 		foreach($suite as $card) {
-			if (isset($weights[$card['weight']])) {
-				continue;
-			}
-			$weights[$card['weight']] = true;
-			$newSuite[] = $card;
-		}
-		unset($weights);
-		
-
-		foreach ($newSuite as $card) {
-			$quantity = count($cards['cards']);
-			if ($card['weight'] == $this->aceWeight) {
-				$aceCard = $card;
-			}
-			if ($quantity == 0) {
-				$cards['weight'] += $card['weight'];
-				$cards['cards'][] = $card;
-				continue;
-			}
-			
-			if (($cards['cards'][$quantity-1]['weight'] >> 1) > $card['weight']) {
-				$cards['cards'][] = 1;
-			}
-			
-			$cards['weight'] += $card['weight'];
-			$cards['cards'][] = $card;
-			
+			$weights[] = $card['weight'];
 		}
 		
-		$i = 0;
-		while ($pos = array_search(1, $cards['cards']) && $i < 7) {
-			$weightHigh = $cards['cards'][$pos-1]['weight'];
-			$weightLow = $cards['cards'][$pos+1]['weight'];
-			if ($weightLow == 0) {
-				return false;
-			}
-			if ($weightHigh / $weightLow > 4 || !$hasJoker) {
-				for ($i = 0; $i < $pos+1; $i++) {
-					array_shift($cards['cards']);
-				}
-				if (count($cards['cards']) < 4) {
-					return false;
-				}
-			} elseif ($hasJoker) {
-				$cards['cards'][$pos] = array(
-					'name' => $this->jokerName,
-					'suit' => $cards['cards'][$pos-1]['suit'],
-					'weight' => $weightHigh >> 1,
-				);
-				$hasJoker = false;
-			} 
-			$i++;
-		}
-		
-		if ($cards['cards'][0]['weight'] == $this->fiveWeight && count($cards['cards']) == 4 && $aceCard) {
-			$cards['cards'][] = $aceCard;
-		}
-		
-		if (count($cards['cards']) < 5) {
+		$weights = array_unique($weights);
+		if (count($weights) < 4) {
 			return false;
 		}
 		
-		if (count($cards['cards']) > 5) {
-			$cards['cards'] = array_splice($cards['cards'], 0, 5);
+		$firstWeight = array_shift($weights);
+		if ($firstWeight < $this->jokerWeight) {
+			array_unshift($weights, $firstWeight);
 		}
 		
-		return $cards;
+		$jokerWeight = 0;
+		$readyWeights = array();
+		
+		if ($hasJoker && $this->aceWeight > $weights[0] ) {
+			$jokerWeight = $weights[0] - $delta;
+			array_unshift($weights, $jokerWeight);
+			$readyWeights = $this->checkDelta($weights, 5, $delta);
+			if (!$readyWeights) {
+				$jokerWeight = 0;
+				array_shift($weights);
+			}
+		} else {
+			foreach ($suite as $card) {
+				if ($card['weight'] == $this->aceWeight) {
+					$card['weight'] = 1;
+					$suite[] = $card;
+					$weights[] = 1;
+					break;
+				}
+			}
+		}
+		
+		
+		
+		if (!$readyWeights) {
+			
+			$j = 0;
+			$jokerPosition = -1;
+			$k = 0;
+			$begWeights = array();
+			if ($hasJoker) {
+				for ($i = 0; $i < count($weights); $i++) {
+					
+					$jokerWeight = $weights[$i] - $delta;
+					if  (($i == 0 || $jokerWeight < $weights[$i-1]) && $jokerWeight < $this->jokerWeight) {
+						if ($i == 0) {
+							$temp = $weights; 
+							array_unshift($temp, $jokerWeight);
+						} else {
+							$temp = array_merge(
+									array_slice($weights, 0, $i), 
+									array($jokerWeight), 
+									array_slice($weights, $i));
+						}
+						if ( $readyWeights = $this->checkDelta($temp, 5, $delta)) {
+							break;
+						}
+					}
+					
+					$jokerWeight = $weights[$i] + $delta;
+					if ($jokerWeight < 1) {
+						break;
+					}
+					if ($i == count($weights)-1 || $jokerWeight > $weights[$i+1]) {
+						if ($weights[$i+1] - $jokerWeight != $delta) {
+							continue;
+						}
+						if ($i == count($weights)-1) {
+							$temp = $weights; 
+							$temp[] = $jokerWeight;
+						} else {
+							$temp = array_merge(
+									array_slice($weights, 0, $i+1), 
+									array($jokerWeight), 
+									array_slice($weights, $i+1));
+						}	
+						if ( $readyWeights = $this->checkDelta($temp, 5, $delta)) {
+							break;
+						}
+					}
+					
+				}
+			} else {
+				$readyWeights = $this->checkDelta($weights, 5, $delta);	
+			}
+		
+		}
+		
+		if (!$readyWeights) {
+			return false;
+		}
+		foreach ($readyWeights as $weight) {
+			foreach ($suite as $card) {
+				if ($weight == $card['weight']) {
+					$cards['weight'] += $weight;
+					$cards['cards'][] = $card;
+					break;
+				} elseif ( $weight == $jokerWeight ) {
+					$cards['weight'] += $weight;
+					$cards['cards'][] = array('name' => 'joker', 'suit' => 0, 'weight' => $weight);
+					break;
+				}
+			}
+		}
+		
+		return $cards; 	
 	}
 	
 	private function isFlash(array $suite) {
@@ -233,7 +297,7 @@ class Combination {
 					);
 					$hasJoker = false;
 				} else {
-					$highCard = $highCard >> 1;
+					$highCard = $highCard - 1;
 				}
 			}
 			$cards['weight'] += $card['weight'];
@@ -529,7 +593,6 @@ class Combination {
 		if ($cards = $this->isFullHouse($triples, $pairs)) {
 			return $cards;
 		} elseif ($cards = $this->isStreet($suite)) {
-			$cards['kiker'] = $this->kikerWeight($suite, $cards);
 			return $cards;
 		} elseif ($cards = $this->isOneTriple($triples, $pairs)) {
 			$cards['kiker'] = $this->kikerWeight($suite, $cards);
