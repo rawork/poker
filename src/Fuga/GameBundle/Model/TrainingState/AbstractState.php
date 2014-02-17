@@ -144,13 +144,13 @@ abstract class AbstractState implements StateInterface {
 			if (!$bot->cards) {
 				continue;
 			}
-			$cards = $combination->get(array_merge($bot->cards, $this->game->flop));
+			$cards = $combination->get($bot->cards, $this->game->flop);
 			$cards['position'] = $bot->position;
 			$cards['name'] = $combination->rankName($cards['rank']);
 			$suites[] = $cards;
 		}
 		if ($this->game->gamer->cards) {
-			$cards = $combination->get(array_merge($this->game->gamer->cards, $this->game->flop));
+			$cards = $combination->get($this->game->gamer->cards, $this->game->flop);
 			$cards['position'] = $this->game->gamer->position;
 			$cards['name'] = $combination->rankName($cards['rank']);
 			$suites[] = $cards;

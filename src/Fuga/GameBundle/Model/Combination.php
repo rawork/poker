@@ -105,6 +105,7 @@ class Combination {
 		$cards = array(
 			'rank'   => self::FLASH_ROYAL,
 			'weight' => 0,
+			'kiker'  => 0,
 			'cards'  => array(),
 		);
 		
@@ -124,6 +125,7 @@ class Combination {
 		$cards = array(
 			'rank'   => self::STREET,
 			'weight' => 0,
+			'kiker'  => 0,
 			'cards'  => array(),
 			'joker'  => false,
 		);
@@ -214,6 +216,7 @@ class Combination {
 		$cards = array(
 			'rank'   => self::FLASH,
 			'weight' => 0,
+			'kiker'  => 0,
 			'cards'  => array(),
 		);
 		$hasJoker = $this->hasJoker;
@@ -255,6 +258,7 @@ class Combination {
 		$cards = array(
 			'rank' => self::FOUR,
 			'weight' => 0,
+			'kiker'  => 0,
 			'cards' => array() 
 		);
 		$suits = array();
@@ -291,6 +295,7 @@ class Combination {
 		$cards = array(
 			'rank' => self::FULL_HOUSE,
 			'weight' => 0,
+			'kiker'  => 0,
 			'cards' => array(),
 		);
 		$hasJoker = $this->hasJoker;
@@ -346,6 +351,7 @@ class Combination {
 		$cards = array(
 			'rank' => self::TRIPLE,
 			'weight' => 0,
+			'kiker'  => 0,
 			'cards' => array(),
 		);
 		$hasJoker = $this->hasJoker;
@@ -382,6 +388,7 @@ class Combination {
 		$cards = array(
 			'rank' => self::PAIR,
 			'weight' => 0,
+			'kiker'  => 0,
 			'cards' => array(),
 		);
 		$hasJoker = $this->hasJoker;
@@ -422,6 +429,7 @@ class Combination {
 		$cards = array(
 			'rank' => self::HIGH_CARD,
 			'weight' => 0,
+			'kiker'  => 0,
 			'cards' => array(),
 		);
 		
@@ -475,12 +483,14 @@ class Combination {
 		return $suites[array_search(max($sums), $sums)];
 	}
 	
-	public function get($suite) {
-		if (!is_array($suite)) {
-			return false;
-		}
+	public function get(array $hand, array $flop) {
+		
+		$suite = array_merge($hand, $flop);
+		
 		usort($suite, array('self', 'sortByWeight'));
+		
 		$this->hasJoker = $this->hasJoker($suite);
+		
 		$singles = array();
 		$pairs   = array();
 		$triples = array();
@@ -505,6 +515,7 @@ class Combination {
 		
 		foreach ($sameWeight as $suit) {
 			if ($cards = $this->isFour($suit)) {
+				$cards['kiker'] = $this->kikerWeight($suite, $cards);
 				return $cards; 
 			} elseif ($this->isTriple($suit)) {
 				$triples[] = $suit;
@@ -518,14 +529,41 @@ class Combination {
 		if ($cards = $this->isFullHouse($triples, $pairs)) {
 			return $cards;
 		} elseif ($cards = $this->isStreet($suite)) {
+			$cards['kiker'] = $this->kikerWeight($suite, $cards);
 			return $cards;
 		} elseif ($cards = $this->isOneTriple($triples, $pairs)) {
+			$cards['kiker'] = $this->kikerWeight($suite, $cards);
 			return $cards;
 		} elseif ($cards = $this->isPairs($pairs, $singles)) {
+			$cards['kiker'] = $this->kikerWeight($suite, $cards);
 			return $cards;
 		}
 		
 		return $this->highCard($suite);
+	}
+	
+	public function kikerWeight(array $suite, array $combination) {
+		usort($suite, array('self', 'sortByWeight'));
+		
+		$weight = 0;
+		$numOfCards = 5 - count($combination['cards']);
+		$names = array();
+
+		foreach ($combination['cards'] as $card) {
+			$names[] = $card['name'];
+		}
+		
+		foreach ($suite as $rawCard) {
+			if (0 == $numOfCards) {
+				return $weight;
+			}
+			if (!in_array($rawCard['name'], $names)) {
+				$weight += $rawCard['weight'];
+				$numOfCards--;
+			}
+		}
+		
+		return $weight;
 	}
 	
 	public function compare(array $suites) {
@@ -545,7 +583,9 @@ class Combination {
 			} elseif ($suite['rank'] == $newSuites[0]['rank']) {
 				if ($suite['weight'] > $newSuites[0]['weight']) {
 					$newSuites = array($suite);
-				} elseif ($suite['weight'] == $newSuites[0]['weight']) {
+				} elseif ($suite['weight'] == $newSuites[0]['weight'] && $suite['kiker'] > $newSuites[0]['kiker']) {
+					$newSuites = array($suite);
+				} elseif ($suite['weight'] == $newSuites[0]['weight'] && $suite['kiker'] == $newSuites[0]['kiker']) {
 					$newSuites[] = $suite;
 				}
 			}

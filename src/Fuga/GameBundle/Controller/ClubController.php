@@ -241,7 +241,6 @@ class ClubController extends PublicController {
 				$page
 		);
 		$paginator->setTemplate('public');
-		$this->get('log')->write($page.':'.$this->getParam('per_page').':'.$paginator->limit);
 		$messages = $this->get('container')->getItems('club_message', 'publish=1 AND message_id=0', 'id DESC', $paginator->limit);
 		foreach ($messages as &$message) {
 			$message['account'] = $this->get('container')->getItem('account_member', $message['member_id']);

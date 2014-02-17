@@ -26,7 +26,7 @@ class PreflopState extends AbstractState {
 		}
 		$this->game->confirmBets();
 		$combination = new Combination();
-		$cards = $combination->get(array_merge($this->game->gamer->cards, $this->game->flop));
+		$cards = $combination->get($this->game->gamer->cards, $this->game->flop);
 		$combinations = array();
 		foreach ($cards['cards'] as $card) {
 			$combinations[$card['name']] = 1;

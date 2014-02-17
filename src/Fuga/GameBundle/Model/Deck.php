@@ -74,6 +74,16 @@ class Deck {
 		return $this->deck;
 	}
 	
+	public function card($name) {
+		foreach ($this->defaultdeck as $card) {
+			if ($name == $card['name']) {
+				return $card;
+			}
+		}
+		
+		throw new \Exception('card with name "'.$name.'" not found');
+	}
+	
 	public function take($quantity = null) {
 		$suite = array();
 		if (!$quantity) {

@@ -72,7 +72,7 @@ class PreflopState extends AbstractState {
 					foreach ($gamers as $doc) {
 						if (!$doc->getFold()) {
 							$combination = new Combination();
-							$cards = $combination->get(array_merge($doc->getCards(), $this->game->getFlop()));
+							$cards = $combination->get($doc->getCards(), $this->game->getFlop());
 							$combinations = array();
 							foreach ($cards['cards'] as $card) {
 								$combinations[] = $card['name'];

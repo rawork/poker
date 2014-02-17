@@ -657,45 +657,6 @@ class GameController extends PublicController {
 		));
 	}
 	
-//	public function calcAction() {
-//		$suite = array();
-//		$suite[] = array(
-//			array('name' => '7_diams', 'suit' => 1, 'weight' => 32),
-//			array('name' => 'queen_clubs', 'suit' => 8, 'weight' => 1024),
-//			array('name' => 'ace_diams', 'suit' => 1, 'weight' => 4096),
-//			array('name' => 'ace_clubs', 'suit' => 8, 'weight' => 4096),
-//			array('name' => 'queen_hearts', 'suit' => 2, 'weight' => 1024),
-//			array('name' => 'queen_diams', 'suit' => 1, 'weight' => 1024),
-//			array('name' => '2_diams', 'suit' => 1, 'weight' => 1),
-//		);
-//		
-//		$suite[] = array(
-//			array('name' => '6_clubs', 'suit' => 8, 'weight' => 16),
-//			array('name' => 'king_clubs', 'suit' => 8, 'weight' => 2048),
-//			array('name' => '3_hearts', 'suit' => 2, 'weight' => 2),
-//			array('name' => '3_clubs', 'suit' => 8, 'weight' => 2),
-//			array('name' => 'king_hearts', 'suit' => 2, 'weight' => 2048),
-//			array('name' => 'king_spades', 'suit' => 4, 'weight' => 2048),
-//			array('name' => '4_clubs', 'suit' => 8, 'weight' => 4),
-//		);
-//		
-//		
-//		$combination = new Combination();
-//		$suites = array();
-//		foreach ($suite as $hand) {
-//			$cards = $combination->get($hand);
-//			if (is_array($cards)) {
-//				$cards['name'] = $combination->rankName($cards['rank']);
-//			}
-//			$suites[] = $cards;
-//		}
-//		
-//		echo json_encode($suites);
-//		exit;
-//		
-//		return $this->render('game/test.tpl', compact('suite', 'cards', 'rank'));
-//	}
-	
 	public function clearAction($params) {
 		$user = $this->get('security')->getCurrentUser();
 		if (!$user || !$this->get('security')->isGroup('admin') ) {

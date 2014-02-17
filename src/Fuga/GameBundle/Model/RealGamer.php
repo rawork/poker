@@ -366,7 +366,7 @@ class RealGamer {
 	
 	public function checkCombination($flop = array()){
 		$combination = new Combination();
-		$cards = $combination->get(array_merge($this->doc->getCards(), $flop));
+		$cards = $combination->get($this->doc->getCards(), $flop);
 		$combinations = array();
 		foreach ($cards['cards'] as $card) {
 			$combinations[] = $card['name'];

@@ -23,7 +23,7 @@ class ChangeState extends AbstractState {
 		$this->game->timer->stop();
 		$this->game->changes = 2;
 		$combination = new Combination();
-		$cards = $combination->get($this->game->gamer->cards);
+		$cards = $combination->get($this->game->gamer->cards, array());
 		$combinations = array();
 		foreach ($cards['cards'] as $card) {
 			$combinations[$card['name']] = 1;

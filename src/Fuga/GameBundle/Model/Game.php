@@ -329,7 +329,7 @@ class Game implements GameInterface {
 				->field('fold')->equals(false)
 				->getQuery()->execute();
 		foreach ($gamers as $gamer) {
-			$cards = $combination->get(array_merge($gamer->getCards(), $this->getFlop()));
+			$cards = $combination->get($gamer->getCards(), $this->getFlop());
 			$cards['user'] = $gamer->getUser();
 			$cards['seat'] = $gamer->getSeat();
 			$cards['numOfGamers'] = $this->numOfGamers();

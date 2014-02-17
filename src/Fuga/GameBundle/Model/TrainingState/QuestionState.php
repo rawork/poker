@@ -26,7 +26,7 @@ class QuestionState extends AbstractState {
 			$this->game->setState(AbstractState::STATE_CHANGE);
 		} elseif ($this->game->gamer->chips > 0) {
 			$combination = new Combination();
-			$cards = $combination->get($this->game->gamer->cards);
+			$cards = $combination->get($this->game->gamer->cards, array());
 			$combinations = array();
 			foreach ($cards['cards'] as $card) {
 				$combinations[$card['name']] = 1;
