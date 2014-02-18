@@ -23,9 +23,12 @@ function exception_handler($exception)
 	$statusCode = $exception instanceof \Fuga\Component\Exception\NotFoundHttpException 
 			? $exception->getStatusCode() 
 			: 500;
-	$controller = new Fuga\CommonBundle\Controller\ExceptionController();
-	
-	echo $controller->indexAction($statusCode, $exception->getMessage());
+	if (isset($_SERVER['REQUEST_URI'])) {
+		$controller = new Fuga\CommonBundle\Controller\ExceptionController();
+		echo $controller->indexAction($statusCode, $exception->getMessage());
+	} else {
+		echo $exception->getMessage();
+	}
 }
 
 function autoloader($className)

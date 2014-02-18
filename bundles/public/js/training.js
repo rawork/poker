@@ -305,7 +305,6 @@ function onClickStop() {
 			$('.game-min-bet').empty();
 			$('.game-main-bank').empty();
 			$('#table').html(data.board);
-			$('.game-start button').on('click', onClickStart);
 		} else {
 //			window.location.reload();
 		}

@@ -466,12 +466,7 @@ class Container
 					$this->services[$name] = new SecurityHandler($this);
 					break;
 				case 'cache':
-					$options = array(
-						'cacheDir' => CACHE_DIR,
-						'lifeTime' => CACHE_TTL,
-						'pearErrorMode' => CACHE_ERROR_DIE
-					);
-					$this->services[$name] = new Cache\Cache($options);
+					$this->services[$name] = new \Doctrine\Common\Cache\ApcCache();
 					break;
 			}	
 		}

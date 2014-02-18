@@ -5,17 +5,19 @@ namespace Fuga\Component\Scheduler;
 class Scheduler 
 {
 	
-	private $tasks;
+	private $tasks = array();
+	private $container;
 	
-	public function __construct() {
-		$this->tasks = array(
-			'maillist' => array(
-				'manager' => 'Fuga\\CommonBundle\\Model\\MaillistManager',
-				'action' => 'processMessage',
-				'frequency' => 'minute',
-				'params' => array()
-			)
-		);
+	public function __construct($container) {
+		$this->container = $container;
+//		$this->tasks = array(
+//			'maillist' => array(
+//				'manager' => 'Fuga\\CommonBundle\\Model\\MaillistManager',
+//				'action' => 'processMessage',
+//				'frequency' => 'minute',
+//				'params' => array()
+//			)
+//		);
 	}
 	
 	public function registerTask($name, $className, $methodName, $frequency = 'hour', $params = array()) {
@@ -35,14 +37,18 @@ class Scheduler
 		set_time_limit(0);
 		foreach ($this->tasks as $name => $params) {
 			if ($params['frequency'] == $frequency) {
-				$this->processTask($name);
+				try {
+					$this->processTask($name);
+				} catch (\Exception $e) {
+					$this->container->get('log')->write($e->getMessage());
+				}
 			}
 		}
 	}
 	
 	public function processTask($name, $params = array()) {
 		if (!isset($this->tasks[$name])) {
-			throw new \ScheduleException('Задача "'.$name.'" не зарегистрирована в планировщике');
+			throw new \Exception('Задача "'.$name.'" не зарегистрирована в планировщике');
 		}
 		$manager = $this->tasks[$name]['manager'];
 		$action = $this->tasks[$name]['action'];

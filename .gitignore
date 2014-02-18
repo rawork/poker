@@ -45,4 +45,6 @@ vendor/doctrine/*
 vendor/symfony/*
 vendor/phpunit/*
 vendor/masterexploder/*
+vendor/monolog/*
+vendor/psr/*
 vendor/autoload.php

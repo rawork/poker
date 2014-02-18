@@ -2,27 +2,33 @@
 
 namespace Fuga\Component\Log;
 
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+
 class Log 
 {
 	
 	private $path;
+	private $log;
 	
 	public function __construct() 
 	{
 		$this->path = PRJ_DIR.'/app/logs/error.log';
+
+		$this->log = new Logger('name');
+		$this->log->pushHandler(new StreamHandler(
+				$this->path, 
+				PRJ_ENV == 'development' ? Logger::DEBUG : Logger::ERROR
+			));
 	}
 	
 	public function write($message)
 	{
-		$filePointer = fopen($this->path, 'a');
-		fwrite($filePointer, date('Y-m-d H:i:s')."\t".$message."\n");
-		fclose($filePointer);
+		if ( 'development' == PRJ_ENV ) {
+			$this->log->addDebug($message);
+		} else {
+			$this->log->addError($message);
+		}
 	}
-	
-	public function clear() 
-	{
-		$filePointer = fopen($this->path, 'w+');
-		fclose($filePointer);
-	} 
 	
 }

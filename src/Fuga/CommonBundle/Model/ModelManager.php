@@ -7,10 +7,6 @@ class ModelManager implements ModelManagerInterface {
 	protected $entityTable;
 	protected $connection;
 	
-	public function findAll() {
-		return $this->findBy();
-	}
-	
 	public function findBy($query = '', $sort = '', $limit = null, $offset = null) {
 		$this->get('container')->getItems($this->entityTable, $query, $sort, $select);
 	}
