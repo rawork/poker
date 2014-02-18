@@ -7,7 +7,6 @@ mb_http_input('UTF-8');
 mb_http_output('UTF-8'); 
 mb_internal_encoding("UTF-8");
 
-require_once 'config/config.php';
 $loader = require __DIR__.'/../vendor/autoload.php';
 $loader->add('Fuga', __DIR__.'/../src/');
 $loader->add('Smarty', __DIR__.'/../vendor/smarty/');
@@ -58,23 +57,25 @@ function autoloader($className)
 set_exception_handler('exception_handler');
 spl_autoload_register('autoloader');
 
-//Registry::init('app/config/parameters.yml');
-
 $container = new Container($loader);
 
 // инициализация переменных
-$params = array();
-$sql = 'SELECT name, value FROM config_variable';
-$stmt = $container->get('connection')->prepare($sql);
-$stmt->execute();
-$vars = $stmt->fetchAll();
-foreach ($vars as $var) {
-	$params[strtolower($var['name'])] = $var['value'];
-	define($var['name'], $var['value']);
+if (isset($_SERVER['REQUEST_URI'])) {
+	require_once 'config/config.php';
+	$params = array();
+	$sql = 'SELECT name, value FROM config_variable';
+	$stmt = $container->get('connection')->prepare($sql);
+	$stmt->execute();
+	$vars = $stmt->fetchAll();
+	foreach ($vars as $var) {
+		$params[strtolower($var['name'])] = $var['value'];
+		define($var['name'], $var['value']);
+	}
+	$params['prj_ref'] = PRJ_REF;
+	$params['theme_ref'] = THEME_REF;
+	$container->get('templating')->assign($params);
+	
+	// TODO убрать инициализацию всех таблиц 
+	$container->initialize();
 }
-$params['prj_ref'] = PRJ_REF;
-$params['theme_ref'] = THEME_REF;
-$container->get('templating')->assign($params);
 
-// TODO убрать инициализацию всех таблиц 
-$container->initialize();
