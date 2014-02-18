@@ -410,7 +410,7 @@ function onNext() {
 			updateRivals(data.rivals);
 			gameTimerId = setInterval(startTimer, 1000);
 		} else {
-			gameTimerId = setInterval(startTimer, 1000);
+			stopTimer();
 		}
 	}, "json");
 }

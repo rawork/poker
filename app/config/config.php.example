@@ -2,7 +2,7 @@
 
 define('PRJ_ENV', 'development'); //production
 define('PRJ_REF', '');
-define('PRJ_DIR', __DIR__.'/../..'.PRJ_REF);
+define('PRJ_DIR', __DIR__.'/../../'.PRJ_REF);
 
 define('RES_REF', PRJ_REF.'/files');
 define('RES_DIR', PRJ_DIR.'/files');
