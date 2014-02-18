@@ -2,12 +2,11 @@
 
 namespace Fuga\GameBundle\Model\TrainingState;
 
-use Fuga\GameBundle\Model\GameInterface;
 use Fuga\GameBundle\Model\Combination;
 
 class QuestionState extends AbstractState {
 	
-	public function __construct(GameInterface $game) {
+	public function __construct($game) {
 		parent::__construct($game);
 	}
 	

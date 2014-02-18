@@ -2,7 +2,6 @@
 
 namespace Fuga\GameBundle\Model\TrainingState;
 
-use Fuga\GameBundle\Model\GameInterface;
 use Fuga\GameBundle\Model\Combination;
 
 abstract class AbstractState implements StateInterface {
@@ -21,7 +20,7 @@ abstract class AbstractState implements StateInterface {
 	
 	protected $game;
 	
-	public function __construct(GameInterface $game) {
+	public function __construct($game) {
 		$this->game = $game;
 	}
 	
@@ -55,43 +54,43 @@ abstract class AbstractState implements StateInterface {
 	}
 	
 	public function changeCards($cardNo, $question) {
-		throw new \Exception('abstract changeCards');
+		$this->game->controller->get('log')->write('abstract changeCards');
 	}
 	
 	public function noChangeCards() {
-		throw new \Exception('abstract noChangeCards');
+		$this->game->controller->get('log')->write('abstract noChangeCards');
 	}
 	
 	public function answerQuestion($answerNo, $question) {
-		throw new \Exception('abstract answerQuestion');
+		$this->game->controller->get('log')->write('abstract answerQuestion');
 	}
 	
 	public function makeBet($chips) {
-		throw new \Exception('abstract makeBet');
+		$this->game->controller->get('log')->write('abstract makeBet');
 	}
 	
 	public function checkBet(){
-		throw new \Exception('abstract checkBet');
+		$this->game->controller->get('log')->write('abstract checkBet');
 	}
 	
 	public function allinBet() {
-		throw new \Exception('abstract allinBet');
+		$this->game->controller->get('log')->write('abstract allinBet');
 	}
 	
 	public function foldCards() {
-		throw new \Exception('abstract foldCards');
+		$this->game->controller->get('log')->write('abstract foldCards');
 	}
 	
 	public function distributeWin($questions) {
-		throw new \Exception('abstract distributeWin');
+		$this->game->controller->get('log')->write('abstract distributeWin');
 	}
 	
 	public function buyChips() {
-		throw new \Exception('abstract buyChips');
+		$this->game->controller->get('log')->write('abstract buyChips');
 	}
 	
 	public function answerBuyQuestion($answerNo) { 
-		throw new \Exception('abstract answeBuyQuestion');
+		$this->game->controller->get('log')->write('abstract answeBuyQuestion');
 	}
 	
 	public function endGame() {

@@ -2,7 +2,7 @@
 
 namespace Fuga\GameBundle\Model;
 
-class Training implements GameInterface {
+class Training {
 	
 	const STATE_BEGIN     = 0;
 	const STATE_CHANGE    = 1;

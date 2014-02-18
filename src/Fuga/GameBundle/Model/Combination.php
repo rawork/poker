@@ -228,7 +228,7 @@ class Combination {
 						break;
 					}
 					if ($i == count($weights)-1 || $jokerWeight > $weights[$i+1]) {
-						if ($weights[$i+1] - $jokerWeight != $delta) {
+						if (!isset($weights[$i+1]) || $weights[$i+1] - $jokerWeight != $delta) {
 							continue;
 						}
 						if ($i == count($weights)-1) {
