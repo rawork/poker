@@ -241,7 +241,7 @@ function onBet(chips) {
 			$('#bets').html(data.bets);
 			updateRivals(data.rivals);
 			gameTimerId = setInterval(startTimer, 1000);
-			gameUpdateId = setInterval(onUpdate, 5000);
+			gameUpdateId = setInterval(onUpdate, 3000);
 		} else {
 //			window.location.reload();
 		}
@@ -268,7 +268,7 @@ function onClickCheck() {
 			$('.gamer-container').append(data.hint);
 			updateRivals(data.rivals);
 			gameTimerId = setInterval(startTimer, 1000);
-			gameUpdateId = setInterval(onUpdate, 5000);
+			gameUpdateId = setInterval(onUpdate, 3000);
 		} else {
 //			window.location.reload();
 		}
@@ -289,7 +289,7 @@ function onFold() {
 			$('#gamer-cards').html(data.cards);
 			$('.gamer-hint').remove();
 			gameTimerId = setInterval(startTimer, 1000);
-			gameUpdateId = setInterval(onUpdate, 5000);
+			gameUpdateId = setInterval(onUpdate, 3000);
 		} else {
 //			window.location.reload();
 		}
@@ -627,7 +627,7 @@ function initGame() {
 	$(document).on('change', '#input_bet', onChangeBetInput);
 	enableButtons();
 	setInterval(startTimer, 1000);
-	setInterval(onUpdate, 5000);
+	setInterval(onUpdate, 3000);
 	$('.gamer-container').zoomcard();
 	$('.game-board-container').preloadImages(cardimages);
 	console.log($.cookie('timerhandler'));
