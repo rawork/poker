@@ -462,7 +462,11 @@ class Combination {
 				$pair = array_shift($pairs);
 				$cards['cards'] = array_merge($cards['cards'], $pair);
 				$card = array_shift($pair);
-				$cards['weight'] += $card['weight'] * 2;
+				if ($i == 0) {
+					$cards['weight'] += $card['weight'] * 2 * 100000;
+				} else {
+					$cards['weight'] += $card['weight'] * 2;
+				}
 			}	
 		} elseif (count($pairs) > 0) {
 			$pair = array_shift($pairs);

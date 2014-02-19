@@ -19,23 +19,23 @@ class TestController extends PublicController {
 		$hands = array();
 		
 		$flop = array(
-			$deck->card('4_diams'),
-			$deck->card('9_clubs'),
+			$deck->card('2_diams'),
+			$deck->card('king_clubs'),
 			$deck->card('queen_diams'),
 		);
 		$hands[] = array(
 			$deck->card('10_spades'),
 			$deck->card('10_hearts'),
-			$deck->card('king_diams'),
-			$deck->card('jack_diams'),
+			$deck->card('6_diams'),
+			$deck->card('6_hearts'),
 		);
 		
 		
 		$hands[] = array(
 			$deck->card('ace_clubs'),
-			$deck->card('5_clubs'),
-			$deck->card('7_hearts'),
-			$deck->card('10_diams'),
+			$deck->card('9_clubs'),
+			$deck->card('queen_hearts'),
+			$deck->card('2_hearts'),
 		);
 		
 		
