@@ -32,6 +32,9 @@ class Gamer {
     private $bet = 0;
 	
 	/** @ODM\Int */
+    private $bet2 = 0;
+	
+	/** @ODM\Int */
     private $chips;
 	
 	/** @ODM\Int */
@@ -81,6 +84,9 @@ class Gamer {
 	
 	/** @ODM\Collection */
 	private $timer = array();
+	
+	/** @ODM\Date */
+    private $updated;
 	
     /**
      * Get id
@@ -618,5 +624,49 @@ class Gamer {
     public function getMove()
     {
         return $this->move;
+    }
+
+    /**
+     * Set updated
+     *
+     * @param date $updated
+     * @return self
+     */
+    public function setUpdated($updated)
+    {
+        $this->updated = $updated;
+        return $this;
+    }
+
+    /**
+     * Get updated
+     *
+     * @return date $updated
+     */
+    public function getUpdated()
+    {
+        return $this->updated;
+    }
+
+    /**
+     * Set bet2
+     *
+     * @param int $bet2
+     * @return self
+     */
+    public function setBet2($bet2)
+    {
+        $this->bet2 = $bet2;
+        return $this;
+    }
+
+    /**
+     * Get bet2
+     *
+     * @return int $bet2
+     */
+    public function getBet2()
+    {
+        return $this->bet2;
     }
 }

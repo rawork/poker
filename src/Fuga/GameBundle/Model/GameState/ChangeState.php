@@ -23,6 +23,14 @@ class ChangeState extends AbstractState {
 			if (!$this->game->lock($gamer->getId())) {
 				return $this->game->getStateNo();
 			}
+			$gamers = $this->game->container->get('odm')
+				->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+				->findAndUpdate()
+				->field('board')->equals($this->game->getId())
+				->field('active')->equals(true)
+				->field('state')->equals(0)
+				->field('fold')->set(true)
+				->getQuery()->execute();
 			$this->game->setState(AbstractState::STATE_PREFLOP);
 			$this->game->setTimer('bet');
 			$this->game->save();

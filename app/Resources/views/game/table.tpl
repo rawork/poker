@@ -170,4 +170,16 @@
 		</div>
 	</div>
 </div>
+{elseif $game->isState(8)}
+<div class="game-message-container">
+	<div class="game-message game-end">
+		<div class="row-fluid">
+			<div class="span4"><img src="/bundles/public/img/joker.jpg"></div>
+			<div class="span8">
+				<div class="text">Все соперники отлучились. Ждемс.</div>
+				<div class="timer" id="wait-timer"></div>
+			</div>
+		</div>
+	</div>
+</div>
 {/if}

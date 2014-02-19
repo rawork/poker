@@ -20,12 +20,6 @@ class PreflopState extends AbstractState {
 			if ($gamer->getBet() > $this->game->getMaxbet()) {
 				$this->game->setMaxbet($gamer->getBet());
 			}
-			if ($gamer->getAllin()) {
-				// TODO надо хранить ставку allin
-				if ($this->game->getBank2() == 0) {
-					$this->game->setBank2($this->game->getBank());
-				}
-			}
 			$this->game->stopTimer();
 			$this->game->container->get('odm')
 					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
@@ -44,7 +38,7 @@ class PreflopState extends AbstractState {
 					->field('fold')->equals(false)
 					->getQuery()->execute();
 
-			if (count($gamers) < 1) {
+			if (count($gamers) < 2) {
 				$this->game->confirmBets();
 				$this->game->setWinner();
 				$this->game->setTimer('distribute');
@@ -58,8 +52,19 @@ class PreflopState extends AbstractState {
 						->field('state')->equals(1)
 						->field('fold')->equals(false)
 						->field('allin')->equals(false)
-						->field('bet')->lt($this->game->getMaxbet())
+						->field('move')->equals('nomove')
 						->getQuery()->execute();
+				if (count($gamers) == 0) {
+					$gamers = $this->game->container->get('odm')
+							->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+							->field('board')->equals($this->game->getId())
+							->field('active')->equals(true)
+							->field('state')->equals(1)
+							->field('fold')->equals(false)
+							->field('allin')->equals(false)
+							->field('bet')->lt($this->game->getMaxbet())
+							->getQuery()->execute();
+				}	
 				if (count($gamers) ==  0) {
 					$this->game->confirmBets();
 					$this->game->setMover($this->game->getDealer());
@@ -81,6 +86,7 @@ class PreflopState extends AbstractState {
 							$doc->setCombination($combinations);
 						}
 						$doc->setBet(0);
+						$doc->setMove('nomove');
 					}
 					$this->game->setMaxBet(0);
 					$this->game->setTimer('bet');
@@ -99,6 +105,10 @@ class PreflopState extends AbstractState {
 		}
 		
 		return $this->game->getStateNo();
+	}
+	
+	public function sync($gamer) {
+		$this->game->fold($gamer);
 	}
 	
 }

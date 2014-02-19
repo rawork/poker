@@ -3,7 +3,6 @@
 namespace Fuga\GameBundle\Model\GameState;
 
 use Fuga\GameBundle\Model\GameInterface;
-use Fuga\GameBundle\Model\RealGamer;
 
 class BeginState extends AbstractState {
 	
@@ -24,7 +23,13 @@ class BeginState extends AbstractState {
 				->field('active')->equals(true)
 				->getQuery()->execute();
 			foreach ($gamers as $doc) {
-				$doc->setCards($this->game->getCards(4));
+				if ($doc->getState() == 1) {
+					$doc->setCards($this->game->getCards(4));
+					$doc->setMove('nomove');
+				} else {
+					$doc->setFold(true);
+					$doc->setTimes(0);
+				}
 			}
 			$this->game->setFlop($this->game->getCards(3));
 			$this->game->nextDealer();
@@ -38,5 +43,9 @@ class BeginState extends AbstractState {
 		$this->game->startTimer();
 		
 		return $this->game->getStateNo();
+	}
+	
+	public function sync($gamer) {
+		$this->startGame($gamer);
 	}
 }

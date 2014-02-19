@@ -59,9 +59,13 @@ spl_autoload_register('autoloader');
 
 $container = new Container($loader);
 
+if (file_exists(__DIR__.'/config/config.php')) {
+	require_once __DIR__.'/config/config.php';
+}
+
 // инициализация переменных
 if (isset($_SERVER['REQUEST_URI'])) {
-	require_once 'config/config.php';
+	
 	$params = array();
 	$sql = 'SELECT name, value FROM config_variable';
 	$stmt = $container->get('connection')->prepare($sql);

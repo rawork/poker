@@ -1,9 +1,10 @@
+#!/usr/bin/env php
 <?php
 
 // */1 * * * * /usr/local/bin/php /home/www/htdocs/app/cron/min.php > /dev/null
 // 0 */1 * * * /usr/local/bin/php /home/www/htdocs/app/cron/hour.php > /dev/null
 // 0 0 */1 * * /usr/local/bin/php /home/www/htdocs/app/cron/day.php > /dev/null
-require_once('../init.php');
+require_once(__DIR__ . '/../init.php');
 
 use Fuga\Component\Scheduler\Scheduler;
 

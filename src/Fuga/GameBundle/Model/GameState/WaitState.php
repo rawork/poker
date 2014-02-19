@@ -4,7 +4,7 @@ namespace Fuga\GameBundle\Model\GameState;
 
 use Fuga\GameBundle\Model\GameInterface;
 
-class RoundEndState extends AbstractState {
+class WaitState extends AbstractState {
 	
 	public function __construct(GameInterface $game) {
 		parent::__construct($game);
@@ -47,11 +47,11 @@ class RoundEndState extends AbstractState {
 					$doc->setTimes(2);
 					$doc->setQuestion(array());
 					$doc->setBuy(array());
-					$this->game->container->get('log')->write('ROUNDS'.$this->game->getRound());
-					$this->game->container->get('log')->write('UPDATED'.serialize($doc->getUpdated()));
-					$this->game->container->get('log')->write('FROMTIME'.serialize($this->game->getFromtime()));
+					$this->game->container->get('log')->write('WROUNDS'.$this->game->getRound());
+					$this->game->container->get('log')->write('WUPDATED'.serialize($doc->getUpdated()));
+					$this->game->container->get('log')->write('WFROMTIME'.serialize($this->game->fromtime));
 					if ($this->game->getRound() >= 3 
-						&& $doc->getUpdated() < $this->game->getFromtime()) {
+						&& $doc->getUpdated() < $this->game->fromtime) {
 						$this->game->acceptBet($doc->getChips());
 						$doc->setChips(0);
 						$doc->setActive(false);
@@ -77,10 +77,6 @@ class RoundEndState extends AbstractState {
 		}
 		
 		return $this->game->getStateNo();
-	}
-	
-	public function sync($gamer) {
-		$this->nextGame($gamer);
 	}
 	
 }

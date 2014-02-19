@@ -3,7 +3,6 @@
 namespace Fuga\GameBundle\Model\GameState;
 
 use Fuga\GameBundle\Model\GameInterface;
-use Fuga\GameBundle\Model\Exception\GameException;
 
 class EndState extends AbstractState {
 	
@@ -12,11 +11,11 @@ class EndState extends AbstractState {
 	}
 	
 	public function nextGame($gamer) {
-		throw new GameException('Игра окончена. Невозможно продолжить.');
+		$this->game->container->get('log')->write('Игра окончена. Невозможно продолжить.');
 	}
 	
 	public function endRound($gamer) {
-		throw new GameException('Игра окончена. Невозможно закончить раунд.');
+		$this->game->container->get('log')->write('Игра окончена. Невозможно закончить раунд.');
 	}
 	
 }

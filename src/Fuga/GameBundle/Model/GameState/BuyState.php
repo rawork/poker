@@ -21,6 +21,7 @@ class BuyState extends AbstractState {
 				$doc->setActive($doc->getChips() >= $this->game->minbet);
 				if (!$doc->getActive()) {
 					$this->game->acceptBet($doc->getChips());
+					$this->game->confirmBets();
 					$doc->setChips(0);
 				}
 			}
@@ -38,10 +39,14 @@ class BuyState extends AbstractState {
 			$this->game->save();
 			
 		} catch (\Exception $e) {
-			$this->game->container->get('log')->write('STATE:'.$e->getMessage());
+			
 		}
 		
 		return $this->game->getStateNo();
+	}
+	
+	public function sync($gamer) {
+		$this->endRound($gamer);
 	}
 	
 }

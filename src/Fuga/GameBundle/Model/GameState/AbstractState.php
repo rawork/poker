@@ -3,12 +3,11 @@
 namespace Fuga\GameBundle\Model\GameState;
 
 use Fuga\GameBundle\Model\GameInterface;
-use Fuga\GameBundle\Model\Combination;
 use Fuga\GameBundle\Model\Exception\GameException;
 
 class AbstractState implements StateInterface {
 	
-	const STATE_BEGIN    = 0;
+	const STATE_BEGIN     = 0;
 	const STATE_CHANGE    = 1;
 	const STATE_PREFLOP   = 2;
 	const STATE_FLOP      = 3;
@@ -17,6 +16,7 @@ class AbstractState implements StateInterface {
 	const STATE_BUY       = 5;
 	const STATE_END       = 6;
 	const STATE_ROUND_END = 7;
+	const STATE_WAIT      = 8;
 	
 	protected $game;
 	
@@ -25,45 +25,48 @@ class AbstractState implements StateInterface {
 	}
 	
 	public function startGame($gamer) {
-		throw new GameException('abstract startGame');
+		$this->game->container->get('log')->write('abstract startGame');
 	}
 	
 	public function changeCards($gamer) {
-		throw new GameException('abstract changeCards');
+		$this->game->container->get('log')->write('abstract changeCards');
 	}
 	
 	public function makeBet($gamer) {
-		throw new GameException('abstract makeBet');
+		$this->game->container->get('log')->write('abstract makeBet');
 	}
 	
 	public function makeMove($gamer) {
-		throw new GameException('abstract makeMove');
+		$this->game->container->get('log')->write('abstract makeMove');
 	}
 	
 	public function distributeWin($gamer) {
-		throw new GameException('abstract distributeWin');
+		$this->game->container->get('log')->write('abstract distributeWin');
 	}
 	
 	public function buyChips($gamer) {
-		throw new GameException('abstract buyChips');
+		$this->game->container->get('log')->write('abstract buyChips');
 	}
 	
 	public function answerBuyQuestion($gamer) { 
-		throw new GameException('abstract answeBuyQuestion');
+		$this->game->container->get('log')->write('abstract answeBuyQuestion');
 	}
 	
 	public function nextGame($gamer) {
-		throw new GameException('abstract nextGame');;
+		$this->game->container->get('log')->write('abstract nextGame');;
 	}
 
-		public function endGame($gamer) {
+	public function endGame($gamer) {
+		if (!$this->game->lock($gamer->getId())) {
+			return $this->game->getStateNo();
+		}
 		try {
 			$this->game->removeTimer();
 			$this->game->stopTime();
 			$this->game->setState(self::STATE_END);
 			$this->game->save();
 		} catch (\Exception $e) {
-			$this->game->container->get('log')->write('STATE:'.$e->getMessage());
+			$this->game->container->get('log')->write('END_GAME:'.$e->getMessage());
 		}
 		
 		return $this->game->getStateNo();
@@ -77,10 +80,29 @@ class AbstractState implements StateInterface {
 			$this->game->save();
 			
 		} catch (\Exception $e) {
-			$this->game->container->get('log')->write('STATE:'.$e->getMessage());
+			$this->game->container->get('log')->write('END ROUND:'.$e->getMessage());
 		}
 		
 		return $this->game->getStateNo();
+	}
+	
+	public function wait() {
+		$this->game->setTimer('noactive');
+		$this->game->startTimer();
+		$this->game->save();
+		$this->game->container->get('odm')
+				->createQueryBuilder('\Fuga\GameBundle\Document\Board')
+				->findAndUpdate()
+				->field('board')->equals($this->game->getId())
+				->field('gamer')->set(0)
+				->getQuery()->execute();
+		$this->game->setState(self::STATE_WAIT);
+		
+		return $this->game->getStateNo();
+	}
+	
+	public function sync($gamer) {
+		$this->game->container->get('log')->write('abstract sync');
 	}
 	
 }

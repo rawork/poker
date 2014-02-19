@@ -36,9 +36,13 @@ class JokerState extends AbstractState {
 			
 			$this->game->unlock($gamer->getId());
 		} catch (\Exception $e) {
-			$this->game->container->get('log')->write('STATE:'.$e->getMessage());
+			$this->game->container->get('log')->write('JOKER STATE:'.$e->getMessage());
 			$this->game->unlock($gamer->getId());
 		}
 		return $this->game->getStateNo();
+	}
+	
+	public function sync($gamer) {
+		$this->buyChips($gamer);
 	}
 }

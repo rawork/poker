@@ -12,6 +12,9 @@ class Board
 
     /** @ODM\Increment */
     private $prizes = 0;
+	
+	 /** @ODM\Increment */
+    private $round = 0;
 
     /** @ODM\Collection */
     private $flop = array();
@@ -44,7 +47,7 @@ class Board
     private $dealer = 0;
 	
 	/** @ODM\Int */
-    private $mover = 1;
+    private $mover = 0;
 	
 	/** @ODM\Int */
     private $firstmover = 0;
@@ -61,11 +64,17 @@ class Board
     /** @ODM\Date */
     private $endtime;
 	
+	/** @ODM\Date */
+    private $updated;
+	
 	/** @ODM\Collection */
     private $cards = array();
 	
 	/** @ODM\Collection */
 	private $timer = array();
+	
+	/** @ODM\Int */
+	private $allin = 0;
 	
 
     /**
@@ -472,5 +481,93 @@ class Board
     public function getTimer()
     {
         return $this->timer;
+    }
+
+    /**
+     * Set firstmover
+     *
+     * @param int $firstmover
+     * @return self
+     */
+    public function setFirstmover($firstmover)
+    {
+        $this->firstmover = $firstmover;
+        return $this;
+    }
+
+    /**
+     * Get firstmover
+     *
+     * @return int $firstmover
+     */
+    public function getFirstmover()
+    {
+        return $this->firstmover;
+    }
+
+    /**
+     * Set round
+     *
+     * @param increment $round
+     * @return self
+     */
+    public function setRound($round)
+    {
+        $this->round = $round;
+        return $this;
+    }
+
+    /**
+     * Get round
+     *
+     * @return increment $round
+     */
+    public function getRound()
+    {
+        return $this->round;
+    }
+
+    /**
+     * Set updated
+     *
+     * @param date $updated
+     * @return self
+     */
+    public function setUpdated($updated)
+    {
+        $this->updated = $updated;
+        return $this;
+    }
+
+    /**
+     * Get updated
+     *
+     * @return date $updated
+     */
+    public function getUpdated()
+    {
+        return $this->updated;
+    }
+
+    /**
+     * Set allin
+     *
+     * @param int $allin
+     * @return self
+     */
+    public function setAllin($allin)
+    {
+        $this->allin = $allin;
+        return $this;
+    }
+
+    /**
+     * Get allin
+     *
+     * @return int $allin
+     */
+    public function getAllin()
+    {
+        return $this->allin;
     }
 }

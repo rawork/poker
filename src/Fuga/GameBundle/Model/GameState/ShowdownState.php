@@ -14,7 +14,10 @@ class ShowdownState extends AbstractState {
 		if (!$this->game->lock($gamer->getId())) {
 			return $this->game->getStateNo();
 		}
-			
+		
+		$this->game->removeTimer();
+		$this->game->save();
+		
 		$bank = $this->game->takeBank();
 		$numWin = count($this->game->getWinner());
 		if ($numWin > 1) {
@@ -41,6 +44,8 @@ class ShowdownState extends AbstractState {
 				$doc->setActive($doc->getChips() > 0);
 			}	
 			$doc->setBet(0);
+			$doc->setBet2(0);
+			$doc->setMove('nomove');
 			$doc->setCards(array());
 			$doc->setRank('');
 			$doc->setCombination(array());
@@ -88,6 +93,10 @@ class ShowdownState extends AbstractState {
 		$this->game->unlock($gamer->getId());
 		
 		return $this->game->getStateNo();
+	}
+	
+	public function sync($gamer) {
+		$this->distributeWin($gamer);
 	}
 	
 }

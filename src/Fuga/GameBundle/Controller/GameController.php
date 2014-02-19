@@ -7,7 +7,6 @@ use Fuga\GameBundle\Model\Game;
 use Fuga\GameBundle\Model\RealGamer;
 use Fuga\GameBundle\Model\Rival;
 use Fuga\GameBundle\Model\Deck;
-use Fuga\GameBundle\Model\Combination;
 use Fuga\GameBundle\Model\Exception\GameException;
 use Fuga\GameBundle\Document\Board;
 use Fuga\GameBundle\Document\Gamer;
@@ -549,6 +548,8 @@ class GameController extends PublicController {
 		
 		try {
 			$gamer = new RealGamer($user['id'], $this->get('container'));
+			$gamer->setUpdated(new \DateTime());
+			$gamer->save();
 			$game = new Game($gamer->getBoard(), $this->get('container'));
 			$rivalsdoc = $this->get('odm')
 					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
@@ -574,7 +575,7 @@ class GameController extends PublicController {
 				'chips' => $rival->chips,
 				'cards' => $this->render('game/rivalcards.tpl', compact('rival', 'game')),
 				'bet'   => $rival->bet,
-				'active' => $rival->isHere(),
+				'active' => $rival->isHere() ? 1 : 0,
 			);
 		}
 		
@@ -717,6 +718,7 @@ class GameController extends PublicController {
 			$game = new Board();
 			$game->setBoard($board['id']);
 			$game->setName($board['name']);
+			$game->setUpdated(new \DateTime());
 			$game->setFromtime(new \DateTime($board['fromtime']));
 			$this->get('odm')->persist($game);
 		}
@@ -737,6 +739,7 @@ class GameController extends PublicController {
 			$gamer->setLastname($gamerData['lastname']);
 			$gamer->setSeat($gamerData['seat']);
 			$gamer->setChips($gamerData['chips']);
+			$gamer->setUpdated(new \DateTime());
 			$gamer->setAvatar(isset($gamerData['avatar_value']['extra']) 
 				? $gamerData['avatar_value']['extra']['main']['path'] 
 				: '/bundles/public/img/avatar_empty.png');
@@ -747,6 +750,65 @@ class GameController extends PublicController {
 		$error = 'Игра и игроки для зала №'.$boardId.' созданы.';
 			
 		return $this->render('game/error.tpl', compact('error'));
+	}
+	
+	public function syncAction() {
+		$this->get('log')->write('CRON_START');
+		$boards = $this->get('odm')
+				->getRepository('\Fuga\GameBundle\Document\Board')
+				->findAll();
+		foreach ($boards as $board) {
+			$timer = $board->getTimer();
+			if ($timer) {
+				$timer = array_shift($timer);
+				if (intval($timer) <= time()) {
+					try {
+						$game = new Game($board->getBoard(), $this->get('container'));
+						$game->removeTimer();
+						$game->save();
+						$gamerdoc = $this->get('odm')
+								->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+								->field('board')->equals($game->getId())
+								->field('seat')->equals($board->getMover())
+								->getQuery()->getSingleResult();
+						$gamer = new RealGamer($gamerdoc->getUser(), $this->get('container'));
+						$game->sync($gamer);
+					} catch (\Exception $e) {
+
+					}	
+				}
+				
+			}
+		}
+		
+		$checkTime = new \DateTime();
+		$checkTime->setTimestamp(time() - 30);
+		$gamers = $this->get('odm')
+				->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+				->field('state')->equals(1)
+				->getQuery()->execute();
+		foreach ($gamers as $doc) {
+			if ($doc->getUpdated() < $checkTime ) {
+				$doc->setState(0);
+			}	
+		}
+		$this->get('odm')->flush();
+		
+//		for ($i = 0; $i < 2; $i++) {
+//			sleep(16);
+//			$checkTime = new \DateTime();
+//			$checkTime->setTimestamp(time() - 20);
+//			$gamers = $this->get('odm')
+//					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+//					->field('state')->equals(1)
+//					->getQuery()->execute();
+//			foreach ($gamers as $doc) {
+//				if ($doc->getUpdated() < $checkTime ) {
+//					$doc->setState(0);
+//				}	
+//			}
+//			$this->get('odm')->flush();
+//		}
 	}
 
 }

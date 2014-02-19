@@ -20,6 +20,7 @@ class Game implements GameInterface {
 	const STATE_BUY       = 5;
 	const STATE_END       = 6;
 	const STATE_ROUND_END = 7;
+	const STATE_WAIT = 8;
 
 	public $minbet = 1;
 	public $stopbuytime;
@@ -35,9 +36,10 @@ class Game implements GameInterface {
 	private $timers     = array(
 		'begin'      => array('handler' => 'onStart', 'holder' => 'begin-timer', 'time' => 0),
 		'change'     => false, // array('handler' => 'onClickNoChange', 'holder' => 'change-timer', 'time' => 14)
-		'distribute' => array('handler' => 'onDistribute', 'holder' => 'game-timer', 'time' => 61),
+		'distribute' => array('handler' => 'onDistribute', 'holder' => 'game-timer', 'time' => 31),
 		'prebuy'     => array('handler' => 'onShowBuy', 'holder' => 'joker-timer', 'time' => 14),
 		'next'		 => array('handler' => 'onNext', 'holder' => 'round-end-timer', 'time' => 31),
+		'nonactive'  => array('handler' => 'onNext', 'holder' => 'wait-timer', 'time' => 61),
 		'bet'        => array('handler' => 'onFold', 'holder' => 'game-timer', 'time' => 61),
 		'buy'        => array('handler' => 'onEndRound', 'holder' => 'buy-timer', 'time' => 121),
 		
@@ -142,6 +144,10 @@ class Game implements GameInterface {
 		return $this->doc->getDealer();
 	}
 	
+	public function getFromtime() {
+		return $this->doc->getFromtime();
+	}
+	
 	public function getBets() {
 		return $this->doc->getBets();
 	}
@@ -168,6 +174,22 @@ class Game implements GameInterface {
 	
 	public function setBank2($value) {
 		$this->doc->setBank2($value);
+	}
+	
+	public function getAllin() {
+		return $this->doc->getAllin();
+	}
+	
+	public function setAllin($value) {
+		$this->doc->setAllin($value);
+	}
+	
+	public function setRound($value) {
+		$this->doc->setRound($value);
+	}
+	
+	public function getRound() {
+		return $this->doc->getRound();
 	}
 	
 	public function setMinbet() {
@@ -280,6 +302,8 @@ class Game implements GameInterface {
 			$this->state = new GameState\EndState($this);
 		} elseif ($state == self::STATE_ROUND_END) {
 			$this->state = new GameState\RoundEndState($this);
+		}  elseif ($state == self::STATE_WAIT) {
+			$this->state = new GameState\WaitState($this);
 		} 
 		
 		setcookie('gamestate', $state, time() + $this->cookietime, '/');
@@ -375,7 +399,7 @@ class Game implements GameInterface {
 				->getSingleResult();
 		}
 		if (!$gamer) {
-			throw new Exception\GameException('Следующий дилер не найден.');
+			return $this->waiting();
 		}
 		$this->doc->setMover($gamer->getSeat());
 		$this->doc->setDealer($gamer->getSeat());
@@ -407,7 +431,7 @@ class Game implements GameInterface {
 				->getSingleResult();
 		}
 		if (!$gamer) {
-			throw new GameException('Игрок для следующего хода не найден.');
+			return $this->waiting();
 		}
 		$this->doc->setMover($gamer->getSeat());
 		
@@ -495,15 +519,47 @@ class Game implements GameInterface {
 	}
 	
 	public function bet($gamer, $chips) {
-		$this->acceptBet($gamer->bet($chips, $this->getMaxbet()));
-		$this->state->makeMove($gamer);
+		$beforeBet = $gamer->getBet2();
+		$bet = $gamer->bet($chips, $this->getMaxbet());
+		$wholeBet = $gamer->getBet2();
+		if ($gamer->getAllin()) {
+			if ($this->getBank2() == 0) {
+				$this->setBank2($this->getBank() + $this->getBets());
+			}
+			$this->setBank2($this->getBank2() + $bet);
+			if ($this->getAllin() < $wholeBet) {
+				$this->setAllin($wholeBet);
+			}
+			
+		} elseif ($this->getAllin() > 0 && $this->getAllin() > $beforeBet) {
+			$this->setBank2($this->getBank2() + $this->getAllin() - $beforeBet);
+		}
+		
+		$this->acceptBet($bet);
 		setcookie('gamemaxbet', $this->doc->getMaxbet(), time() + $this->cookietime, '/');
+		
+		$this->state->makeMove($gamer);
 	}
 	
 	public function check($gamer) {
+		$beforeBet = $gamer->getBet2();
+		$bet = $gamer->bet($chips, $this->getMaxbet());
+		$wholeBet = $gamer->getBet2();
+		if ($gamer->getAllin()) {
+			if ($this->getBank2() == 0) {
+				$this->setBank2($this->getBank() + $this->getBets());
+			}
+			$this->setBank2($this->getBank2() + $bet);
+			if ($this->getAllin() < $wholeBet) {
+				$this->setAllin($wholeBet);
+			}
+			
+		} elseif ($this->getAllin() > 0 && $this->getAllin() > $beforeBet) {
+			$this->setBank2($this->getBank2() + $this->getAllin() - $beforeBet);
+		}
 		$this->acceptBet($gamer->check($this->getMaxbet()));
-		$this->state->makeMove($gamer);
 		setcookie('gamemaxbet', $this->getMaxbet(), time() + $this->cookietime, '/');
+		$this->state->makeMove($gamer);
 	}
 	
 	public function distribute($gamer) {
@@ -537,6 +593,14 @@ class Game implements GameInterface {
 	
 	public function nochange(RealGamer $gamer) {
 		$this->state->changeCards($gamer);
+	}
+	
+	public function wait() {
+		$this->state->wait();
+	}
+	
+	public function sync(RealGamer $gamer) {
+		$this->state->sync($gamer);
 	}
 	
 }

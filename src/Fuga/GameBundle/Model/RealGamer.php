@@ -42,8 +42,11 @@ class RealGamer {
 			$this->save();
 		}
 		
-		$this->question = array_shift($this->doc->getQuestion());
-		$this->combination = array_shift($this->doc->getCombination());
+		$question = $this->doc->getQuestion();
+		$combination = $this->doc->getCombination();
+		
+		$this->question = array_shift($question);
+		$this->combination = array_shift($combination);
 		$this->haveBuyQuestion();
 		
 		setcookie('gamerstate', $this->doc->getState(), time()+7000000, '/');
@@ -69,6 +72,10 @@ class RealGamer {
 		return $this->doc->setRank();
 	}
 	
+	public function setUpdated($value){
+		return $this->doc->setUpdated($value);
+	}
+	
 	public function getSeat(){
 		return $this->doc->getSeat();
 	}
@@ -87,6 +94,10 @@ class RealGamer {
 	
 	public function getBet(){
 		return $this->doc->getBet();
+	}
+	
+	public function getBet2(){
+		return $this->doc->getBet2();
 	}
 	
 	public function getBuy(){
@@ -196,6 +207,7 @@ class RealGamer {
 		}
 		$this->doc->setChips( $this->doc->getChips() - $bet );
 		$this->doc->setBet( $this->doc->getBet() + $bet );
+		$this->doc->setBet2( $this->doc->getBet2() + $bet );
 		$this->doc->setMove('bet');
 		$this->save();
 		
@@ -210,7 +222,7 @@ class RealGamer {
 		if ($this->doc->getChips() <= 0) {
 			$this->doc->setChips(0);
 			$this->save();
-			throw new GameException('Нет фишек');
+//			throw new GameException('Нет фишек');
 		}
 		
 		if ( $bet >= $this->doc->getChips() ) {
@@ -220,6 +232,7 @@ class RealGamer {
 		
 		$this->doc->setChips( $this->doc->getChips() - $bet );
 		$this->doc->setBet( $this->doc->getBet() + $bet );
+		$this->doc->setBet2( $this->doc->getBet2() + $bet );
 		$this->doc->setMove('check');
 		$this->save();
 		
