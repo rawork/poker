@@ -355,24 +355,28 @@ class Game implements GameInterface {
 				->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
 				->field('board')->equals($this->getId())
 				->field('active')->equals(true)
+				->field('state')->gt(0)
 				->field('fold')->equals(false)
 				->getQuery()->execute();
 		foreach ($gamers as $gamer) {
 			$cards = $combination->get($gamer->getCards(), $this->getFlop());
 			$cards['user'] = $gamer->getUser();
+			$cards['bank'] = $gamer->getBank();
+			$cards['win']  = 0;
 			$cards['seat'] = $gamer->getSeat();
 			$cards['numOfGamers'] = $this->numOfGamers();
 			$cards['name'] = $combination->rankName($cards['rank']);
 			$cards['allin'] = $gamer->getAllin();
-			if ($cards['allin']) {
+			
+			$allins[] = $cards;
+			if (!$cards['allin']) {
 				$suites[] = $cards;
-			} else {
-				$allins[] = $cards;
 			}
 		}
+
 		$winner = $combination->compare($suites);
 		$allinWinner = $combination->compare($allins);
-		$this->doc->setWinner($winner, $allins);
+		$this->doc->setWinner(array_merge($winner, $allinWinner));
 		$combinations = array();
 		foreach ($this->doc->getWinner() as $winner) {
 			foreach ($winner['cards'] as $card) {

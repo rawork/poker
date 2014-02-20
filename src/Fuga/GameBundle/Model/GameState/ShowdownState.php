@@ -18,25 +18,81 @@ class ShowdownState extends AbstractState {
 
 			$this->game->removeTimer();
 			$this->game->save();
-
+			
+			$winners = array();
+			$allins  = array();
 			$bank = $this->game->takeBank();
-			$numWin = count($this->game->getWinner());
-			if ($numWin > 1) {
-				$nextBank = $bank % $numWin;
-				$share = ($bank - $nextBank) / $numWin;
-				$this->game->setBank($nextBank);
-			} else {
-				$share = $bank;
+			
+			$ids = array();
+			
+			foreach ($this->game->getWinner() as $winner) {
+				if (in_array($winner['user'], $ids)) {
+					continue;
+				}
+				
+				$ids[] = $winner['user'];
+				
+				if ($winner['allin']) {
+					$allins[] = $winner;
+				} else {
+					$winners[] = $winner;
+				}
 			}
+			
+			if (count($allins) > 0) {
+				if (count($winners) == 0) {
+					$maxallinbank = $bank; 
+				} else {
+					$maxallinbank = 0;
+					foreach ($allins as $winner) {
+						if ($winner['bank'] > $maxallinbank) {
+							$maxallinbank = $winner['bank'];
+						}
+					}
+				}	
+
+				$numWin = count($allins);
+				if ($numWin > 1) {
+					$nextBank = $maxallinbank % $numWin;
+					$share = ($maxallinbank - $nextBank) / $numWin;
+					$this->game->setBank($this->game->getBank() + $nextBank);
+				} else {
+					$share = $maxallinbank;
+				}
+
+				foreach ($allins as &$winner) {
+					$winner['win'] = $share;
+				}
+
+				$bank -= $maxallinbank; 
+			}
+			
+			if (count($winners) > 0) {
+				$numWin = count($winners);
+				if ($numWin > 1) {
+					$nextBank = $bank % $numWin;
+					$share = ($bank - $nextBank) / $numWin;
+					$this->game->setBank($this->game->getBank() + $nextBank);
+				} else {
+					$share = $bank;
+				}
+				foreach ($winners as &$winner) {
+					$winner['win'] = $share;
+				}
+			}
+			
+			$winners = array_merge($winners, $allins);
+			
 			$gamers = $this->game->container->get('odm')
 					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
 					->field('board')->equals($this->game->getId())
 					->field('active')->equals(true)
 					->getQuery()->execute();
+			
 			foreach ($gamers as $doc) {
-				foreach ($this->game->getWinner() as $winner) {
+				foreach ($winners as $winner) {
 					if ($doc->getUser() == $winner['user']) {
-						$doc->setChips( $doc->getChips() + $share );
+						$doc->setChips( $doc->getChips() + $winner['win'] );
 						foreach ($winner['cards'] as $card) {
 							if ($card['name'] == 'joker') {
 								$doc->setChips( $doc->getChips() + 2 );
