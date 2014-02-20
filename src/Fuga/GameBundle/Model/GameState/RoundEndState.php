@@ -36,7 +36,7 @@ class RoundEndState extends AbstractState {
 					->getQuery()->execute();
 				foreach ($gamers as $doc) {
 					$doc->setFold(false);
-					if ($doc->getState() == 1) {
+					if ($doc->getState() > 0) {
 						$doc->setCards($this->game->getCards(4));
 					} else {
 						$doc->setFold(true);
@@ -66,8 +66,6 @@ class RoundEndState extends AbstractState {
 				$this->game->nextMover();
 				$this->game->setFlop($this->game->getCards(3));
 
-				$this->game->setTimer('change');
-				$this->game->startTimer();
 				$this->game->setState(AbstractState::STATE_CHANGE);
 			}
 			

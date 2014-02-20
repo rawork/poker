@@ -69,8 +69,12 @@ class RealGamer {
 		return $this->doc->getRank();
 	}
 	
-	public function setRank(){
-		return $this->doc->setRank();
+	public function setRank($value){
+		$this->doc->setRank($value);
+	}
+	
+	public function setTimes($value){
+		$this->doc->setTimes($value);
 	}
 	
 	public function setUpdated($value){
@@ -346,8 +350,12 @@ class RealGamer {
 		$this->question = null;
 		$this->doc->setCard(-1);
 		$this->doc->setQuestion(array());
-		if ($this->checkActive()) {
+		if ($this->getChips() > 0) {
 			$this->checkCombination();
+		} else {
+			$this->doc->setFold(true);
+			$this->doc->setCards(array());
+			$this->doc->setTimes(0);
 		}
 		if ($this->doc->getTimes() > 0) {
 			$this->setTimer('change');

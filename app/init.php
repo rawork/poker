@@ -79,7 +79,7 @@ if (isset($_SERVER['REQUEST_URI'])) {
 	$params['theme_ref'] = THEME_REF;
 	$container->get('templating')->assign($params);
 	
-	// TODO убрать инициализацию всех таблиц 
-	$container->initialize();
 }
 
+// TODO убрать инициализацию всех таблиц 
+$container->initialize();

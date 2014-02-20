@@ -23,7 +23,7 @@ class BeginState extends AbstractState {
 				->field('active')->equals(true)
 				->getQuery()->execute();
 			foreach ($gamers as $doc) {
-				if ($doc->getState() == 1) {
+				if ($doc->getState() > 0) {
 					$doc->setCards($this->game->getCards(4));
 					$doc->setMove('nomove');
 					$doc->setTimer(array(array(

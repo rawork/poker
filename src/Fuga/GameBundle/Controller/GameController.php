@@ -757,7 +757,7 @@ class GameController extends PublicController {
 			$timer = $board->getTimer();
 			if ($timer) {
 				$timer = array_shift($timer);
-				if (intval($timer) <= time()) {
+				if (intval($timer['time']) <= time()) {
 					try {
 						$game = new Game($board->getBoard(), $this->get('container'));
 						$game->removeTimer();
@@ -780,12 +780,30 @@ class GameController extends PublicController {
 			}
 		}
 		
-		$this->get('odm')
+		$gamers = $this->get('odm')
 				->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
-				->findAndUpdate()
 				->field('updated')->lt(time() - 30)
-				->field('timer')->set(array())
+				->field('timer')->notEqual(null)
 				->getQuery()->execute();
+		foreach ($gamers as $doc) {
+			$timer = $doc->getTimer();
+			if ($timer) {
+				$timer = array_shift($timer);
+				if (intval($timer['time']) <= time()) {
+					try {
+						
+						$game = new Game($doc->getBoard(), $this->get('container'));
+						$game->removeTimer();
+						$game->save();
+						$gamer = new RealGamer($doc->getUser(), $this->get('container'));
+						$game->sync($gamer);
+						
+					} catch (\Exception $e) {
+						$this->get('log')->write('CRON_GAMER_ERROR:'.$e->getMessage());
+					}
+				}
+			}
+		}
 		
 	}
 

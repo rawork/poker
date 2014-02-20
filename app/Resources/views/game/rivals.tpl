@@ -10,7 +10,7 @@
 			{/if}
 		</div>
 		{foreachelse}
-		{if $rival->isActive() && ($game->isState(2) || $game->isState(3) || $game->isState(4))}<div class="pass">ПАС</div>{/if}
+		{if $rival->state > 0 && $rival->isActive() && ($game->isState(2) || $game->isState(3) || $game->isState(4))}<div class="pass">ПАС</div>{/if}
 		{/foreach}
 	</div>
 	{/if}
@@ -39,7 +39,7 @@
 			{/if}
 		</div> 
 		{foreachelse}
-		{if $rival->isActive() && ($game->isState(2) || $game->isState(3) || $game->isState(4))}<div class="pass">ПАС</div>{/if}
+		{if $rival->state > 0 && $rival->isActive() && ($game->isState(2) || $game->isState(3) || $game->isState(4))}<div class="pass">ПАС</div>{/if}
 		{/foreach}
 	</div>
 	{/if}

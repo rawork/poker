@@ -433,7 +433,7 @@ class Game implements GameInterface {
 				->getSingleResult();
 		}
 		if (!$gamer) {
-			return $this->waiting();
+			return $this->wait();
 		}
 		$this->doc->setMover($gamer->getSeat());
 		

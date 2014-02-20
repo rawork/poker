@@ -30,7 +30,7 @@ class FlopState extends AbstractState {
 					->findAndUpdate()
 					->field('board')->equals($this->game->getId())
 					->field('active')->equals(true)
-					->field('state')->notEqual(1)
+					->field('state')->lt(1)
 					->field('fold')->set(true)
 					->field('allin')->set(false)
 					->field('bet')->set(0)
@@ -70,6 +70,7 @@ class FlopState extends AbstractState {
 							->field('state')->equals(1)
 							->field('fold')->equals(false)
 							->field('allin')->equals(false)
+							->field('chips')->gt(0)
 							->field('bet')->lt($this->game->getMaxbet())
 							->getQuery()->execute();
 				}

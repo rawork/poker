@@ -439,11 +439,11 @@ function onToggleOut() {
 			$.cookie('gamerstate', state, {path: '/'});
 			if (data.state == 1) {
 				$('.gamer-out').addClass('closed');
-				$('a[data-action=out]').html('Вне игры');
+				$('button[data-action=out]').html('Вне игры');
 				enableButtons();
 			} else {
 				$('.gamer-out').removeClass('closed');
-				$('a[data-action=out]').html('В игре');
+				$('button[data-action=out]').html('В игре');
 				enableButtons();
 			}
 		}
@@ -466,7 +466,8 @@ function startTime() {
 //	console.log($.cookie());
 	
 	var now = new Date();
-	var fromtime = new Date($.cookie('gamefromtime'));
+	var fromtime = new Date();
+	fromtime.setTime(+$.cookie('gamefromtime')*1000);
 	if (fromtime > now) {
 		$('#game-time').html($.cookie('gamename'));
 		return;
@@ -494,7 +495,8 @@ function startTimer() {
 	}
 	
 	var now = new Date();
-	var timerstop = new Date($.cookie('timerstop'));
+	var timerstop = new Date();
+	timerstop.setTime(+$.cookie('timerstop')*1000);
 	if (timerstop < now) {
 		$('#'+ timerName).html( "00:00:00" );
 		var timerhandler = $.cookie('timerhandler');
@@ -507,7 +509,7 @@ function startTimer() {
 		return;
 	}
 	
-    var timer = timerstop.getTime() - now.getTime();
+    var timer = timerstop - now.getTime();
 
 	var seconds = timer % 3600000;
     var hours = parseInt((timer - seconds) / 3600000);
@@ -570,28 +572,19 @@ function enableButtons(state) {
 	switch (state) {
 		case 2:
 		case 3:
-			$('.game-buttons button[data-action=bet]').html('&nbsp;');
-			$('.game-buttons button[data-action=check]').html('&nbsp;');
 			if (gamermover == 1 && gamerstate == 1) {
 				$('.game-buttons button[data-action=fold]').prop('disabled', false);
 				$('.game-buttons button[data-action=allin]').prop('disabled', false);
 				if (minbet < chips && (maxbet - bet) < chips) {
 					if (bet == 0 && maxbet == 0 && state == 2) {
-						$('.game-buttons button[data-action=bet]').html('Ставка('+ minbet +')');
-						$('.game-buttons button[data-action=check]').html('Чек');
 						$('.game-buttons button[data-action=bet]').prop('disabled', false);
 					} else if ( maxbet > bet ) {
-						if ($('#input_bet').val() < (maxbet - bet)*2) {
-							$('#input_bet').val((maxbet - bet)*2);
+						if ($('#input_bet').val() < (maxbet - bet)) {
+							$('#input_bet').val((maxbet - bet));
 						}
-						$('.game-buttons button[data-action=bet]').html('Рейз ('+ ((maxbet - bet)*2) +')');
-						$('.game-buttons button[data-action=check]').html('Колл ('+ (maxbet - bet) +')');
-						$('.game-buttons button[data-action=check]').prop('disabled', false);
 						$('.game-buttons button[data-action=bet]').prop('disabled', false);
 					} else {
 						$('#input_bet').val(minbet);
-						$('.game-buttons button[data-action=bet]').html('Ставка('+ minbet +')');
-						$('.game-buttons button[data-action=check]').html('Чек');
 						$('.game-buttons button[data-action=check]').prop('disabled', false);
 						$('.game-buttons button[data-action=bet]').prop('disabled', false);
 					}
@@ -602,8 +595,6 @@ function enableButtons(state) {
 			$('.game-buttons button[data-action=buy]').prop('disabled', false);
 			break;
 		default:
-			$('.game-buttons button[data-action=bet]').html('&nbsp;');
-			$('.game-buttons button[data-action=check]').html('&nbsp;');
 	}
 	$('.game-buttons button[data-action=out]').prop('disabled', state == 6);
 }
@@ -612,7 +603,7 @@ function initGame() {
 	stopTime();
 	setInterval(startTime, 1000);
 	$(document).on('click', '.choose', onChooseCard);
-//	$(document).on('click', 'a[data-action=nobuyanswer]',    onClickNoBuyAnswer);
+	$(document).on('click', 'a[data-action=nobuyanswer]',    onClickNoBuyAnswer);
 	$(document).on('click', '.question-answer',              onChooseAnswer);
 	$(document).on('click', 'button[data-action=answer]',    onClickAnswer);
 	$(document).on('click', 'button[data-action=change]',    onClickChange);

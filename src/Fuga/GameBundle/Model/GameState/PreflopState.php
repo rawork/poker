@@ -26,7 +26,7 @@ class PreflopState extends AbstractState {
 					->findAndUpdate()
 					->field('board')->equals($this->game->getId())
 					->field('active')->equals(true)
-					->field('state')->notEqual(1)
+					->field('state')->lt(1)
 					->field('fold')->set(true)
 					->field('cards')->set(array())
 					->getQuery()->execute();
@@ -37,6 +37,14 @@ class PreflopState extends AbstractState {
 					->field('active')->equals(true)
 					->field('fold')->equals(false)
 					->getQuery()->execute();
+			if (count($gamers) > 2) {
+				$gamers = $this->game->container->get('odm')
+					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+					->field('board')->equals($this->game->getId())
+					->field('active')->equals(true)
+					->field('chips')->gt(0)
+					->getQuery()->execute();
+			}
 
 			if (count($gamers) < 2) {
 				$this->game->confirmBets();
@@ -62,6 +70,7 @@ class PreflopState extends AbstractState {
 							->field('state')->equals(1)
 							->field('fold')->equals(false)
 							->field('allin')->equals(false)
+							->field('chips')->gt(0)
 							->field('bet')->lt($this->game->getMaxbet())
 							->getQuery()->execute();
 				}	
