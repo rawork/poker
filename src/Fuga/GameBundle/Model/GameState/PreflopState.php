@@ -4,7 +4,7 @@ namespace Fuga\GameBundle\Model\GameState;
 
 use Fuga\GameBundle\Model\GameInterface;
 use Fuga\GameBundle\Model\Combination;
-use Fuga\GameBundle\Model\Exception\GameException;
+use Fuga\GameBundle\Model\RealGamer;
 
 class PreflopState extends AbstractState {
 	
@@ -117,8 +117,30 @@ class PreflopState extends AbstractState {
 		return $this->game->getStateNo();
 	}
 	
-	public function sync($gamer) {
-		$this->game->fold($gamer);
+	public function sync() {
+		$gamer = null;
+		
+		$gamerdoc = $this->game->container->get('odm')
+				->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+				->field('board')->equals($this->game->getId())
+				->field('seat')->equals($this->game->getMover())
+				->getQuery()->getSingleResult();
+		if ($gamerdoc) {
+			$timer = $this->game->getTimer();
+			$timer = array_shift($timer);
+			if (!$timer || intval($timer['time']) < time()) { 
+				$this->game->container->get('log')->write(
+						'game'.$this->game->getId()
+						.' :preflop.find.outtimer '
+						.(intval($timer['time']) - time())
+				);
+				$gamer = new RealGamer($gamerdoc->getUser(), $this->game->container);
+			}
+		}
+		
+		if ($gamer) {
+			$this->game->fold($gamer);
+		}
 	}
 	
 }

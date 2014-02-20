@@ -567,7 +567,8 @@ class GameController extends PublicController {
 				'chips' => $rival->chips,
 				'cards' => $this->render('game/rivalcards.tpl', compact('rival', 'game')),
 				'bet'   => $rival->bet,
-				'active' => $rival->isHere() ? 1 : 0,
+				'state'   => $rival->state,
+				'active' => $rival->active ? 1 : 0,
 			);
 		}
 		
@@ -749,60 +750,18 @@ class GameController extends PublicController {
 			$this->get('router')->redirect('/');
 		}
 		
-		$this->get('log')->write('CRON_START');
 		$boards = $this->get('odm')
-				->getRepository('\Fuga\GameBundle\Document\Board')
-				->findAll();
-		foreach ($boards as $board) {
-			$timer = $board->getTimer();
-			if ($timer) {
-				$timer = array_shift($timer);
-				if (intval($timer['time']) <= time()) {
-					try {
-						$game = new Game($board->getBoard(), $this->get('container'));
-						$game->removeTimer();
-						$game->save();
-						$gamerdoc = $this->get('odm')
-								->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
-								->field('board')->equals($game->getId())
-								->field('seat')->equals($board->getMover())
-								->getQuery()->getSingleResult();
-						if (!$gamerdoc) {
-							throw new \Exception('no gamer to sync timer');
-						}	
-						$gamer = new RealGamer($gamerdoc->getUser(), $this->get('container'));
-						$game->sync($gamer);
-					} catch (\Exception $e) {
-						$this->get('log')->write('CRON_ERROR:'.$e->getMessage());
-					}	
-				}
-				
-			}
-		}
-		
-		$gamers = $this->get('odm')
-				->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
-				->field('updated')->lt(time() - 30)
-				->field('timer')->notEqual(null)
+				->createQueryBuilder('\Fuga\GameBundle\Document\Board')
+				->field('state')->gt(0)
+				->field('state')->notEqual(6)
 				->getQuery()->execute();
-		foreach ($gamers as $doc) {
-			$timer = $doc->getTimer();
-			if ($timer) {
-				$timer = array_shift($timer);
-				if (intval($timer['time']) <= time()) {
-					try {
-						
-						$game = new Game($doc->getBoard(), $this->get('container'));
-						$game->removeTimer();
-						$game->save();
-						$gamer = new RealGamer($doc->getUser(), $this->get('container'));
-						$game->sync($gamer);
-						
-					} catch (\Exception $e) {
-						$this->get('log')->write('CRON_GAMER_ERROR:'.$e->getMessage());
-					}
-				}
-			}
+		foreach ($boards as $board) {
+			try {
+				$game = new Game($board->getBoard(), $this->get('container'));
+				$game->sync();
+			} catch (\Exception $e) {
+				$this->get('log')->write('cron.ERROR:'.$e->getMessage());
+			}	
 		}
 		
 	}

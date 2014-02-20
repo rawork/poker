@@ -54,4 +54,30 @@ class TestController extends PublicController {
 		echo json_encode($combinations);
 		exit;
 	}
+	
+	public function importAction() {
+		$fh = fopen($_SERVER['DOCUMENT_ROOT'].'/'.'seat.csv', 'r');
+		if ($fh) {
+			$seat = 0;
+			$board = 0;
+			while (($buffer = fgetcsv($fh, 4096, ';')) !== false) {
+//				var_dump($buffer);
+				if (intval($buffer[6]) > $board) {
+					$board = intval($buffer[6]);
+					$seat = 1;
+				} else {
+					$seat++; 
+				}
+				$user = $this->get('container')->getItem('user_user', 'email="'.$buffer[3].'"');
+				$account = $this->get('container')->getItem('account_member', 'user_id='.$user['id']);
+				echo 'UPDATE account_member SET board_id='.($board+1).', seat='.$seat.'  WHERE id='.$account['id'].";\n<br>";
+			}
+			if (!feof($fh)) {
+//				echo "Error: unexpected fgets() fail\n";
+				exit;
+			}
+			fclose($fh);
+			exit;
+		}
+	}
 }

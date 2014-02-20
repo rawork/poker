@@ -50,7 +50,4 @@ class BeginState extends AbstractState {
 		return $this->game->getStateNo();
 	}
 	
-	public function sync($gamer) {
-		$this->startGame($gamer);
-	}
 }

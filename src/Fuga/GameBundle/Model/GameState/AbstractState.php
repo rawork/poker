@@ -101,7 +101,7 @@ class AbstractState implements StateInterface {
 		return $this->game->getStateNo();
 	}
 	
-	public function sync($gamer) {
+	public function sync() {
 		$this->game->container->get('log')->write('abstract sync');
 	}
 	

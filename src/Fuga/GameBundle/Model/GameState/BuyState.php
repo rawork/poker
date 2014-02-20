@@ -46,8 +46,4 @@ class BuyState extends AbstractState {
 		return $this->game->getStateNo();
 	}
 	
-	public function sync($gamer) {
-		$this->endRound($gamer);
-	}
-	
 }

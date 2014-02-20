@@ -3,7 +3,6 @@
 namespace Fuga\GameBundle\Model\GameState;
 
 use Fuga\GameBundle\Model\GameInterface;
-use Fuga\GameBundle\Model\Combination;
 use Fuga\GameBundle\Model\RealGamer;
 
 class ChangeState extends AbstractState {
@@ -24,24 +23,15 @@ class ChangeState extends AbstractState {
 				return $this->game->getStateNo();
 			}
 			$gamer->removeTimer();
-			$this->game->container->get('odm')
-				->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
-				->findAndUpdate()
-				->field('board')->equals($this->game->getId())
-				->field('active')->equals(true)
-				->field('state')->equals(0)
-				->field('fold')->set(true)
-				->field('cards')->set(array())
-				->getQuery()->execute();
 			$gamers = $this->game->container->get('odm')
 				->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
 				->field('board')->equals($this->game->getId())
 				->field('active')->equals(true)
-				->field('state')->gt(0)
-				->field('fold')->equals(false)
 				->getQuery()->execute();
 			foreach ($gamers as $doc) {
-				$doc->setChips($doc->getChips()-1);
+				if ($doc->getChips() > 0) {
+					$doc->setChips($doc->getChips()-1);
+				}
 				$doc->setFold(!($doc->getChips() > 0));
 				$this->game->acceptBet(1);
 			}
@@ -59,11 +49,35 @@ class ChangeState extends AbstractState {
 		return $this->game->getStateNo();
 	}
 	
-	public function sync($gamer) {
-		$gamer->removeTimer();
-		$gamer->setTimes(0);
-		$gamer->save();
-		$this->changeCards($gamer);
+	public function sync() {
+		$gamer = null;
+		$gamers = $this->game->container->get('odm')
+				->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+				->field('board')->equals($this->game->getId())
+				->field('times')->gt(0)
+				->field('state')->gt(0)
+				->getQuery()->execute();
+		foreach ($gamers as $doc) {
+			$timer = $doc->getTimer();
+			$timer = array_shift($timer);
+			if (!$timer || intval($timer['time']) < time()) {
+				$this->game->container->get('log')->write(
+						'game'.$this->game->getId()
+						.' :change.find.outtimer '
+						.(intval($timer['time']) - time())
+				);
+				$doc->setTimer(array());
+				$doc->setTimes(0);
+				$this->game->save();
+				if (!$gamer) {
+					$gamer = new RealGamer($doc->getUser(), $this->game->container); 
+				}
+			}
+		}
+		
+		if ($gamer) {
+			$this->changeCards($gamer);			
+		}
 	}
 	
 }

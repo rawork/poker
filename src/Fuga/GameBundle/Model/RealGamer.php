@@ -101,6 +101,14 @@ class RealGamer {
 		return $this->doc->getBet();
 	}
 	
+	public function getBank() {
+		return $this->doc->getBank();
+	}
+	
+	public function setBank($value) {
+		$this->doc->setBank($value);
+	}
+	
 	public function getBet2(){
 		return $this->doc->getBet2();
 	}
@@ -272,7 +280,7 @@ class RealGamer {
 	public function changeCard($card) {
 		$questions = $this->container->getItems(
 				'game_poll', 
-				'id NOT IN('.$this->getDeniedQuestions().')'
+				'id < 141 AND id NOT IN('.$this->getDeniedQuestions().')'
 		);
 		$question = $questions[array_rand($questions)];
 		$this->question = $question;

@@ -24,7 +24,6 @@ class RoundEndState extends AbstractState {
 				$this->game->removeTimer();
 				$this->game->save();
 				$this->game->newDeck();
-				$this->game->setBank(0);
 				$this->game->setBank2(0);
 				$this->game->setAllin(0);
 				$this->game->setBets(0);
@@ -38,20 +37,22 @@ class RoundEndState extends AbstractState {
 					$doc->setFold(false);
 					if ($doc->getState() > 0) {
 						$doc->setCards($this->game->getCards(4));
+						$doc->setTimes(2);
+						$doc->setTimer(array(array(
+							'handler' => 'onClickNoChange', 
+							'holder' => 'change-timer', 
+							'time' => time() +31
+						)));
 					} else {
 						$doc->setFold(true);
+						$doc->setTimes(0);
 					}
 					$doc->setBet(0);
 					$doc->setAllin(false);
 					$doc->setWinner(false);
-					$doc->setTimes(2);
+					
 					$doc->setQuestion(array());
 					$doc->setBuy(array());
-					$doc->setTimer(array(array(
-						'handler' => 'onClickNoChange', 
-						'holder' => 'change-timer', 
-						'time' => time() +31
-					)));
 					if ($this->game->getRound() >= 3 
 						&& $doc->getUpdated() < $this->game->getFromtime()) {
 						$this->game->acceptBet($doc->getChips());
@@ -77,10 +78,6 @@ class RoundEndState extends AbstractState {
 		}
 		
 		return $this->game->getStateNo();
-	}
-	
-	public function sync($gamer) {
-		$this->nextGame($gamer);
 	}
 	
 }

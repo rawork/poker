@@ -87,6 +87,10 @@ class Game implements GameInterface {
 		return $this->doc->getWinner();
 	}
 	
+	public function getTimer() {
+		return $this->doc->getTimer();
+	}
+	
 	public function getMaxbet() {
 		return $this->doc->getMaxbet();
 	}
@@ -346,6 +350,7 @@ class Game implements GameInterface {
 	public function setWinner() {
 		$combination = new Combination();
 		$suites = array();
+		$allins = array();
 		$gamers = $this->container->get('odm')
 				->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
 				->field('board')->equals($this->getId())
@@ -358,9 +363,16 @@ class Game implements GameInterface {
 			$cards['seat'] = $gamer->getSeat();
 			$cards['numOfGamers'] = $this->numOfGamers();
 			$cards['name'] = $combination->rankName($cards['rank']);
-			$suites[] = $cards;
+			$cards['allin'] = $gamer->getAllin();
+			if ($cards['allin']) {
+				$suites[] = $cards;
+			} else {
+				$allins[] = $cards;
+			}
 		}
-		$this->doc->setWinner($combination->compare($suites));
+		$winner = $combination->compare($suites);
+		$allinWinner = $combination->compare($allins);
+		$this->doc->setWinner($winner, $allins);
 		$combinations = array();
 		foreach ($this->doc->getWinner() as $winner) {
 			foreach ($winner['cards'] as $card) {
@@ -521,44 +533,21 @@ class Game implements GameInterface {
 	}
 	
 	public function bet($gamer, $chips) {
-		$beforeBet = $gamer->getBet2();
-		$bet = $gamer->bet($chips, $this->getMaxbet());
-		$wholeBet = $gamer->getBet2();
+		$this->acceptBet($gamer->bet($chips, $this->getMaxbet()));
 		if ($gamer->getAllin()) {
-			if ($this->getBank2() == 0) {
-				$this->setBank2($this->getBank() + $this->getBets());
-			}
-			$this->setBank2($this->getBank2() + $bet);
-			if ($this->getAllin() < $wholeBet) {
-				$this->setAllin($wholeBet);
-			}
-			
-		} elseif ($this->getAllin() > 0 && $this->getAllin() > $beforeBet) {
-			$this->setBank2($this->getBank2() + $this->getAllin() - $beforeBet);
+			$gamer->setBank($this->getBank() + $this->getBets());
 		}
-		
-		$this->acceptBet($bet);
+
 		setcookie('gamemaxbet', $this->doc->getMaxbet(), time() + $this->cookietime, '/');
 		$this->state->makeMove($gamer);
 	}
 	
 	public function check($gamer) {
-		$beforeBet = $gamer->getBet2();
-		$bet = $gamer->bet($chips, $this->getMaxbet());
-		$wholeBet = $gamer->getBet2();
-		if ($gamer->getAllin()) {
-			if ($this->getBank2() == 0) {
-				$this->setBank2($this->getBank() + $this->getBets());
-			}
-			$this->setBank2($this->getBank2() + $bet);
-			if ($this->getAllin() < $wholeBet) {
-				$this->setAllin($wholeBet);
-			}
-			
-		} elseif ($this->getAllin() > 0 && $this->getAllin() > $beforeBet) {
-			$this->setBank2($this->getBank2() + $this->getAllin() - $beforeBet);
-		}
 		$this->acceptBet($gamer->check($this->getMaxbet()));
+		if ($gamer->getAllin()) {
+			$gamer->setBank($this->getBank() + $this->getBets());
+		}
+		
 		setcookie('gamemaxbet', $this->getMaxbet(), time() + $this->cookietime, '/');
 		$this->state->makeMove($gamer);
 	}
@@ -603,8 +592,8 @@ class Game implements GameInterface {
 		$this->state->wait();
 	}
 	
-	public function sync(RealGamer $gamer) {
-		$this->state->sync($gamer);
+	public function sync() {
+		$this->state->sync();
 	}
 	
 }

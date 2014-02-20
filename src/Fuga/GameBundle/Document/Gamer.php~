@@ -32,6 +32,9 @@ class Gamer {
     private $bet = 0;
 	
 	/** @ODM\Int */
+    private $bank = 0;
+	
+	/** @ODM\Int */
     private $bet2 = 0;
 	
 	/** @ODM\Int */
@@ -648,4 +651,26 @@ class Gamer {
         return $this->bet2;
     }
 
+
+    /**
+     * Set updated
+     *
+     * @param int $updated
+     * @return self
+     */
+    public function setUpdated($updated)
+    {
+        $this->updated = $updated;
+        return $this;
+    }
+
+    /**
+     * Get updated
+     *
+     * @return int $updated
+     */
+    public function getUpdated()
+    {
+        return $this->updated;
+    }
 }

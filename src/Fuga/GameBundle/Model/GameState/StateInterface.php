@@ -13,7 +13,7 @@ interface StateInterface {
 	public function nextGame($gamer);
 	public function endRound($gamer);
 	public function endGame($gamer);
-	public function sync($gamer);
+	public function sync();
 	public function wait();
 	
 }

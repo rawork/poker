@@ -43,7 +43,4 @@ class JokerState extends AbstractState {
 		return $this->game->getStateNo();
 	}
 	
-	public function sync($gamer) {
-		$this->buyChips($gamer);
-	}
 }

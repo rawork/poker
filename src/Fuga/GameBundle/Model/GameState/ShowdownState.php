@@ -58,7 +58,7 @@ class ShowdownState extends AbstractState {
 				$doc->setWinner(false);
 				$query = '1=1';
 				if ($denied = $doc->getDenied()) {
-					$query = 'id NOT IN('.implode(',', $denied).')';
+					$query = 'id < 141 AND id NOT IN('.implode(',', $denied).')';
 				}
 				$questions = $this->game->container->getItems('game_poll', $query);
 				shuffle($questions);
@@ -104,10 +104,6 @@ class ShowdownState extends AbstractState {
 		}
 		
 		return $this->game->getStateNo();
-	}
-	
-	public function sync($gamer) {
-		$this->distributeWin($gamer);
 	}
 	
 }

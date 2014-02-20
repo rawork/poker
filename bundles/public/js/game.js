@@ -540,7 +540,9 @@ function updateRivals(rivals) {
 		if (rivals[i].cards !== undefined) {
 			$('.gamer-cards[data-bot-id='+i+']').html(rivals[i].cards);
 		}
-		if (rivals[i].active == 1) {
+		if (rivals[i].active == 1 && rivals[i].state == 3) {
+			$('.gamer-status[data-bot-id='+i+']').addClass('notready').html('Вне игры');
+		} else if (rivals[i].active == 1 && rivals[i].state == 1) {
 			$('.gamer-status[data-bot-id='+i+']').removeClass('notready').html('Активен');
 		} else {
 			$('.gamer-status[data-bot-id='+i+']').addClass('notready').html('Не активен');
