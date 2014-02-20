@@ -48,6 +48,7 @@ class RoundEndState extends AbstractState {
 						$doc->setTimes(0);
 					}
 					$doc->setBet(0);
+					$doc->setBank(0);
 					$doc->setAllin(false);
 					$doc->setWinner(false);
 					

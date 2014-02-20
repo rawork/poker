@@ -20,11 +20,6 @@ class FlopState extends AbstractState {
 			if ($gamer->getBet() > $this->game->getMaxbet()) {
 				$this->game->setMaxbet($gamer->getBet());
 			}
-			if ($gamer->getAllin()) {
-				if ($this->game->getBank2() == 0) {
-					$this->game->setBank2($this->game->getBank());
-				}
-			}
 			$gamers = $this->game->container->get('odm')
 					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
 					->findAndUpdate()

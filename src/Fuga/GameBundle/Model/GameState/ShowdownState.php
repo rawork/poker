@@ -107,6 +107,7 @@ class ShowdownState extends AbstractState {
 				}	
 				$doc->setBet(0);
 				$doc->setBet2(0);
+				$doc->setBank(0);
 				$doc->setMove('nomove');
 				$doc->setCards(array());
 				$doc->setRank('');
