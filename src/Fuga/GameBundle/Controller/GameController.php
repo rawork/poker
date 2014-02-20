@@ -48,7 +48,7 @@ class GameController extends PublicController {
 				throw new GameException('Вам не назначен зал для игры. Обратитесь к администратору');
 			}
 			
-			if (time() - strtotime($board['fromtime']) < - 7200) {
+			if (time() - strtotime($board['fromtime']) < -1800) {
 				throw new GameException('Игра еще не началась');
 			}
 			
