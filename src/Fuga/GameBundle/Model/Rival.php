@@ -30,6 +30,7 @@ class Rival {
 		$this->cards    = $rival->getCards();
 		$this->active   = $rival->getActive();
 		$this->state    = $rival->getState();
+		$this->times    = $rival->getTimes();
 	}
 	
 	public function isActive() {

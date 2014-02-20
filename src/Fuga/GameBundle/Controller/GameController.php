@@ -18,23 +18,16 @@ class GameController extends PublicController {
 	}
 	
 	public function indexAction() {
-		$now  = new \Datetime();
-		$date = new \DateTime('2014-02-17 00:00:01');
-		if ($date > $now) {
-			$this->get('router')->redirect('/victorina');
-		} else {
-			$this->get('router')->redirect('/game/game');
-		}
+		
+		$this->get('router')->redirect('/game/game');
 		
 	}
 	
 	public function gameAction() {
 		$user = $this->get('security')->getCurrentUser();
-		$now = new \DateTime();
-		$date = new \DateTime($this->getParam('access_date').' 00:00:01');
 		
 		try {
-			if ( $date > $now  ) {
+			if ( strtotime($this->getParam('access_date').' 00:00:01') > time()  ) {
 				if (!$user || !$this->get('security')->isGroup('admin')) {
 					throw new GameException('Игровой зал открыт<br> только в период 
 						проведения игры.<br> Расписание игр 
@@ -55,8 +48,7 @@ class GameController extends PublicController {
 				throw new GameException('Вам не назначен зал для игры. Обратитесь к администратору');
 			}
 			
-			$fromtime = new \DateTime($board['fromtime']);
-			if ($now->getTimestamp() - $fromtime->getTimestamp() < - 7200) {
+			if (time() - strtotime($board['fromtime']) < - 7200) {
 				throw new GameException('Игра еще не началась');
 			}
 			
@@ -548,7 +540,7 @@ class GameController extends PublicController {
 		
 		try {
 			$gamer = new RealGamer($user['id'], $this->get('container'));
-			$gamer->setUpdated(new \DateTime());
+			$gamer->setUpdated(time());
 			$gamer->save();
 			$game = new Game($gamer->getBoard(), $this->get('container'));
 			$rivalsdoc = $this->get('odm')
@@ -718,8 +710,8 @@ class GameController extends PublicController {
 			$game = new Board();
 			$game->setBoard($board['id']);
 			$game->setName($board['name']);
-			$game->setUpdated(new \DateTime());
-			$game->setFromtime(new \DateTime($board['fromtime']));
+			$game->setUpdated(time());
+			$game->setFromtime(strtotime($board['fromtime']));
 			$this->get('odm')->persist($game);
 		}
 		
@@ -739,7 +731,7 @@ class GameController extends PublicController {
 			$gamer->setLastname($gamerData['lastname']);
 			$gamer->setSeat($gamerData['seat']);
 			$gamer->setChips($gamerData['chips']);
-			$gamer->setUpdated(new \DateTime());
+			$gamer->setUpdated(time());
 			$gamer->setAvatar(isset($gamerData['avatar_value']['extra']) 
 				? $gamerData['avatar_value']['extra']['main']['path'] 
 				: '/bundles/public/img/avatar_empty.png');
@@ -753,6 +745,10 @@ class GameController extends PublicController {
 	}
 	
 	public function syncAction() {
+		if (isset($_SERVER['REQUEST_URI'])) {
+			$this->get('router')->redirect('/');
+		}
+		
 		$this->get('log')->write('CRON_START');
 		$boards = $this->get('odm')
 				->getRepository('\Fuga\GameBundle\Document\Board')
@@ -771,44 +767,26 @@ class GameController extends PublicController {
 								->field('board')->equals($game->getId())
 								->field('seat')->equals($board->getMover())
 								->getQuery()->getSingleResult();
+						if (!$gamerdoc) {
+							throw new \Exception('no gamer to sync timer');
+						}	
 						$gamer = new RealGamer($gamerdoc->getUser(), $this->get('container'));
 						$game->sync($gamer);
 					} catch (\Exception $e) {
-
+						$this->get('log')->write('CRON_ERROR:'.$e->getMessage());
 					}	
 				}
 				
 			}
 		}
 		
-		$checkTime = new \DateTime();
-		$checkTime->setTimestamp(time() - 30);
-		$gamers = $this->get('odm')
+		$this->get('odm')
 				->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
-				->field('state')->equals(1)
+				->findAndUpdate()
+				->field('updated')->lt(time() - 30)
+				->field('timer')->set(array())
 				->getQuery()->execute();
-		foreach ($gamers as $doc) {
-			if ($doc->getUpdated() < $checkTime ) {
-				$doc->setState(0);
-			}	
-		}
-		$this->get('odm')->flush();
 		
-//		for ($i = 0; $i < 2; $i++) {
-//			sleep(16);
-//			$checkTime = new \DateTime();
-//			$checkTime->setTimestamp(time() - 20);
-//			$gamers = $this->get('odm')
-//					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
-//					->field('state')->equals(1)
-//					->getQuery()->execute();
-//			foreach ($gamers as $doc) {
-//				if ($doc->getUpdated() < $checkTime ) {
-//					$doc->setState(0);
-//				}	
-//			}
-//			$this->get('odm')->flush();
-//		}
 	}
 
 }

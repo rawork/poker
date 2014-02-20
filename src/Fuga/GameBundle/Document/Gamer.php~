@@ -85,7 +85,7 @@ class Gamer {
 	/** @ODM\Collection */
 	private $timer = array();
 	
-	/** @ODM\Date */
+	/** @ODM\Int */
     private $updated;
 	
     /**
@@ -627,24 +627,25 @@ class Gamer {
     }
 
     /**
-     * Set updated
+     * Set bet2
      *
-     * @param date $updated
+     * @param int $bet2
      * @return self
      */
-    public function setUpdated($updated)
+    public function setBet2($bet2)
     {
-        $this->updated = $updated;
+        $this->bet2 = $bet2;
         return $this;
     }
 
     /**
-     * Get updated
+     * Get bet2
      *
-     * @return date $updated
+     * @return int $bet2
      */
-    public function getUpdated()
+    public function getBet2()
     {
-        return $this->updated;
+        return $this->bet2;
     }
+
 }

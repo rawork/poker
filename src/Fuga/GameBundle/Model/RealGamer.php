@@ -24,7 +24,8 @@ class RealGamer {
 	
 	private $timers     = array(
 		'answer'     => array('handler' => 'onNoAnswer', 'holder' => 'answer-timer', 'time' => 14),
-		'bet'        => array('handler' => 'onFold', 'holder' => 'game-timer', 'time' => 601),
+		'bet'        => array('handler' => 'onFold', 'holder' => 'game-timer', 'time' => 31),
+		'change'     => array('handler' => 'onClickNoChange', 'holder' => 'change-timer', 'time' => 31),
 	);
 	
 	public function __construct($userId, Container $container) {
@@ -348,6 +349,10 @@ class RealGamer {
 		if ($this->checkActive()) {
 			$this->checkCombination();
 		}
+		if ($this->doc->getTimes() > 0) {
+			$this->setTimer('change');
+			$this->startTimer();
+		}
 		$this->save();
 		
 		return $this->doc->getTimes();
@@ -405,11 +410,9 @@ class RealGamer {
 	public function startTimer() {
 		$timer = array_shift($this->doc->getTimer());
 		if (is_array($timer) && isset($timer['handler'])) {
-			$date = new \DateTime();
-			$date->setTimestamp($timer['time']);
 			setcookie('timerholder', $timer['holder'], time()+$this->cookietime, '/');
 			setcookie('timerhandler', $timer['handler'], time()+$this->cookietime, '/');
-			setcookie('timerstop',  $date->format('c'), time()+$this->cookietime, '/');
+			setcookie('timerstop',  $timer['time'], time()+$this->cookietime, '/');
 		}
 		
 		return $this;

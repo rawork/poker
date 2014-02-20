@@ -20,7 +20,7 @@
 			{if $rival->isHere()}
 			<div class="gamer-status" data-bot-id="{$rival->id}">Активен</div>
 			{else}
-			<div class="gamer-status notready" data-bot-id="{$rival->id}">Не активен</div>
+			<div class="gamer-status notready" data-bot-id="{$rival->id}">{if $rival->state == 3}Вне игры{else}Не активен{/if}</div>
 			{/if}
 			<div class="gamer-name">{$rival->name}<br>{$rival->lastname}</div>
 		</div>

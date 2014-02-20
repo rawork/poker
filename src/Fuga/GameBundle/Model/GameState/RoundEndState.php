@@ -47,9 +47,11 @@ class RoundEndState extends AbstractState {
 					$doc->setTimes(2);
 					$doc->setQuestion(array());
 					$doc->setBuy(array());
-					$this->game->container->get('log')->write('ROUNDS'.$this->game->getRound());
-					$this->game->container->get('log')->write('UPDATED'.serialize($doc->getUpdated()));
-					$this->game->container->get('log')->write('FROMTIME'.serialize($this->game->getFromtime()));
+					$doc->setTimer(array(array(
+						'handler' => 'onClickNoChange', 
+						'holder' => 'change-timer', 
+						'time' => time() +31
+					)));
 					if ($this->game->getRound() >= 3 
 						&& $doc->getUpdated() < $this->game->getFromtime()) {
 						$this->game->acceptBet($doc->getChips());

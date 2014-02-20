@@ -36,6 +36,7 @@ class BuyState extends AbstractState {
 				$this->game->startTimer();
 				$this->game->setState(self::STATE_ROUND_END);
 			}
+			$this->game->setUpdated(time());
 			$this->game->save();
 			
 		} catch (\Exception $e) {

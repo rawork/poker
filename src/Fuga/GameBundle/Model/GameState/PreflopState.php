@@ -96,7 +96,8 @@ class PreflopState extends AbstractState {
 					$this->game->setTimer('bet');
 				}
 			}
-
+			
+			$this->game->setUpdated(time());
 			$this->game->save();
 			$this->game->unlock($gamer->getId());
 		} catch (\Exception $e) {

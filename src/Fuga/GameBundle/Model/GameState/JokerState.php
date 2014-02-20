@@ -16,8 +16,7 @@ class JokerState extends AbstractState {
 		if (!$this->game->lock($gamer->getId())) {
 			return $this->game->getStateNo();
 		}
-			$now = new \Datetime();
-			if ($now > $this->game->stopbuytime) {
+			if (time() > $this->game->stopbuytime) {
 				if (!$this->game->existsGamers()) {
 					$this->game->removeTimer();
 					$this->game->stopTime();
@@ -32,6 +31,8 @@ class JokerState extends AbstractState {
 				$this->game->startTimer();
 				$this->game->setState(AbstractState::STATE_BUY);
 			}
+			
+			$this->game->setUpdated(time());
 			$this->game->save();
 			
 			$this->game->unlock($gamer->getId());

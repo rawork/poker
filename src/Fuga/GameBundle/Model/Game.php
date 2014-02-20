@@ -31,18 +31,17 @@ class Game implements GameInterface {
 	
 	private $cookietime = 7776000;
 	private $upTimer    = 780;
-	private $repo = '\Fuga\GameBundle\Document\Board';
+	private $repo       = '\Fuga\GameBundle\Document\Board';
 	
 	private $timers     = array(
 		'begin'      => array('handler' => 'onStart', 'holder' => 'begin-timer', 'time' => 0),
-		'change'     => false, // array('handler' => 'onClickNoChange', 'holder' => 'change-timer', 'time' => 14)
+		'change'     => array('handler' => 'onClickNoChange', 'holder' => 'change-timer', 'time' => 31),
 		'distribute' => array('handler' => 'onDistribute', 'holder' => 'game-timer', 'time' => 31),
-		'prebuy'     => array('handler' => 'onShowBuy', 'holder' => 'joker-timer', 'time' => 14),
-		'next'		 => array('handler' => 'onNext', 'holder' => 'round-end-timer', 'time' => 31),
+		'prebuy'     => array('handler' => 'onShowBuy', 'holder' => 'joker-timer', 'time' => 6),
+		'next'		 => array('handler' => 'onNext', 'holder' => 'round-end-timer', 'time' => 14),
 		'nonactive'  => array('handler' => 'onNext', 'holder' => 'wait-timer', 'time' => 61),
-		'bet'        => array('handler' => 'onFold', 'holder' => 'game-timer', 'time' => 61),
+		'bet'        => array('handler' => 'onFold', 'holder' => 'game-timer', 'time' => 31),
 		'buy'        => array('handler' => 'onEndRound', 'holder' => 'buy-timer', 'time' => 121),
-		
 		'answer'     => array('handler' => 'onNoAnswer', 'holder' => 'answer-timer', 'time' => 14),
 		
 	);
@@ -58,16 +57,15 @@ class Game implements GameInterface {
 			throw new GameException('Не создан зал для игры. Обратитесь к администратору.');
 		}
 		
-		$this->doc->setFromtime(new \DateTime($board['fromtime']));
+		$this->doc->setFromtime(strtotime($board['fromtime']));
 		$this->save();
 		
-		if ($this->doc->getFromtime() > new \DateTime()) {
+		if ($this->doc->getFromtime() > time()) {
 			$this->setTimer('begin');
 			$this->startTimer();
 		}
 		
-		$this->stopbuytime = clone $this->doc->getFromtime();
-		$this->stopbuytime->add(new \DateInterval('PT35M'));
+		$this->stopbuytime = $this->doc->getFromtime() + 35*60;
 		$this->setState($this->doc->getState());
 		$this->syncTime();
 		$this->setMinbet();
@@ -95,6 +93,10 @@ class Game implements GameInterface {
 	
 	public function setMover($value) {
 		$this->doc->setMover($value);
+	}
+	
+	public function setUpdated($value) {
+		$this->doc->setUpdated($value);
 	}
 
 	public function newDeck(){
@@ -193,9 +195,8 @@ class Game implements GameInterface {
 	}
 	
 	public function setMinbet() {
-		$now = new \DateTime();
-		if ($now > $this->doc->getFromtime()) {
-			$seconds = $now->getTimestamp() - $this->doc->getFromtime()->getTimestamp();
+		if (time() > $this->doc->getFromtime()) {
+			$seconds = time() - $this->doc->getFromtime();
 			$this->minbet = ($seconds - $seconds % $this->upTimer) / $this->upTimer + 1;
 		} else {
 			$this->minbet = 1;
@@ -227,18 +228,19 @@ class Game implements GameInterface {
 	}
 	
 	public function syncTime() {
-		$now = new \DateTime();
-		if (!$this->doc->getEndtime() && $now > $this->doc->getFromtime() ) {
-			setcookie('gamefromtime', $this->doc->getFromtime()->format('c'), time()+$this->cookietime, '/');
-			setcookie('gamestopbuytime', $this->stopbuytime->format('c'), time()+$this->cookietime, '/');
+		if (!$this->doc->getEndtime() && time() > $this->doc->getFromtime() ) {
+			setcookie('gamefromtime', $this->doc->getFromtime(), time()+$this->cookietime, '/');
+			setcookie('gameboardid', $this->doc->getBoard(), time()+$this->cookietime, '/');
+			setcookie('gamestopbuytime', $this->stopbuytime, time()+$this->cookietime, '/');
 		} else {
 			setcookie('gamefromtime', null, time()+$this->cookietime, '/');
+			setcookie('gameboardid', null, time()+$this->cookietime, '/');
 			setcookie('gamestopbuytime', null, time()+$this->cookietime, '/');
 		}
 	}
 	
 	public function stopTime() {
-		$this->doc->setEndtime(new \DateTime());
+		$this->doc->setEndtime(time());
 		setcookie('gamefromtime', null, time()+$this->cookietime, '/');
 		setcookie('gamestopbuytime', null, time()+$this->cookietime, '/');
 	}
@@ -247,7 +249,7 @@ class Game implements GameInterface {
 		if (array_key_exists($name, $this->timers) && $this->timers[$name]) {
 			$timer = $this->timers[$name];
 			if ('begin' == $name) {
-				$timer['time'] = $this->doc->getFromtime()->getTimestamp();
+				$timer['time'] = $this->doc->getFromtime();
 			} else {
 				$timer['time'] = time() + $this->timers[$name]['time'];
 			}
@@ -259,11 +261,9 @@ class Game implements GameInterface {
 	public function startTimer() {
 		$timer = array_shift($this->doc->getTimer());
 		if (is_array($timer) && isset($timer['handler'])) {
-			$date = new \DateTime();
-			$date->setTimestamp($timer['time']);
 			setcookie('timerholder', $timer['holder'], time()+$this->cookietime, '/');
 			setcookie('timerhandler', $timer['handler'], time()+$this->cookietime, '/');
-			setcookie('timerstop',  $date->format('c'), time()+$this->cookietime, '/');
+			setcookie('timerstop',  $timer['time'], time()+$this->cookietime, '/');
 		}
 		
 		return $this;
@@ -327,7 +327,7 @@ class Game implements GameInterface {
 	}
 	
 	public function isStarted() {
-		return time() >= $this->doc->getFromtime()->getTimestamp();
+		return time() >= $this->doc->getFromtime();
 	}
 	
 	public function numOfGamers() {
@@ -384,6 +384,7 @@ class Game implements GameInterface {
 				->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
 				->field('board')->equals($this->getId())
 				->field('active')->equals(true)
+				->field('state')->gt(0)
 				->field('seat')->gt($this->doc->getDealer())
 				->sort('seat')
 				->getQuery()
@@ -393,6 +394,7 @@ class Game implements GameInterface {
 				->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
 				->field('board')->equals($this->getId())
 				->field('active')->equals(true)
+				->field('state')->gt(0)
 				->field('seat')->gt(0)
 				->sort('seat')
 				->getQuery()
@@ -412,7 +414,7 @@ class Game implements GameInterface {
 				->field('active')->equals(true)
 				->field('fold')->equals(false)
 				->field('allin')->equals(false)
-				->field('state')->equals(1)
+				->field('state')->gt(0)
 				->field('seat')->gt($this->doc->getMover())
 				->sort('seat')
 				->getQuery()
@@ -424,7 +426,7 @@ class Game implements GameInterface {
 				->field('active')->equals(true)
 				->field('fold')->equals(false)
 				->field('allin')->equals(false)
-				->field('state')->equals(1)
+				->field('state')->gt(0)
 				->field('seat')->gt(0)
 				->sort('seat')
 				->getQuery()
@@ -537,7 +539,6 @@ class Game implements GameInterface {
 		
 		$this->acceptBet($bet);
 		setcookie('gamemaxbet', $this->doc->getMaxbet(), time() + $this->cookietime, '/');
-		
 		$this->state->makeMove($gamer);
 	}
 	
@@ -592,6 +593,9 @@ class Game implements GameInterface {
 	}
 	
 	public function nochange(RealGamer $gamer) {
+		$gamer->removeTimer();
+		$gamer->setUpdated(time());
+		$gamer->save();
 		$this->state->changeCards($gamer);
 	}
 	

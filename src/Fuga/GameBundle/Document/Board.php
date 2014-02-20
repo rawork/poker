@@ -58,13 +58,13 @@ class Board
 	/** @ODM\Int */
 	private $gamer = 0;
 
-    /** @ODM\Date */
+    /** @ODM\Int */
     private $fromtime;
 
-    /** @ODM\Date */
+    /** @ODM\Int */
     private $endtime;
 	
-	/** @ODM\Date */
+	/** @ODM\Int */
     private $updated;
 	
 	/** @ODM\Collection */
@@ -396,50 +396,6 @@ class Board
     }
 
     /**
-     * Set fromtime
-     *
-     * @param date $fromtime
-     * @return self
-     */
-    public function setFromtime($fromtime)
-    {
-        $this->fromtime = $fromtime;
-        return $this;
-    }
-
-    /**
-     * Get fromtime
-     *
-     * @return date $fromtime
-     */
-    public function getFromtime()
-    {
-        return $this->fromtime;
-    }
-
-    /**
-     * Set endtime
-     *
-     * @param date $endtime
-     * @return self
-     */
-    public function setEndtime($endtime)
-    {
-        $this->endtime = $endtime;
-        return $this;
-    }
-
-    /**
-     * Get endtime
-     *
-     * @return date $endtime
-     */
-    public function getEndtime()
-    {
-        return $this->endtime;
-    }
-
-    /**
      * Set cards
      *
      * @param collection $cards
@@ -528,28 +484,6 @@ class Board
     }
 
     /**
-     * Set updated
-     *
-     * @param date $updated
-     * @return self
-     */
-    public function setUpdated($updated)
-    {
-        $this->updated = $updated;
-        return $this;
-    }
-
-    /**
-     * Get updated
-     *
-     * @return date $updated
-     */
-    public function getUpdated()
-    {
-        return $this->updated;
-    }
-
-    /**
      * Set allin
      *
      * @param int $allin
@@ -569,5 +503,72 @@ class Board
     public function getAllin()
     {
         return $this->allin;
+    }
+
+
+    /**
+     * Set fromtime
+     *
+     * @param int $fromtime
+     * @return self
+     */
+    public function setFromtime($fromtime)
+    {
+        $this->fromtime = $fromtime;
+        return $this;
+    }
+
+    /**
+     * Get fromtime
+     *
+     * @return int $fromtime
+     */
+    public function getFromtime()
+    {
+        return $this->fromtime;
+    }
+
+    /**
+     * Set endtime
+     *
+     * @param int $endtime
+     * @return self
+     */
+    public function setEndtime($endtime)
+    {
+        $this->endtime = $endtime;
+        return $this;
+    }
+
+    /**
+     * Get endtime
+     *
+     * @return int $endtime
+     */
+    public function getEndtime()
+    {
+        return $this->endtime;
+    }
+
+    /**
+     * Set updated
+     *
+     * @param int $updated
+     * @return self
+     */
+    public function setUpdated($updated)
+    {
+        $this->updated = $updated;
+        return $this;
+    }
+
+    /**
+     * Get updated
+     *
+     * @return int $updated
+     */
+    public function getUpdated()
+    {
+        return $this->updated;
     }
 }

@@ -26,6 +26,11 @@ class BeginState extends AbstractState {
 				if ($doc->getState() == 1) {
 					$doc->setCards($this->game->getCards(4));
 					$doc->setMove('nomove');
+					$doc->setTimer(array(array(
+						'handler' => 'onClickNoChange', 
+						'holder' => 'change-timer', 
+						'time' => time() +31
+					)));
 				} else {
 					$doc->setFold(true);
 					$doc->setTimes(0);
@@ -34,9 +39,9 @@ class BeginState extends AbstractState {
 			$this->game->setFlop($this->game->getCards(3));
 			$this->game->nextDealer();
 			$this->game->nextMover();
-			$this->game->setTimer('change');
 			$this->game->setState(AbstractState::STATE_CHANGE);
 			$this->game->syncTime();
+			$this->game->setUpdated(time());
 			$this->game->save();
 			$this->game->unlock($gamer->getId());
 		}

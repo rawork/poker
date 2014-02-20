@@ -228,13 +228,14 @@ class Combination {
 						break;
 					}
 					if ($i == count($weights)-1 || $jokerWeight > $weights[$i+1]) {
-						if (!isset($weights[$i+1]) || $weights[$i+1] - $jokerWeight != $delta) {
-							continue;
-						}
+						
 						if ($i == count($weights)-1) {
 							$temp = $weights; 
 							$temp[] = $jokerWeight;
 						} else {
+							if (!isset($weights[$i+1]) || $weights[$i+1] >= $jokerWeight) {
+								continue;
+							}
 							$temp = array_merge(
 									array_slice($weights, 0, $i+1), 
 									array($jokerWeight), 

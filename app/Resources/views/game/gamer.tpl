@@ -26,8 +26,8 @@
 		<input type="text" id="input_bet" value="{$game->minbet}">
 		<button disabled="true" class="btn btn-warning" data-action="allin">Ва-банк</button>
 		&nbsp;&nbsp;&nbsp;&nbsp;
-		<button disabled="true" class="btn btn-success" data-action="bet">&nbsp;</button>
-		<button disabled="true" class="btn btn-primary" data-action="check">&nbsp;</button>
+		<button disabled="true" class="btn btn-success" data-action="bet">Ставка</button>
+		<button disabled="true" class="btn btn-primary" data-action="check">Чек</button>
 		<button disabled="true"class="btn btn-danger" data-action="fold">Пас</button>
 		&nbsp;&nbsp;&nbsp;&nbsp;
 		<button disabled="true" class="btn btn-primary btn-buy" data-action="buy">Покупка фишек</button>
