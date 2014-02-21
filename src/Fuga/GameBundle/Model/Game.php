@@ -431,6 +431,7 @@ class Game implements GameInterface {
 			return $this->wait();
 		}
 		$this->doc->setMover($gamer->getSeat());
+		setcookie('gamemover', $this->doc->getMover(), time() + $this->cookietime, '/');
 		
 		return $gamer;
 	}
