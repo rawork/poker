@@ -40,7 +40,7 @@ class Scheduler
 				try {
 					$this->processTask($name);
 				} catch (\Exception $e) {
-					$this->container->get('log')->write($e->getMessage());
+					$this->container->get('log')->addError($e->getMessage());
 				}
 			}
 		}

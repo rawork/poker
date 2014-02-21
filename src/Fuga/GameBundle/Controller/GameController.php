@@ -37,27 +37,34 @@ class GameController extends PublicController {
 				throw new GameException($this->call('Fuga:Public:Account:login'));
 			}
 
-			$gamer0 = $this->get('container')->getItem('account_member', 'user_id='.$user['id']);
-			if (!$gamer0 || 
+			$gamerdoc = $this->get('odm')
+					->getRepository('\Fuga\GameBundle\Document\Gamer')
+					->findOneByUser(intval($user['id']));
+			
+			if (!$gamerdoc || 
 				(!$this->get('security')->isGroup('admin') && !$this->get('security')->isGroup('gamer'))) {
 				throw new GameException('Вы не являетесь игроком. Для участия в игре войдите на сайт с логином и паролем игрока<br>'.$this->call('Fuga:Public:Account:login'));
 			}
 
-			$board = $this->get('container')->getItem('game_board', $gamer0['board_id']);
-			if (!$board) {
+			$gamedoc = $this->get('odm')
+					->getRepository('\Fuga\GameBundle\Document\Board')
+					->findOneByBoard($gamerdoc->getBoard());
+			
+			if (!$gamedoc) {
 				throw new GameException('Вам не назначен зал для игры. Обратитесь к администратору');
 			}
 			
-			if (time() - strtotime($board['fromtime']) < -1800) {
+			if (time() - $gamedoc->getFromtime() < -1800) {
 				throw new GameException('Игра еще не началась');
 			}
 			
-			$game = new Game($board['id'], $this->get('container'));
-			$gamer = new RealGamer($user['id'], $this->get('container'));
+			$game = new Game($gamedoc, $this->get('container'));
+			$gamer = new RealGamer($gamerdoc, $this->get('container'));
 			
 			if ($game->isState(Game::STATE_BEGIN)) {
 				$game->start($gamer);
 			}
+			
 			$rivalsdoc = $this->get('odm')
 					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
 					->field('board')->equals($game->getId())
@@ -65,6 +72,7 @@ class GameController extends PublicController {
 					->getQuery()->execute();
 			$rivals = array();
 			$numOfGamers = count($rivalsdoc) + 1;
+			
 			foreach ($rivalsdoc as $rivaldoc) {
 				$rivals[] = new Rival($rivaldoc, $gamer->getRivalPosition($rivaldoc->getSeat(), $numOfGamers));
 			}
@@ -111,14 +119,21 @@ class GameController extends PublicController {
 		}
 		
 		try {
+			$gamerdoc = $this->get('odm')
+					->getRepository('\Fuga\GameBundle\Document\Gamer')
+					->findOneByUser(intval($user['id']));
+			
+			$gamedoc = $this->get('odm')
+					->getRepository('\Fuga\GameBundle\Document\Board')
+					->findOneByBoard($gamerdoc->getBoard());
+			
 			$answerNo = $this->get('util')->post('answer', true, 0);
-			$gamer = new RealGamer($user['id'], $this->get('container'));
-			$game = new Game($gamer->getBoard(), $this->get('container'));
+			$gamer = new RealGamer($gamerdoc, $this->get('container'));
+			$game = new Game($gamedoc, $this->get('container'));
 			$gamer->answerQuestion($answerNo, $game);
 			$game->change($gamer);
 		} catch (GameException $e) {
-			$this->get('log')->write($e->getMessage());
-			$this->get('log')->write($e->getTraceAsString());
+			$this->get('log')->addError($e->getMessage());
 		}
 		
 		return json_encode(array(
@@ -144,13 +159,19 @@ class GameController extends PublicController {
 		}
 		
 		try {
+			$gamerdoc = $this->get('odm')
+					->getRepository('\Fuga\GameBundle\Document\Gamer')
+					->findOneByUser(intval($user['id']));
+			
+			$gamedoc = $this->get('odm')
+					->getRepository('\Fuga\GameBundle\Document\Board')
+					->findOneByBoard($gamerdoc->getBoard());
 			$card = $this->get('util')->post('card_no', true, 0);
-			$gamer = new RealGamer($user['id'], $this->get('container'));
-			$game = new Game($gamer->getBoard(), $this->get('container'));
+			$gamer = new RealGamer($gamerdoc, $this->get('container'));
+			$game = new Game($gamedoc, $this->get('container'));
 			$gamer->changeCard($card);
 		} catch (GameException $e) {
-			$this->get('log')->write($e->getMessage());
-			$this->get('log')->write($e->getTraceAsString());
+			$this->get('log')->addError($e->getMessage());
 		}
 		
 		return json_encode(array(
@@ -172,14 +193,20 @@ class GameController extends PublicController {
 		}
 		
 		try {
-			$gamer = new RealGamer($user['id'], $this->get('container'));
-			$game = new Game($gamer->getBoard(), $this->get('container'));
+			$gamerdoc = $this->get('odm')
+					->getRepository('\Fuga\GameBundle\Document\Gamer')
+					->findOneByUser(intval($user['id']));
+			
+			$gamedoc = $this->get('odm')
+					->getRepository('\Fuga\GameBundle\Document\Board')
+					->findOneByBoard($gamerdoc->getBoard());
+			$gamer = new RealGamer($gamerdoc, $this->get('container'));
+			$game = new Game($gamedoc, $this->get('container'));
 			
 			$gamer->nochangeCard();
 			$game->nochange($gamer);
 		} catch (GameException $e) {
-			$this->get('log')->write($e->getMessage());
-			$this->get('log')->write($e->getTraceAsString());
+			$this->get('log')->addError($e->getMessage());
 		}
 		
 		return json_encode(array(
@@ -202,12 +229,18 @@ class GameController extends PublicController {
 		}
 		
 		try {
-			$gamer = new RealGamer($user['id'], $this->get('container'));
-			$game = new Game($gamer->getBoard(), $this->get('container'));
+			$gamerdoc = $this->get('odm')
+					->getRepository('\Fuga\GameBundle\Document\Gamer')
+					->findOneByUser(intval($user['id']));
+			
+			$gamedoc = $this->get('odm')
+					->getRepository('\Fuga\GameBundle\Document\Board')
+					->findOneByBoard($gamerdoc->getBoard());
+			$gamer = new RealGamer($gamerdoc, $this->get('container'));
+			$game = new Game($gamedoc, $this->get('container'));
 			$game->fold($gamer);
 		} catch (GameException $e) {
-			$this->get('log')->write($e->getMessage());
-			$this->get('log')->write($e->getTraceAsString());
+			$this->get('log')->addError($e->getMessage());
 			return json_encode(array('ok' => false));
 		}
 		
@@ -232,13 +265,19 @@ class GameController extends PublicController {
 		}
 		
 		try {
+			$gamerdoc = $this->get('odm')
+					->getRepository('\Fuga\GameBundle\Document\Gamer')
+					->findOneByUser(intval($user['id']));
+			
+			$gamedoc = $this->get('odm')
+					->getRepository('\Fuga\GameBundle\Document\Board')
+					->findOneByBoard($gamerdoc->getBoard());
 			$chips = $this->get('util')->post('chips', true, 0);
-			$gamer = new RealGamer($user['id'], $this->get('container'));
-			$game = new Game($gamer->getBoard(), $this->get('container'));
+			$gamer = new RealGamer($gamerdoc, $this->get('container'));
+			$game = new Game($gamedoc, $this->get('container'));
 			$game->bet($gamer, $chips);
 		} catch (GameException $e) {
-			$this->get('log')->write($e->getMessage());
-			$this->get('log')->write($e->getTraceAsString());
+			$this->get('log')->addError($e->getMessage());
 			return json_encode(array('ok' => false));
 		}
 		
@@ -269,12 +308,18 @@ class GameController extends PublicController {
 		}
 		
 		try {
-			$gamer = new RealGamer($user['id'], $this->get('container'));
-			$game = new Game($gamer->getBoard(), $this->get('container'));
+			$gamerdoc = $this->get('odm')
+					->getRepository('\Fuga\GameBundle\Document\Gamer')
+					->findOneByUser(intval($user['id']));
+			
+			$gamedoc = $this->get('odm')
+					->getRepository('\Fuga\GameBundle\Document\Board')
+					->findOneByBoard($gamerdoc->getBoard());
+			$gamer = new RealGamer($gamerdoc, $this->get('container'));
+			$game = new Game($gamedoc, $this->get('container'));
 			$game->check($gamer);
 		} catch (GameException $e) {
-			$this->get('log')->write($e->getMessage());
-			$this->get('log')->write($e->getTraceAsString());
+			$this->get('log')->addError($e->getMessage());
 			return json_encode(array('ok' => false));
 		}
 		
@@ -305,8 +350,15 @@ class GameController extends PublicController {
 		}
 		
 		try {
-			$gamer = new RealGamer($user['id'], $this->get('container'));
-			$game = new Game($gamer->getBoard(), $this->get('container'));
+			$gamerdoc = $this->get('odm')
+					->getRepository('\Fuga\GameBundle\Document\Gamer')
+					->findOneByUser(intval($user['id']));
+			
+			$gamedoc = $this->get('odm')
+					->getRepository('\Fuga\GameBundle\Document\Board')
+					->findOneByBoard($gamerdoc->getBoard());
+			$gamer = new RealGamer($gamerdoc, $this->get('container'));
+			$game = new Game($gamedoc, $this->get('container'));
 			$game->distribute($gamer);
 			$rivalsdoc = $this->get('odm')
 					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
@@ -319,8 +371,7 @@ class GameController extends PublicController {
 				$rivals[] = new Rival($rivaldoc, $gamer->getRivalPosition($rivaldoc->getSeat(), $numOfGamers));
 			}
 		} catch (GameException $e) {
-			$this->get('log')->write($e->getMessage());
-			$this->get('log')->write($e->getTraceAsString());
+			$this->get('log')->addError($e->getMessage());
 			return json_encode(array('ok' => false));
 		}
 		
@@ -363,12 +414,18 @@ class GameController extends PublicController {
 		}
 		
 		try {
-			$gamer = new RealGamer($user['id'], $this->get('container'));
-			$game = new Game($gamer->getBoard(), $this->get('container'));
+			$gamerdoc = $this->get('odm')
+					->getRepository('\Fuga\GameBundle\Document\Gamer')
+					->findOneByUser(intval($user['id']));
+			
+			$gamedoc = $this->get('odm')
+					->getRepository('\Fuga\GameBundle\Document\Board')
+					->findOneByBoard($gamerdoc->getBoard());
+			$gamer = new RealGamer($gamerdoc, $this->get('container'));
+			$game = new Game($gamedoc, $this->get('container'));
 			$game->endround($gamer);
 		} catch (GameException $e) {
-			$this->get('log')->write($e->getMessage());
-			$this->get('log')->write($e->getTraceAsString());
+			$this->get('log')->addError($e->getMessage());
 			return json_encode(array('ok' => false));
 		}
 		
@@ -392,8 +449,15 @@ class GameController extends PublicController {
 		}
 		
 		try {
-			$gamer = new RealGamer($user['id'], $this->get('container'));
-			$game = new Game($gamer->getBoard(), $this->get('container'));
+			$gamerdoc = $this->get('odm')
+					->getRepository('\Fuga\GameBundle\Document\Gamer')
+					->findOneByUser(intval($user['id']));
+			
+			$gamedoc = $this->get('odm')
+					->getRepository('\Fuga\GameBundle\Document\Board')
+					->findOneByBoard($gamerdoc->getBoard());
+			$gamer = new RealGamer($gamerdoc, $this->get('container'));
+			$game = new Game($gamedoc, $this->get('container'));
 			$game->next($gamer);
 			$rivalsdoc = $this->get('odm')
 					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
@@ -410,8 +474,7 @@ class GameController extends PublicController {
 			}
 			$gamer->startTimer();
 		} catch (GameException $e) {
-			$this->get('log')->write($e->getMessage());
-			$this->get('log')->write($e->getTraceAsString());
+			$this->get('log')->addError($e->getMessage());
 			return json_encode(array('ok' => false));
 		}
 		
@@ -452,12 +515,18 @@ class GameController extends PublicController {
 		}
 		
 		try {
-			$gamer = new RealGamer($user['id'], $this->get('container'));
-			$game = new Game($gamer->getBoard(), $this->get('container'));
+			$gamerdoc = $this->get('odm')
+					->getRepository('\Fuga\GameBundle\Document\Gamer')
+					->findOneByUser(intval($user['id']));
+			
+			$gamedoc = $this->get('odm')
+					->getRepository('\Fuga\GameBundle\Document\Board')
+					->findOneByBoard($gamerdoc->getBoard());
+			$gamer = new RealGamer($gamerdoc, $this->get('container'));
+			$game = new Game($gamedoc, $this->get('container'));
 			$game->prebuy($gamer);
 		} catch (GameException $e) {
-			$this->get('log')->write($e->getMessage());
-			$this->get('log')->write($e->getTraceAsString());
+			$this->get('log')->addError($e->getMessage());
 			return json_encode(array('ok' => false));
 		}
 		
@@ -481,12 +550,18 @@ class GameController extends PublicController {
 		}
 		
 		try {
-			$gamer = new RealGamer($user['id'], $this->get('container'));
-			$game = new Game($gamer->getBoard(), $this->get('container'));
+			$gamerdoc = $this->get('odm')
+					->getRepository('\Fuga\GameBundle\Document\Gamer')
+					->findOneByUser(intval($user['id']));
+			
+			$gamedoc = $this->get('odm')
+					->getRepository('\Fuga\GameBundle\Document\Board')
+					->findOneByBoard($gamerdoc->getBoard());
+			$gamer = new RealGamer($gamerdoc, $this->get('container'));
+			$game = new Game($gamedoc, $this->get('container'));
 			$gamer->buyChips();
 		} catch (GameException $e) {
-			$this->get('log')->write($e->getMessage());
-			$this->get('log')->write($e->getTraceAsString());
+			$this->get('log')->addError($e->getMessage());
 			return json_encode(array('ok' => false));
 		}
 		
@@ -509,13 +584,19 @@ class GameController extends PublicController {
 		}
 		
 		try {
+			$gamerdoc = $this->get('odm')
+					->getRepository('\Fuga\GameBundle\Document\Gamer')
+					->findOneByUser(intval($user['id']));
+			
+			$gamedoc = $this->get('odm')
+					->getRepository('\Fuga\GameBundle\Document\Board')
+					->findOneByBoard($gamerdoc->getBoard());
 			$answer = $this->get('util')->post('answer', true, 0);
-			$gamer = new RealGamer($user['id'], $this->get('container'));
-			$game = new Game($gamer->getBoard(), $this->get('container'));
+			$gamer = new RealGamer($gamerdoc, $this->get('container'));
+			$game = new Game($gamedoc, $this->get('container'));
 			$gamer->answerBuyQuestion($answer, $game);
 		} catch (GameException $e) {
-			$this->get('log')->write($e->getMessage());
-			$this->get('log')->write($e->getTraceAsString());
+			$this->get('log')->addError($e->getMessage());
 			return json_encode(array('ok' => false));
 		}
 		
@@ -539,10 +620,15 @@ class GameController extends PublicController {
 		}
 		
 		try {
-			$gamer = new RealGamer($user['id'], $this->get('container'));
-			$gamer->setUpdated(time());
-			$gamer->save();
-			$game = new Game($gamer->getBoard(), $this->get('container'));
+			$gamerdoc = $this->get('odm')
+					->getRepository('\Fuga\GameBundle\Document\Gamer')
+					->findOneByUser(intval($user['id']));
+			
+			$gamedoc = $this->get('odm')
+					->getRepository('\Fuga\GameBundle\Document\Board')
+					->findOneByBoard($gamerdoc->getBoard());
+			$gamer = new RealGamer($gamerdoc, $this->get('container'));
+			$game = new Game($gamedoc, $this->get('container'));
 			$rivalsdoc = $this->get('odm')
 					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
 					->field('board')->equals($game->getId())
@@ -558,7 +644,8 @@ class GameController extends PublicController {
 			}
 			$gamer->startTimer();
 		} catch (Exception\GameException $e) {
-			$this->get('log')->write('UPDATE:'.$e->getMessage());
+			$this->get('log')->addError('UPDATE:'.$e->getMessage());
+			return json_encode(array('ok' => false));
 		}
 		
 		$rivalsData = array();
@@ -569,6 +656,7 @@ class GameController extends PublicController {
 				'bet'   => $rival->bet,
 				'state'   => $rival->state,
 				'active' => $rival->active ? 1 : 0,
+				'allin' => $rival->allin ? 1 : 0,
 			);
 		}
 		
@@ -604,12 +692,17 @@ class GameController extends PublicController {
 		}
 		
 		try {
-			$gamer = new RealGamer($user['id'], $this->get('container'));
-			$game = new Game($gamer->getBoard(), $this->get('container'));
+			$gamerdoc = $this->get('odm')
+					->getRepository('\Fuga\GameBundle\Document\Gamer')
+					->findOneByUser(intval($user['id']));
+			
+			$gamedoc = $this->get('odm')
+					->getRepository('\Fuga\GameBundle\Document\Board')
+					->findOneByBoard($gamerdoc->getBoard());
+			$game = new Game($gamedoc, $this->get('container'));
 			$game->removeTimer();
 		} catch (GameException $e) {
-			$this->get('log')->write($e->getMessage());
-			$this->get('log')->write($e->getTraceAsString());
+			$this->get('log')->addError($e->getMessage());
 		}
 		
 		return json_encode(array(
@@ -657,35 +750,38 @@ class GameController extends PublicController {
 			$this->get('router')->redirect('/game');
 		}
 		
-		$gameId = array_shift($params);
-		$time   = array_shift($params) ?: '10S';
+		$gameId = intval(array_shift($params));
+		$time   = array_shift($params) ?: null;
 		
 		if (!$gameId) {
 			$this->get('router')->redirect('/game');
 		}
 		
-		$now = new \DateTime();
-		$new = $now->add(new \DateInterval('PT'.strtoupper($time)));
-		
+		if ($time && strlen($time) == 4) {
+			$hour = substr($time, 0, 2);
+			$minute = substr($time, 2, 2);
+			$now = new \DateTime(date('Y-m-d').' '.$hour.':'.$minute.':00');
+		} else {
+			$now = new \DateTime();
+			$now->add(new \DateInterval('PT10S'));
+		}
 		$this->get('container')->updateItem('game_board', 
-				array('fromtime' => $new->format('Y-m-d H:i:s')),
+				array('fromtime' => $now->format('Y-m-d H:i:s')),
 				array('id' => $gameId)
 		);
 		
 		try {
-			$game = new Game($gameId, $this->get('container'));
-			$game->clear();
-			$game->save();
-
-			$gamers = $this->get('container')->getItems('account_member', 'board_id='.$gameId);
-			foreach ($gamers as $gamerData) {
-				$gamer = new RealGamer($gamerData['user_id'], $this->get('container'));
-				$gamer->clear();
-				$gamer->save();
-			}
-		} catch (GameException $e) {
+			$this->get('odm')->createQueryBuilder('\Fuga\GameBundle\Document\Board')
+					->remove()
+					->field('board')->equals($gameId)
+					->getQuery()->execute();
 			
-		}
+			$this->get('odm')->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+					->remove()
+					->field('board')->equals($gameId)
+					->getQuery()->execute();
+			
+		} catch (GameException $e) { }
 		
 		$this->createAction(array($gameId));
 		
@@ -712,6 +808,11 @@ class GameController extends PublicController {
 			$game->setBoard($board['id']);
 			$game->setName($board['name']);
 			$game->setUpdated(time());
+			$game->setTimer(array( array(
+				'handler' => 'onStart', 
+				'holder' => 'begin-timer', 
+				'time' => strtotime($board['fromtime'])
+			)));
 			$game->setFromtime(strtotime($board['fromtime']));
 			$this->get('odm')->persist($game);
 		}
@@ -732,7 +833,6 @@ class GameController extends PublicController {
 			$gamer->setLastname($gamerData['lastname']);
 			$gamer->setSeat($gamerData['seat']);
 			$gamer->setChips($gamerData['chips']);
-			$gamer->setUpdated(time());
 			$gamer->setAvatar(isset($gamerData['avatar_value']['extra']) 
 				? $gamerData['avatar_value']['extra']['main']['path'] 
 				: '/bundles/public/img/avatar_empty.png');
@@ -755,12 +855,12 @@ class GameController extends PublicController {
 				->field('state')->gt(0)
 				->field('state')->notEqual(6)
 				->getQuery()->execute();
-		foreach ($boards as $board) {
+		foreach ($boards as $gamedoc) {
 			try {
-				$game = new Game($board->getBoard(), $this->get('container'));
+				$game = new Game($gamedoc, $this->get('container'));
 				$game->sync();
 			} catch (\Exception $e) {
-				$this->get('log')->write('cron.ERROR:'.$e->getMessage());
+				$this->get('log')->addError('cron.ERROR:'.$e->getMessage());
 			}	
 		}
 		

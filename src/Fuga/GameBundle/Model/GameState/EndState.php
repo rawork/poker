@@ -11,11 +11,11 @@ class EndState extends AbstractState {
 	}
 	
 	public function nextGame($gamer) {
-		$this->game->container->get('log')->write('Игра окончена. Невозможно продолжить.');
+		return self::STATE_END;
 	}
 	
 	public function endRound($gamer) {
-		$this->game->container->get('log')->write('Игра окончена. Невозможно закончить раунд.');
+		return self::STATE_END;
 	}
 	
 }

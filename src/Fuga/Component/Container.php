@@ -105,7 +105,7 @@ class Container
 	}
 	
 	public function initialize() {
-		$this->tables = $this->getAllTables();
+//		$this->tables = $this->getAllTables();
 	}
 
 	public function getModule($name) {
@@ -191,6 +191,10 @@ class Container
 	}
 
 	public function getTable($name) {
+		if (!$this->tables) {
+			$this->tables = $this->getAllTables();
+		}
+		
 		if (isset($this->tables[$name])) {
 			return $this->tables[$name];
 		} else {
@@ -346,7 +350,7 @@ class Container
 		$obj = new \ReflectionClass($this->getControllerClass($path));
 		$action .= 'Action'; 	
 		if (!$obj->hasMethod($action)) {
-			$this->get('log')->write('Не найден обработчик ссылки '.$path);
+			$this->get('log')->addError('Не найден обработчик ссылки '.$path);
 			throw new NotFoundHttpException('Несуществующая страница');
 		}
 		return $obj->getMethod($action)->invoke($this->createController($path), $params);	
@@ -369,7 +373,13 @@ class Container
 		if (!isset($this->services[$name])) {
 			switch ($name) {
 				case 'log':
-					$this->services[$name] = new Log\Log();
+					$log = new \Monolog\Logger('fuga');
+					$log->pushHandler(new \Monolog\Handler\StreamHandler(
+							PRJ_DIR.'/app/logs/error.log', 
+							PRJ_ENV == 'development' ? \Monolog\Logger::DEBUG : \Monolog\Logger::ERROR
+						));
+					
+					$this->services[$name] = $log;
 					break;
 				case 'util':
 					$this->services[$name] = new Util();
@@ -426,6 +436,8 @@ class Container
 					$config->setProxyNamespace('Proxies');
 					$config->setHydratorDir(__DIR__ . '/../../../app/cache/hydrators');
 					$config->setHydratorNamespace('Hydrators');
+					$config->setAutoGenerateProxyClasses('development' == PRJ_ENV);
+					$config->getAutoGenerateHydratorClasses('development' == PRJ_ENV);
 					$config->setDefaultDB(MONGO_BASE);
 					
 					$config->setMetadataDriverImpl(\Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver::create(__DIR__ . '/../GameBundle/Document'));

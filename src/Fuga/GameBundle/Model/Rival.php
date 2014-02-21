@@ -31,6 +31,7 @@ class Rival {
 		$this->active   = $rival->getActive();
 		$this->state    = $rival->getState();
 		$this->times    = $rival->getTimes();
+		$this->allin    = $rival->getAllin();
 	}
 	
 	public function isActive() {

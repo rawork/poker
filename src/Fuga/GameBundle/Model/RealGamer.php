@@ -4,7 +4,6 @@ namespace Fuga\GameBundle\Model;
 
 use Fuga\Component\Container;
 use Fuga\GameBundle\Model\Game;
-use Fuga\GameBundle\Document\Gamer;
 use Fuga\GameBundle\Model\Exception\GameException;
 
 class RealGamer {
@@ -12,7 +11,6 @@ class RealGamer {
 	const STATE_NO    = 0;
 	const STATE_READY = 1;
 	const STATE_OUT   = 3;
-	const STATE_END   = 4;
 
 	public $position = 0;
 	public $question;
@@ -20,7 +18,7 @@ class RealGamer {
 
 	private $doc;
 	private $container;
-	private $cookietime = 7776000;
+	private $cookietime = 604800;
 	
 	private $timers     = array(
 		'answer'     => array('handler' => 'onNoAnswer', 'holder' => 'answer-timer', 'time' => 14),
@@ -28,15 +26,9 @@ class RealGamer {
 		'change'     => array('handler' => 'onClickNoChange', 'holder' => 'change-timer', 'time' => 31),
 	);
 	
-	public function __construct($userId, Container $container) {
+	public function __construct($doc, Container $container) {
 		$this->container    = $container;
-		$this->doc = $this->container->get('odm')
-				->getRepository('\Fuga\GameBundle\Document\Gamer')
-				->findOneByUser(intval($userId));
-		
-		if (!$this->doc) {
-			throw new Exception\GameException('Ошибка создания игрока. Обратитесь к администратору.');
-		}
+		$this->doc = $doc;
 		
 		if ($this->isState(0)) {
 			$this->doc->setState(1);
@@ -50,7 +42,7 @@ class RealGamer {
 		$this->combination = array_shift($combination);
 		$this->haveBuyQuestion();
 		
-		setcookie('gamerstate', $this->doc->getState(), time()+7000000, '/');
+		setcookie('gamerstate', $this->doc->getState(), time() + $this->cookietime, '/');
 	}
 	
 	public function getId() {
@@ -207,9 +199,7 @@ class RealGamer {
 	
 	public function bet($bet, $maxbet) {
 		if ($this->doc->getChips() <= 0) {
-			$this->doc->setChips(0);
-			$this->save();
-			throw new GameException('Нет фишек');
+			return 0;
 		}
 		if ( $maxbet > $this->doc->getChips() ) {
 			$this->doc->setAllin(true);
@@ -233,9 +223,7 @@ class RealGamer {
 			throw new GameException('Неправильная ставка');
 		}
 		if ($this->doc->getChips() <= 0) {
-			$this->doc->setChips(0);
-			$this->save();
-//			throw new GameException('Нет фишек');
+			return 0;
 		}
 		
 		if ( $bet >= $this->doc->getChips() ) {
@@ -305,8 +293,8 @@ class RealGamer {
 			$this->question = $question;
 			$this->doc->setQuestion(array($question));
 			$this->doc->setBuy($buy);
+			$this->save();
 		}
-		$this->save();
 	}
 	
 	public function nochangeCard() {
@@ -328,7 +316,7 @@ class RealGamer {
 	public function answerQuestion($answerNo, Game $game) {
 		$this->removeTimer();
 		if ($this->doc->getTimes() > 0 && !$this->question) {
-			throw new GameException('Потерялся вопрос');
+			return 0;
 		}
 		if ($this->doc->getTimes() <= 0) {
 			$this->doc->setQuestion(array());
@@ -348,7 +336,6 @@ class RealGamer {
 				$myCards = $this->doc->getCards();
 				$myCards[$cardNo] = array_shift($game->getCards(1));
 				$this->doc->setCards($myCards);
-				$game->save();
 				$game->unlock($this->getId());
 				$isChanged = true;
 			}
@@ -419,7 +406,6 @@ class RealGamer {
 				$timer['time'] = time() + $this->timers[$name]['time'];
 			}
 			$this->doc->setTimer(array($timer));
-			$this->save();
 		}
 	}
 	
@@ -443,7 +429,6 @@ class RealGamer {
 	public function removeTimer() {
 		$this->stopTimer();
 		$this->doc->setTimer(array());
-		$this->save();
 	}
 	
 	public function save() {
@@ -452,6 +437,5 @@ class RealGamer {
 	
 	public function clear() {
 		$this->container->get('odm')->remove($this->doc);
-		$this->container->get('odm')->flush();
 	}
 }

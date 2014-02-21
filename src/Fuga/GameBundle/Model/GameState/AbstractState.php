@@ -25,35 +25,35 @@ class AbstractState implements StateInterface {
 	}
 	
 	public function startGame($gamer) {
-		$this->game->container->get('log')->write('abstract startGame');
+		$this->game->container->get('log')->addError('abstract startGame');
 	}
 	
 	public function changeCards($gamer) {
-		$this->game->container->get('log')->write('abstract changeCards');
+		$this->game->container->get('log')->addError('abstract changeCards');
 	}
 	
 	public function makeBet($gamer) {
-		$this->game->container->get('log')->write('abstract makeBet');
+		$this->game->container->get('log')->addError('abstract makeBet');
 	}
 	
 	public function makeMove($gamer) {
-		$this->game->container->get('log')->write('abstract makeMove');
+		$this->game->container->get('log')->addError('abstract makeMove');
 	}
 	
 	public function distributeWin($gamer) {
-		$this->game->container->get('log')->write('abstract distributeWin');
+		$this->game->container->get('log')->addError('abstract distributeWin');
 	}
 	
 	public function buyChips($gamer) {
-		$this->game->container->get('log')->write('abstract buyChips');
+		$this->game->container->get('log')->addError('abstract buyChips');
 	}
 	
 	public function answerBuyQuestion($gamer) { 
-		$this->game->container->get('log')->write('abstract answeBuyQuestion');
+		$this->game->container->get('log')->addError('abstract answeBuyQuestion');
 	}
 	
 	public function nextGame($gamer) {
-		$this->game->container->get('log')->write('abstract nextGame');;
+		$this->game->container->get('log')->addError('abstract nextGame');
 	}
 
 	public function endGame($gamer) {
@@ -66,7 +66,7 @@ class AbstractState implements StateInterface {
 			$this->game->setState(self::STATE_END);
 			$this->game->save();
 		} catch (\Exception $e) {
-			$this->game->container->get('log')->write('END_GAME:'.$e->getMessage());
+			$this->game->container->get('log')->addError('END_GAME:'.$e->getMessage());
 		}
 		
 		return $this->game->getStateNo();
@@ -80,7 +80,7 @@ class AbstractState implements StateInterface {
 			$this->game->save();
 			
 		} catch (\Exception $e) {
-			$this->game->container->get('log')->write('END ROUND:'.$e->getMessage());
+			$this->game->container->get('log')->addError('END ROUND:'.$e->getMessage());
 		}
 		
 		return $this->game->getStateNo();
@@ -89,7 +89,6 @@ class AbstractState implements StateInterface {
 	public function wait() {
 		$this->game->setTimer('noactive');
 		$this->game->startTimer();
-		$this->game->save();
 		$this->game->container->get('odm')
 				->createQueryBuilder('\Fuga\GameBundle\Document\Board')
 				->findAndUpdate()
@@ -97,12 +96,13 @@ class AbstractState implements StateInterface {
 				->field('gamer')->set(0)
 				->getQuery()->execute();
 		$this->game->setState(self::STATE_WAIT);
+		$this->game->save();
 		
 		return $this->game->getStateNo();
 	}
 	
 	public function sync() {
-		$this->game->container->get('log')->write('abstract sync');
+		$this->game->container->get('log')->addError('abstract sync');
 	}
 	
 }

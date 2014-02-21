@@ -5,7 +5,6 @@ namespace Fuga\GameBundle\Model;
 use Fuga\GameBundle\Model\Combination;
 use Fuga\GameBundle\Model\Deck;
 use Fuga\GameBundle\Model\RealGamer;
-use Fuga\GameBundle\Document\Board;
 use Fuga\GameBundle\Model\Exception\GameException;
 use Fuga\Component\Container;
 
@@ -29,7 +28,7 @@ class Game implements GameInterface {
 	private $state;
 	private $doc;
 	
-	private $cookietime = 7776000;
+	private $cookietime = 604800;
 	private $upTimer    = 780;
 	private $repo       = '\Fuga\GameBundle\Document\Board';
 	
@@ -38,34 +37,18 @@ class Game implements GameInterface {
 		'change'     => array('handler' => 'onClickNoChange', 'holder' => 'change-timer', 'time' => 31),
 		'distribute' => array('handler' => 'onDistribute', 'holder' => 'game-timer', 'time' => 31),
 		'prebuy'     => array('handler' => 'onShowBuy', 'holder' => 'joker-timer', 'time' => 6),
-		'next'		 => array('handler' => 'onNext', 'holder' => 'round-end-timer', 'time' => 14),
-		'nonactive'  => array('handler' => 'onNext', 'holder' => 'wait-timer', 'time' => 61),
+		'next'		 => array('handler' => 'onNext', 'holder' => 'round-end-timer', 'time' => 6),
+		'nonactive'  => false,//array('handler' => 'onNext', 'holder' => 'wait-timer', 'time' => 61),
 		'bet'        => array('handler' => 'onFold', 'holder' => 'game-timer', 'time' => 31),
 		'buy'        => array('handler' => 'onEndRound', 'holder' => 'buy-timer', 'time' => 121),
 		'answer'     => array('handler' => 'onNoAnswer', 'holder' => 'answer-timer', 'time' => 14),
-		
 	);
 	
-	public function __construct( $id, Container $container) {
+	public function __construct( $doc, Container $container) {
 		$this->container = $container;
-		$this->doc = $this->container->get('odm')
-				->getRepository($this->repo)
-				->findOneByBoard(intval($id));
+		$this->doc = $doc;
 		
-		$board = $this->container->getItem('game_board', intval($id));
-		if (!$board || !$this->doc) {
-			throw new GameException('Не создан зал для игры. Обратитесь к администратору.');
-		}
-		
-		$this->doc->setFromtime(strtotime($board['fromtime']));
-		$this->save();
-		
-		if ($this->doc->getFromtime() > time()) {
-			$this->setTimer('begin');
-			$this->startTimer();
-		}
-		
-		$this->stopbuytime = $this->doc->getFromtime() + 35*60;
+		$this->stopbuytime = $this->doc->getFromtime() + 2100;
 		$this->setState($this->doc->getState());
 		$this->syncTime();
 		$this->setMinbet();
@@ -115,6 +98,7 @@ class Game implements GameInterface {
 			$cards[] = array_shift($deck);
 		}
 		$this->doc->setCards($deck);
+		$this->save();
 		
 		return $cards;
 	}
@@ -130,19 +114,16 @@ class Game implements GameInterface {
 	
 	public function acceptBet($bet) {
 		$this->doc->setBets( $this->doc->getBets() + $bet );
-		$this->save();
 	}
 	
 	public function confirmBets() {
 		$this->doc->setBank($this->getBank() + $this->getBets());
 		$this->doc->setBets(0);
-		$this->save();
 	}
 	
 	public function takeBank() {
 		$chips = $this->doc->getBank();
 		$this->doc->setBank(0);
-		$this->save();
 		return $chips;
 	}
 	
@@ -282,7 +263,6 @@ class Game implements GameInterface {
 	public function removeTimer() {
 		$this->stopTimer();
 		$this->doc->setTimer(array());
-		$this->save();
 	}
 	
 	public function setState($state) {
@@ -392,7 +372,6 @@ class Game implements GameInterface {
 					->getQuery()->execute();
 		}
 		$this->doc->setCombination($combinations);
-		$this->save();
 	}
 	
 	public function nextDealer() {
@@ -480,7 +459,6 @@ class Game implements GameInterface {
 	
 	public function clear() {
 		$this->container->get('odm')->remove($this->doc);
-		$this->save();
 	}
 	
 	public function lock($gamerId) {
@@ -499,7 +477,7 @@ class Game implements GameInterface {
 			
 			return true;
 		} catch (\Exception $e) {
-			$this->container->get('log')->write('LOCK:'.$e->getMessage());
+			$this->container->get('log')->addError('Error.LOCK.gamer'.$gamerId.' '.$e->getMessage());
 		}
 		
 		return false;
@@ -521,7 +499,7 @@ class Game implements GameInterface {
 
 			return true;
 		} catch (\Exception $e) {
-			$this->container->get('log')->write('UNLOCK:'.$e->getMessage());
+			$this->container->get('log')->addError('Error.UNLOCK.gamer'.$gamerId.' '.$e->getMessage());
 		}
 		
 		return false;
@@ -587,7 +565,6 @@ class Game implements GameInterface {
 	
 	public function nochange(RealGamer $gamer) {
 		$gamer->removeTimer();
-		$gamer->setUpdated(time());
 		$gamer->save();
 		$this->state->changeCards($gamer);
 	}

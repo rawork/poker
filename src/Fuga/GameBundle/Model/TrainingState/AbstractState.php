@@ -54,43 +54,43 @@ abstract class AbstractState implements StateInterface {
 	}
 	
 	public function changeCards($cardNo, $question) {
-		$this->game->controller->get('log')->write('abstract changeCards');
+		
 	}
 	
 	public function noChangeCards() {
-		$this->game->controller->get('log')->write('abstract noChangeCards');
+		
 	}
 	
 	public function answerQuestion($answerNo, $question) {
-		$this->game->controller->get('log')->write('abstract answerQuestion');
+		
 	}
 	
 	public function makeBet($chips) {
-		$this->game->controller->get('log')->write('abstract makeBet');
+		
 	}
 	
 	public function checkBet(){
-		$this->game->controller->get('log')->write('abstract checkBet');
+		
 	}
 	
 	public function allinBet() {
-		$this->game->controller->get('log')->write('abstract allinBet');
+		
 	}
 	
 	public function foldCards() {
-		$this->game->controller->get('log')->write('abstract foldCards');
+		
 	}
 	
 	public function distributeWin($questions) {
-		$this->game->controller->get('log')->write('abstract distributeWin');
+		
 	}
 	
 	public function buyChips() {
-		$this->game->controller->get('log')->write('abstract buyChips');
+		
 	}
 	
 	public function answerBuyQuestion($answerNo) { 
-		$this->game->controller->get('log')->write('abstract answeBuyQuestion');
+		
 	}
 	
 	public function endGame() {

@@ -206,8 +206,8 @@ class AccountController extends PublicController {
 					$this->get('connection')->commit();
 				} catch(\Exception $e) {
 					$this->get('connection')->rollback();
-					$this->get('log')->write('Account:register Error:'.$e->getMessage());
-					$this->get('log')->write('Account:register Error:'.$e->getTraceAsString());
+					$this->get('log')->addError('Account:register Error:'.$e->getMessage());
+					$this->get('log')->addError('Account:register Error:'.$e->getTraceAsString());
 					$errors[] = $e->getMessage();
 					$_SESSION['danger'] = implode('<br>', $errors);
 					$_SESSION['register'] = json_encode($user);
@@ -264,7 +264,7 @@ class AccountController extends PublicController {
 				
 				if ($user) {
 					$newPassword = $this->get('util')->genKey(8);
-					$this->get('log')->write($email.':'.$newPassword);
+					$this->get('log')->addError($email.':'.$newPassword);
 					$this->get('container')->updateItem('user_user',
 							array('password' => md5($newPassword)),
 							array('id' => $user['id'])
@@ -339,8 +339,8 @@ class AccountController extends PublicController {
 					$this->get('connection')->commit();
 				} catch(\Exception $e) {
 					$this->get('connection')->rollback();
-					$this->get('log')->write('Account:edit Error:'.$e->getMessage());
-					$this->get('log')->write('Account:edit Error:'.$e->getTraceAsString());
+					$this->get('log')->addError('Account:edit Error:'.$e->getMessage());
+					$this->get('log')->addError('Account:edit Error:'.$e->getTraceAsString());
 					$errors[] = $e->getMessage();
 					$_SESSION['danger'] = implode('<br>', $errors);
 					$this->get('router')->reload();

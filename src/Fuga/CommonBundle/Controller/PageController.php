@@ -35,12 +35,12 @@ class PageController extends Controller {
 					$this->get('router')->getParam('params')
 				);
 			} catch (NotFoundHttpException $e) {
-				$this->get('log')->write('Error:'.$e->getMessage());
-				$this->get('log')->write($e->getTraceAsString());
+				$this->get('log')->addError($e->getMessage());
+				$this->get('log')->addError($e->getTraceAsString());
 				throw $this->createNotFoundException($e->getMessage());
 			} catch (\Exception $e) {
-				$this->get('log')->write('Error:'.$e->getMessage());
-				$this->get('log')->write($e->getTraceAsString());
+				$this->get('log')->addError($e->getMessage());
+				$this->get('log')->addError($e->getTraceAsString());
 				throw new \Exception($e->getMessage());
 			}
 		}
@@ -142,8 +142,8 @@ class PageController extends Controller {
         
 		$params = array(
 			'h1'        => $this->getH1(),
-			'title'     => $this->getManager('Fuga:Common:Meta')->getTitle() ?: strip_tags($this->getTitle()),
-			'meta'      => $this->getManager('Fuga:Common:Meta')->getMeta(),
+			'title'     => /*$this->getManager('Fuga:Common:Meta')->getTitle() ?:*/ strip_tags($this->getTitle()),
+//			'meta'      => $this->getManager('Fuga:Common:Meta')->getMeta(),
 			'links'     => $links,
 			'action'    => $this->get('router')->getParam('action'),
 			'curnode'   => $node,
@@ -200,9 +200,9 @@ class PageController extends Controller {
 				echo $obj->getMethod($method)->invokeArgs($controller, $post);
 				return;
 			} catch (\Exception $e) {
-				$this->get('log')->write(json_encode($_POST));
-				$this->get('log')->write($e->getMessage());
-				$this->get('log')->write('Trace: '.$e->getTraceAsString());
+				$this->get('log')->addError(json_encode($_POST));
+				$this->get('log')->addError($e->getMessage());
+				$this->get('log')->addError($e->getTraceAsString());
 				echo '';
 				return;
 			}

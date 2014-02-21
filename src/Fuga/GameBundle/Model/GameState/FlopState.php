@@ -16,7 +16,6 @@ class FlopState extends AbstractState {
 				return $this->game->getStateNo();
 			}
 			$this->game->removeTimer();
-			$this->game->save();
 			if ($gamer->getBet() > $this->game->getMaxbet()) {
 				$this->game->setMaxbet($gamer->getBet());
 			}
@@ -85,7 +84,6 @@ class FlopState extends AbstractState {
 			$this->game->save();
 			$this->game->unlock($gamer->getId());
 		} catch (\Exception $e) {
-			$this->game->container->get('log')->write('STATE:'.$e->getMessage());
 			$this->game->unlock($gamer->getId());
 		}
 		
@@ -103,13 +101,21 @@ class FlopState extends AbstractState {
 		if ($gamerdoc) {
 			$timer = $this->game->getTimer();
 			$timer = array_shift($timer);
-			if (!$timer || intval($timer['time']) < time()) { 
-				$this->game->container->get('log')->write(
+			if (!$timer || intval($timer['time'])+5 < time()) { 
+				$this->game->container->get('log')->addError(
 						'game'.$this->game->getId()
 						.' :preflop.find.outtimer '
 						.(intval($timer['time']) - time())
 				);
-				$gamer = new RealGamer($gamerdoc->getUser(), $this->game->container);
+				
+				$this->game->container->get('odm')
+						->createQueryBuilder('\Fuga\GameBundle\Document\Board')
+						->findAndUpdate()
+						->field('board')->equals($this->game->getId())
+						->field('gamer')->set(0)
+						->getQuery()->execute();
+				
+				$gamer = new RealGamer($gamerdoc, $this->game->container);
 			}
 		}
 		

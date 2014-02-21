@@ -22,7 +22,6 @@ class RoundEndState extends AbstractState {
 				$this->game->setState(self::STATE_END);
 			} else {
 				$this->game->removeTimer();
-				$this->game->save();
 				$this->game->newDeck();
 				$this->game->setBank2(0);
 				$this->game->setAllin(0);
@@ -55,7 +54,7 @@ class RoundEndState extends AbstractState {
 					$doc->setQuestion(array());
 					$doc->setBuy(array());
 					if ($this->game->getRound() >= 3 
-						&& $doc->getUpdated() < $this->game->getFromtime()) {
+						&& $doc->getState() == 0) {
 						$this->game->acceptBet($doc->getChips());
 						$doc->setChips(0);
 						$doc->setActive(false);
@@ -79,6 +78,35 @@ class RoundEndState extends AbstractState {
 		}
 		
 		return $this->game->getStateNo();
+	}
+	
+	public function sync() {
+		$gamer = null;
+		$gamerdoc = $this->game->container->get('odm')
+				->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+				->field('board')->equals($this->game->getId())
+				->field('state')->gt(0)
+				->getQuery()->getSingleResult();
+		$timer = $this->game->getTimer();
+		$timer = array_shift($timer);
+		if (!$timer || intval($timer['time'])+5 < time()) { 
+			$this->game->container->get('log')->addError(
+					'game'.$this->game->getId()
+					.' :roundend.find.outtimer '
+					.(intval($timer['time']) - time())
+			);
+			$this->game->container->get('odm')
+				->createQueryBuilder('\Fuga\GameBundle\Document\Board')
+				->findAndUpdate()
+				->field('board')->equals($this->game->getId())
+				->field('gamer')->set(0)
+				->getQuery()->execute();
+			$gamer = new RealGamer($gamerdoc, $this->game->container);
+		}
+		
+		if ($gamer) {
+			$this->changeCards($gamer);			
+		}
 	}
 	
 }

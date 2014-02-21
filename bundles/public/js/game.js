@@ -53,8 +53,26 @@
 var gameTimerId;
 var gameTimeId;
 var gameUpdateId;
+var eventTimers = {};
+
+function hasEventTimer(name) {
+	if (eventTimers[name] !== undefined) {
+		if (Date.now() - eventTimers[name] < 2500) {
+			console.log('loop event ', name);
+			return true;
+		} else {
+			return false;
+		}
+	} else {
+		eventTimers[name] = Date.now();
+		return false;
+	}
+}
 
 function onUpdate() {
+	if (hasEventTimer('update')) {
+		return;
+	}
 	var state = +$.cookie('gamestate');
 	$.post('/game/update', {},
 	function(data){
@@ -103,6 +121,8 @@ function onUpdate() {
 //				gameTimerId = setInterval(startTimer, 1000);
 				startTimer();
 			}
+		} else {
+			alert('Update error');
 		}
 	}, "json");
 }
@@ -276,6 +296,9 @@ function onClickCheck() {
 }
 
 function onFold() {
+	if (hasEventTimer('fold')) {
+		return;
+	}
 	clearInterval(gameUpdateId);
 	stopTimer();
 	$('.gamer-card-zoom').hide();
@@ -297,6 +320,9 @@ function onFold() {
 }
 
 function onDistribute() {
+	if (hasEventTimer('distribute')) {
+		return;
+	}
 	stopTimer();
 	$('.game-winner').remove();
 	$('.gamer-hint').remove();
@@ -327,6 +353,9 @@ function onDistribute() {
 }
 
 function onShowBuy() {
+	if (hasEventTimer('showbuy')) {
+		return;
+	}
 	stopTimer();
 	$.post('/game/prebuy', {},
 	function(data){
@@ -387,6 +416,9 @@ function onBuyAnswer(n) {
 }
 
 function onEndRound() {
+	if (hasEventTimer('endround')) {
+		return;
+	}
 	$('button[data-move=buy]').prop('disabled', true);
 	$.post('/game/endround', {},
 	function(data){
@@ -400,6 +432,9 @@ function onEndRound() {
 }
 
 function onNext() {
+	if (hasEventTimer('next')) {
+		return;
+	}
 	stopTimer();
 	$.post('/game/next', {},
 	function(data){
@@ -629,3 +664,43 @@ function initGame() {
 $(document).ready(function(){
 	initGame();
 });
+
+var gameupdated = 0;
+
+function startUpdate(games) {
+	var gameid = +$.cookie('gameboardid');
+	console.log(gameid);
+	for (i in games) {
+		if (games[i]['board'] == gameid && games[i]['updated'] > gameupdated) {
+			gameupdated = board[i]['updated']
+			console('update ' + Date.now());
+			onUpdate();
+		} else {
+			console.log('no update ' + Date.now());
+		}
+	}
+}
+
+var ws = new WebSocket('ws://' + window.location.hostname + ':3001');
+
+ws.onmessage = function (event) {
+	startUpdate(JSON.parse(event.data));
+};
+
+ws.onopen = function () {
+	console.log('Connected');
+};
+
+ws.onclose = function (event) {
+	if (event.wasClean) {
+		console.log('Disconnected clear');
+	} else {
+		console.log('Disconnect with error');
+	}
+	console.log('Code ' + event.code);
+};
+
+ws.onerror = function (err) {
+	
+};
+

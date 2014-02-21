@@ -32,7 +32,7 @@ class ChangeState extends AbstractState {
 				if ($doc->getChips() > 0) {
 					$doc->setChips($doc->getChips()-1);
 				}
-				$doc->setFold(!($doc->getChips() > 0));
+				$doc->setFold($doc->getChips() <= 0);
 				$this->game->acceptBet(1);
 			}
 			$this->game->confirmBets();
@@ -57,20 +57,28 @@ class ChangeState extends AbstractState {
 				->field('times')->gt(0)
 				->field('state')->gt(0)
 				->getQuery()->execute();
-		foreach ($gamers as $doc) {
-			$timer = $doc->getTimer();
+		foreach ($gamers as $gamerdoc) {
+			$timer = $gamerdoc->getTimer();
 			$timer = array_shift($timer);
-			if (!$timer || intval($timer['time']) < time()) {
-				$this->game->container->get('log')->write(
+			if (!$timer || intval($timer['time'])+5 < time()) {
+				$this->game->container->get('log')->addError(
 						'game'.$this->game->getId()
 						.' :change.find.outtimer '
 						.(intval($timer['time']) - time())
 				);
-				$doc->setTimer(array());
-				$doc->setTimes(0);
+				
+				$this->game->container->get('odm')
+						->createQueryBuilder('\Fuga\GameBundle\Document\Board')
+						->findAndUpdate()
+						->field('board')->equals($this->game->getId())
+						->field('gamer')->set(0)
+						->getQuery()->execute();
+				
+				$gamerdoc->setTimer(array());
+				$gamerdoc->setTimes(0);
 				$this->game->save();
 				if (!$gamer) {
-					$gamer = new RealGamer($doc->getUser(), $this->game->container); 
+					$gamer = new RealGamer($gamerdoc, $this->game->container); 
 				}
 			}
 		}

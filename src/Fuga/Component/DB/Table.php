@@ -266,7 +266,7 @@ class Table {
 				try {
 					$column = $table->getColumn($field['name']);
 					if ($column->getType()->getName() != $this->getFieldType($field)->getType()) {
-						$this->get('log')->write($field['type']);
+						$this->get('log')->addError($field['type']);
 						$table->changeColumn(
 							$field['name'], 
 							array('Type' => \Doctrine\DBAL\Types\Type::getType($this->getFieldType($field)->getType())
@@ -294,14 +294,14 @@ class Table {
 			
 			$queries = $fromSchema->getMigrateToSql($toSchema, $this->get('connection')->getDatabasePlatform());
 			foreach ($queries as $sql) {
-				$this->get('log')->write($sql);
+				$this->get('log')->addError($sql);
 				$this->get('connection')->query($sql);
 			}
 			
 			return true;
 		} catch (\Exception $e) {
-			$this->get('log')->write($e->getMessage());
-			$this->get('log')->write($e->getTraceAsString());
+			$this->get('log')->addError($e->getMessage());
+			$this->get('log')->addError($e->getTraceAsString());
 			
 			return false;
 		}	
@@ -476,20 +476,19 @@ class Table {
 			if (empty($options['order_by'])) {
 				$options['order_by'] = $this->params['order_by'] ?: 'id';
 			}
-			if (empty($options['limit'])) {
-				$options['limit'] = '10000';
-			}
 			$sql = 'SELECT '.$options['select'].
 				' FROM '.$options['from'].
 				' WHERE '.$options['where'].
 				' ORDER BY '.$options['order_by'].
-				' LIMIT '.$options['limit'];
+				(empty($options['limit']) ? '' : ' LIMIT '.$options['limit']);
+			
+			
 			$this->stmt = $this->get('connection')->prepare($sql);
 			$this->stmt->execute();
 			
 			return true;	
 		} catch (\Exception $e) {
-			
+			$this->get('log')->addError('Error.SQL'.$e->getMessage());
 			return false;
 		}	
 	}
