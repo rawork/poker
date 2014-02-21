@@ -431,6 +431,7 @@ function onNext() {
 	stopTimer();
 	$.post('/game/next', {},
 	function(data){
+		console.log('onNext', data);
 		if (data.ok) {
 			if (data.table) {
 				$('#table').html(data.table);
