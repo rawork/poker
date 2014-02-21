@@ -74,6 +74,7 @@ class RoundEndState extends AbstractState {
 			$this->game->unlock($gamer->getId());
 			
 		} catch (\Exception $e) {
+			$this->game->save();
 			$this->game->unlock($gamer->getId());
 		}
 		

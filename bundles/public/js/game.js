@@ -244,7 +244,6 @@ function onClickAllIn() {
 }
 
 function onBet(chips) {
-	clearInterval(gameUpdateId);
 	stopTimer();
 	enableButtons(4);
 	$('.gamer-card-zoom').hide();
@@ -261,7 +260,6 @@ function onBet(chips) {
 			$('#bets').html(data.bets);
 			updateRivals(data.rivals);
 			gameTimerId = setInterval(startTimer, 1000);
-//			gameUpdateId = setInterval(onUpdate, 3000);
 		} else {
 //			window.location.reload();
 		}
@@ -269,7 +267,6 @@ function onBet(chips) {
 }
 
 function onClickCheck() {
-	clearInterval(gameUpdateId);
 	stopTimer();
 	enableButtons(4);
 	$('.gamer-card-zoom').hide();
@@ -288,7 +285,6 @@ function onClickCheck() {
 			$('.gamer-container').append(data.hint);
 			updateRivals(data.rivals);
 			gameTimerId = setInterval(startTimer, 1000);
-//			gameUpdateId = setInterval(onUpdate, 3000);
 		} else {
 //			window.location.reload();
 		}
@@ -299,7 +295,6 @@ function onFold() {
 	if (hasEventTimer('fold')) {
 		return;
 	}
-	clearInterval(gameUpdateId);
 	stopTimer();
 	$('.gamer-card-zoom').hide();
 	$('.gamer-hint').remove();
@@ -312,7 +307,6 @@ function onFold() {
 			$('#gamer-cards').html(data.cards);
 			$('.gamer-hint').remove();
 			gameTimerId = setInterval(startTimer, 1000);
-//			gameUpdateId = setInterval(onUpdate, 3000);
 		} else {
 //			window.location.reload();
 		}
@@ -451,7 +445,7 @@ function onNext() {
 			updateRivals(data.rivals);
 			gameTimerId = setInterval(startTimer, 1000);
 		} else {
-			stopTimer();
+			gameTimerId = setInterval(startTimer, 1000);
 		}
 	}, "json");
 }
