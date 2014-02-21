@@ -50,8 +50,6 @@ class ShowdownState extends AbstractState {
 					}
 				}
 				
-				$this->game->container->get('log')->addError('distribute-allins'.count($allins).'-bank'.$maxallinbank);
-
 				$numWin = count($allins);
 				if ($numWin > 1) {
 					$nextBank = $maxallinbank % $numWin;
@@ -69,7 +67,6 @@ class ShowdownState extends AbstractState {
 			}
 			
 			if (count($winners) > 0) {
-				$this->game->container->get('log')->addError('distribute-winners'.count($winners).'-bank'.$bank);
 				$numWin = count($winners);
 				if ($numWin > 1) {
 					$nextBank = $bank % $numWin;

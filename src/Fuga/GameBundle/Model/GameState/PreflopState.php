@@ -41,9 +41,7 @@ class PreflopState extends AbstractState {
 					->field('fold')->equals(false)
 					->field('chips')->gt(0)
 					->getQuery()->execute();
-			$this->game->container->get('log')->addError('PREFLOP GAMERS-'.count($gamers));
 			if (count($gamers) < 2) {
-				$this->game->container->get('log')->addError('INPREFLOP GAMERS-'.count($gamers));
 				$this->game->confirmBets();
 				$this->game->setWinner();
 				$this->game->setTimer('distribute');

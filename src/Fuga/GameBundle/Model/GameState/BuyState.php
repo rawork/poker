@@ -71,7 +71,7 @@ class BuyState extends AbstractState {
 //		}
 //		
 //		if ($gamer) {
-//			$this->changeCards($gamer);			
+//			$this->endRound($gamer);			
 //		}
 //	}
 	
