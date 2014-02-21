@@ -340,8 +340,7 @@ function onDistribute() {
 			enableButtons();
 			gameTimerId = setInterval(startTimer, 1000);
 		} else {
-			enableButtons();
-			gameTimerId = setInterval(startTimer, 1000);
+			onUpdate();
 		}
 	}, "json");
 }
@@ -439,13 +438,11 @@ function onNext() {
 			if (data.cards){
 				$('#gamer-cards').html(data.cards);
 			}
-			$('.game-winner').remove();
-			$('.gamer-hint').remove();
 			enableButtons();
 			updateRivals(data.rivals);
 			gameTimerId = setInterval(startTimer, 1000);
 		} else {
-			gameTimerId = setInterval(startTimer, 1000);
+			onUpdate();
 		}
 	}, "json");
 }
