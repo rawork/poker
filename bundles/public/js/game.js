@@ -78,7 +78,6 @@ function onUpdate() {
 	function(data){
 		if (data.ok) {
 			if (state > 0 && +data.state == 0 ) {
-				console.log('sdfsdfsdfds');
 				window.location.reload();
 			}
 			if (+data.state > 0 && data.table) {
@@ -109,7 +108,7 @@ function onUpdate() {
 			$.cookie('gamerstate', +data.gamerstate, {path: '/'});
 			$.cookie('gamestate', +data.state, {path: '/'});
 			$.cookie('gamemaxbet', +data.maxbet, {path: '/'});
-			$.cookie('gamermover', +data.mover, {path: '/'});
+			$.cookie('gamemover', +data.mover, {path: '/'});
 			enableButtons();
 			updateRivals(data.rivals);
 			if (+data.state == 6) {
@@ -592,7 +591,7 @@ function enableButtons(state) {
 	$('.game-buttons button').prop('disabled', true);
 	state = state || +$.cookie('gamestate');
 	var gamerstate = +$.cookie('gamerstate');
-	var gamermover = +$.cookie('gamermover');
+	var gamemover = +$.cookie('gamemover');
 	var minbet = +$('#min-bet').html();
 	var maxbet = +$.cookie('gamemaxbet');
 	var bet    = +$('#bet').html();
@@ -601,7 +600,7 @@ function enableButtons(state) {
 	switch (state) {
 		case 2:
 		case 3:
-			if (gamermover == 1 && gamerstate == 1) {
+			if (gamemover == gamerseat && gamerstate == 1) {
 				$('.game-buttons button[data-action=fold]').prop('disabled', false);
 				$('.game-buttons button[data-action=allin]').prop('disabled', false);
 				if (minbet < chips && (maxbet - bet) < chips) {

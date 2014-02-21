@@ -292,7 +292,6 @@ class Game implements GameInterface {
 		
 		setcookie('gamestate', $state, time() + $this->cookietime, '/');
 		setcookie('gamemaxbet', $this->doc->getMaxbet(), time() + $this->cookietime, '/');
-		setcookie('gamemover', $this->doc->getMover(), time() + $this->cookietime, '/');
 		setcookie('gamename', $this->doc->getName(), time() + $this->cookietime, '/');
 		$this->syncTime();
 		$this->setMinbet();

@@ -11,7 +11,7 @@ class BeginState extends AbstractState {
 	}
 	
 	public function startGame($gamer) {
-		if ($this->game->isStarted() && $this->game->isState(AbstractState::STATE_BEGIN)) {
+		if ($this->game->isStarted()) {
 			if (!$this->game->lock($gamer->getId())) {
 				return $this->game->getStateNo();
 			}

@@ -678,7 +678,7 @@ class GameController extends PublicController {
 			'state' => $game->getStateNo(),
 			'maxbet'=> $game->getMaxbet(),
 			'gamerstate' => $gamer->getState(),
-			'mover' => $game->isMover($gamer->getSeat()) ? 1 : 0,
+			'mover' => $game->getMover(),
 			'rivals'=> $rivalsData,
 			'minbet' => $game->minbet,
 		));

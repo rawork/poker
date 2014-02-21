@@ -57,16 +57,13 @@ class AbstractState implements StateInterface {
 	}
 
 	public function endGame($gamer) {
-		if (!$this->game->lock($gamer->getId())) {
-			return $this->game->getStateNo();
-		}
 		try {
 			$this->game->removeTimer();
 			$this->game->stopTime();
 			$this->game->setState(self::STATE_END);
 			$this->game->save();
 		} catch (\Exception $e) {
-			$this->game->container->get('log')->addError('END_GAME:'.$e->getMessage());
+			
 		}
 		
 		return $this->game->getStateNo();
@@ -78,9 +75,8 @@ class AbstractState implements StateInterface {
 			$this->game->startTimer();
 			$this->game->setState(self::STATE_ROUND_END);
 			$this->game->save();
-			
 		} catch (\Exception $e) {
-			$this->game->container->get('log')->addError('END ROUND:'.$e->getMessage());
+
 		}
 		
 		return $this->game->getStateNo();
