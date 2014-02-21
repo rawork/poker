@@ -515,20 +515,24 @@ class Game implements GameInterface {
 	}
 	
 	public function bet($gamer, $chips) {
-		$this->acceptBet($gamer->bet($chips, $this->getMaxbet()));
+		$bet = $gamer->bet($chips, $this->getMaxbet());
+		$this->acceptBet($bet);
 		if ($gamer->getAllin()) {
 			$gamer->setBank($this->getBank() + $this->getBets());
 		}
+		$this->save();
 
 		setcookie('gamemaxbet', $this->doc->getMaxbet(), time() + $this->cookietime, '/');
 		$this->state->makeMove($gamer);
 	}
 	
 	public function check($gamer) {
-		$this->acceptBet($gamer->check($this->getMaxbet()));
+		$bet = $gamer->check($this->getMaxbet());
+		$this->acceptBet($bet);
 		if ($gamer->getAllin()) {
 			$gamer->setBank($this->getBank() + $this->getBets());
 		}
+		$this->save();
 		
 		setcookie('gamemaxbet', $this->getMaxbet(), time() + $this->cookietime, '/');
 		$this->state->makeMove($gamer);

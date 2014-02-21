@@ -57,8 +57,8 @@ var eventTimers = {};
 
 function hasEventTimer(name) {
 	if (eventTimers[name] !== undefined) {
-		if (Date.now() - eventTimers[name] < 2500) {
-			console.log('loop event ', name);
+		if (Date.now() - eventTimers[name] < 5000) {
+//			console.log('loop event ', name);
 			return true;
 		} else {
 			return false;
@@ -119,7 +119,7 @@ function onUpdate() {
 				stopTime();
 			} else if (+data.state > 0) {
 //				gameTimerId = setInterval(startTimer, 1000);
-				startTimer();
+				gameTimerId = setInterval(startTimer, 1000);
 			}
 		} else {
 			alert('Update error');
@@ -261,7 +261,7 @@ function onBet(chips) {
 			$('#bets').html(data.bets);
 			updateRivals(data.rivals);
 			gameTimerId = setInterval(startTimer, 1000);
-			gameUpdateId = setInterval(onUpdate, 3000);
+//			gameUpdateId = setInterval(onUpdate, 3000);
 		} else {
 //			window.location.reload();
 		}
@@ -288,7 +288,7 @@ function onClickCheck() {
 			$('.gamer-container').append(data.hint);
 			updateRivals(data.rivals);
 			gameTimerId = setInterval(startTimer, 1000);
-			gameUpdateId = setInterval(onUpdate, 3000);
+//			gameUpdateId = setInterval(onUpdate, 3000);
 		} else {
 //			window.location.reload();
 		}
@@ -312,7 +312,7 @@ function onFold() {
 			$('#gamer-cards').html(data.cards);
 			$('.gamer-hint').remove();
 			gameTimerId = setInterval(startTimer, 1000);
-			gameUpdateId = setInterval(onUpdate, 3000);
+//			gameUpdateId = setInterval(onUpdate, 3000);
 		} else {
 //			window.location.reload();
 		}
@@ -535,7 +535,7 @@ function startTimer() {
 	if (timerstop < now) {
 		$('#'+ timerName).html( "00:00:00" );
 		var timerhandler = $.cookie('timerhandler');
-		console.log(timerhandler);
+//		console.log(timerhandler);
 		$.cookie('timerhandler', '', {path: '/'});
 		stopTimer();
 		if (timerhandler !== 'null') {
@@ -589,10 +589,10 @@ function updateRivals(rivals) {
 }
 
 function onChangeBetInput() {
-	var minbet = +$('#min-bet').html();
-	var maxbet = +$.cookie('gamemaxbet');
-	var bet    = +$('#bet').html();
-	var currentBet = +this.val();
+//	var minbet = +$('#min-bet').html();
+//	var maxbet = +$.cookie('gamemaxbet');
+//	var bet    = +$('#bet').html();
+//	var currentBet = +this.val();
 }
 
 
@@ -654,8 +654,8 @@ function initGame() {
 	$(document).on('click', 'button[data-action=out]',       onToggleOut);
 	$(document).on('change', '#input_bet', onChangeBetInput);
 	enableButtons();
-	setInterval(startTimer, 1000);
-	setInterval(onUpdate, 3000);
+	gameTimerId = setInterval(startTimer, 1000);
+//	setInterval(onUpdate, 3000);
 	$('.gamer-container').zoomcard();
 	$('.game-board-container').preloadImages(cardimages);
 	console.log($.cookie('timerhandler'));
@@ -668,15 +668,11 @@ $(document).ready(function(){
 var gameupdated = 0;
 
 function startUpdate(games) {
-	var gameid = +$.cookie('gameboardid');
-	console.log(gameid);
 	for (i in games) {
 		if (games[i]['board'] == gameid && games[i]['updated'] > gameupdated) {
-			gameupdated = board[i]['updated']
-			console('update ' + Date.now());
+			gameupdated = games[i]['updated'];
+//			console.log('update ' + Date.now());
 			onUpdate();
-		} else {
-			console.log('no update ' + Date.now());
 		}
 	}
 }

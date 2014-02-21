@@ -26,6 +26,7 @@
 </div>
 <div class="game-combinations"><img src="{$theme_ref}/public/img/combinations4.jpg"></div>
 <script type="text/javascript">
+	var gameid = {$game->getId()};
 	var cardimages = {$deck->names(true)};
 </script>
 

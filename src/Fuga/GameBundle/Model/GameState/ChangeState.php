@@ -32,7 +32,9 @@ class ChangeState extends AbstractState {
 				if ($doc->getChips() > 0) {
 					$doc->setChips($doc->getChips()-1);
 				}
-				$doc->setFold($doc->getChips() <= 0);
+				if (!$doc->getFold()) {
+					$doc->setFold($doc->getChips() <= 0);
+				}
 				$this->game->acceptBet(1);
 			}
 			$this->game->confirmBets();
@@ -44,6 +46,9 @@ class ChangeState extends AbstractState {
 			if ($this->game->isMover($gamer->getSeat())) {
 				$this->game->startTimer();
 			}
+		} else {
+			$this->game->setUpdated(time());
+			$this->game->save();
 		}
 		
 		return $this->game->getStateNo();
@@ -60,7 +65,7 @@ class ChangeState extends AbstractState {
 		foreach ($gamers as $gamerdoc) {
 			$timer = $gamerdoc->getTimer();
 			$timer = array_shift($timer);
-			if (!$timer || intval($timer['time'])+5 < time()) {
+			if (!$timer || intval($timer['time'])+15 < time()) {
 				$this->game->container->get('log')->addError(
 						'game'.$this->game->getId()
 						.' :change.find.outtimer '

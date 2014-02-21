@@ -306,6 +306,7 @@ class RealGamer {
 	}
 	
 	public function foldCards() {
+		$this->doc->setTimer(array());
 		$this->doc->setCards(array());
 		$this->doc->setFold(true);
 		$this->doc->setCombination(array());

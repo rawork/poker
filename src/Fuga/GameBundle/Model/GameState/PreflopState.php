@@ -20,33 +20,30 @@ class PreflopState extends AbstractState {
 			if ($gamer->getBet() > $this->game->getMaxbet()) {
 				$this->game->setMaxbet($gamer->getBet());
 			}
-			$this->game->stopTimer();
-			$this->game->container->get('odm')
+			$gamers = $this->game->container->get('odm')
 					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
 					->findAndUpdate()
 					->field('board')->equals($this->game->getId())
 					->field('active')->equals(true)
 					->field('state')->lt(1)
 					->field('fold')->set(true)
+					->field('allin')->set(false)
+					->field('bet')->set(0)
 					->field('cards')->set(array())
 					->getQuery()->execute();
-			// Find who not FOLD
+			$this->game->stopTimer();
+			$this->game->save();
+			// Find who not FOLD & have money
 			$gamers = $this->game->container->get('odm')
 					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
 					->field('board')->equals($this->game->getId())
 					->field('active')->equals(true)
 					->field('fold')->equals(false)
-					->getQuery()->execute();
-			if (count($gamers) > 2) {
-				$gamers = $this->game->container->get('odm')
-					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
-					->field('board')->equals($this->game->getId())
-					->field('active')->equals(true)
 					->field('chips')->gt(0)
 					->getQuery()->execute();
-			}
-
+			$this->game->container->get('log')->addError('PREFLOP GAMERS-'.count($gamers));
 			if (count($gamers) < 2) {
+				$this->game->container->get('log')->addError('INPREFLOP GAMERS-'.count($gamers));
 				$this->game->confirmBets();
 				$this->game->setWinner();
 				$this->game->setTimer('distribute');
@@ -127,7 +124,7 @@ class PreflopState extends AbstractState {
 		if ($gamerdoc) {
 			$timer = $this->game->getTimer();
 			$timer = array_shift($timer);
-			if (!$timer || intval($timer['time'])+5 < time()) { 
+			if (!$timer || intval($timer['time'])+15 < time()) { 
 				$this->game->container->get('log')->addError(
 						'game'.$this->game->getId()
 						.' :preflop.find.outtimer '
