@@ -349,30 +349,32 @@ class GameController extends PublicController {
 			return json_encode(array('ok' => false));
 		}
 		
-		try {
-			$gamerdoc = $this->get('odm')
+		$gamerdoc = $this->get('odm')
 					->getRepository('\Fuga\GameBundle\Document\Gamer')
 					->findOneByUser(intval($user['id']));
 			
-			$gamedoc = $this->get('odm')
-					->getRepository('\Fuga\GameBundle\Document\Board')
-					->findOneByBoard($gamerdoc->getBoard());
-			$gamer = new RealGamer($gamerdoc, $this->get('container'));
-			$game = new Game($gamedoc, $this->get('container'));
+		$gamedoc = $this->get('odm')
+				->getRepository('\Fuga\GameBundle\Document\Board')
+				->findOneByBoard($gamerdoc->getBoard());
+		$gamer = new RealGamer($gamerdoc, $this->get('container'));
+		$game = new Game($gamedoc, $this->get('container'));
+		
+		try {
 			$game->distribute($gamer);
-			$rivalsdoc = $this->get('odm')
-					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
-					->field('board')->equals($game->getId())
-					->field('user')->notEqual($gamer->getId())
-					->getQuery()->execute();
-			$rivals = array();
-			$numOfGamers = count($rivalsdoc) + 1;
-			foreach ($rivalsdoc as $rivaldoc) {
-				$rivals[] = new Rival($rivaldoc, $gamer->getRivalPosition($rivaldoc->getSeat(), $numOfGamers));
-			}
 		} catch (GameException $e) {
 			$this->get('log')->addError($e->getMessage());
 			return json_encode(array('ok' => false));
+		}
+		
+		$rivalsdoc = $this->get('odm')
+				->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+				->field('board')->equals($game->getId())
+				->field('user')->notEqual($gamer->getId())
+				->getQuery()->execute();
+		$rivals = array();
+		$numOfGamers = count($rivalsdoc) + 1;
+		foreach ($rivalsdoc as $rivaldoc) {
+			$rivals[] = new Rival($rivaldoc, $gamer->getRivalPosition($rivaldoc->getSeat(), $numOfGamers));
 		}
 		
 		$rivalsData = array();
@@ -448,35 +450,37 @@ class GameController extends PublicController {
 			return json_encode(array('ok' => false));
 		}
 		
+		$gamerdoc = $this->get('odm')
+				->getRepository('\Fuga\GameBundle\Document\Gamer')
+				->findOneByUser(intval($user['id']));
+
+		$gamedoc = $this->get('odm')
+				->getRepository('\Fuga\GameBundle\Document\Board')
+				->findOneByBoard($gamerdoc->getBoard());
+		$gamer = new RealGamer($gamerdoc, $this->get('container'));
+		$game = new Game($gamedoc, $this->get('container'));
+		
 		try {
-			$gamerdoc = $this->get('odm')
-					->getRepository('\Fuga\GameBundle\Document\Gamer')
-					->findOneByUser(intval($user['id']));
-			
-			$gamedoc = $this->get('odm')
-					->getRepository('\Fuga\GameBundle\Document\Board')
-					->findOneByBoard($gamerdoc->getBoard());
-			$gamer = new RealGamer($gamerdoc, $this->get('container'));
-			$game = new Game($gamedoc, $this->get('container'));
 			$game->next($gamer);
-			$rivalsdoc = $this->get('odm')
-					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
-					->field('board')->equals($game->getId())
-					->field('user')->notEqual($gamer->getId())
-					->getQuery()->execute();
-			$rivals = array();
-			$numOfGamers = count($rivalsdoc) + 1;
-			foreach ($rivalsdoc as $rivaldoc) {
-				$rivals[] = new Rival($rivaldoc, $gamer->getRivalPosition($rivaldoc->getSeat(), $numOfGamers));
-			}
-			if ($game->isMover($gamer->getSeat()) || in_array($game->getStateNo(), array(4, 41, 5, 7))) {
-				$game->startTimer();
-			}
-			$gamer->startTimer();
 		} catch (GameException $e) {
 			$this->get('log')->addError($e->getMessage());
 			return json_encode(array('ok' => false));
 		}
+		
+		$rivalsdoc = $this->get('odm')
+				->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+				->field('board')->equals($game->getId())
+				->field('user')->notEqual($gamer->getId())
+				->getQuery()->execute();
+		$rivals = array();
+		$numOfGamers = count($rivalsdoc) + 1;
+		foreach ($rivalsdoc as $rivaldoc) {
+			$rivals[] = new Rival($rivaldoc, $gamer->getRivalPosition($rivaldoc->getSeat(), $numOfGamers));
+		}
+		if ($game->isMover($gamer->getSeat()) || in_array($game->getStateNo(), array(4, 41, 5, 7))) {
+			$game->startTimer();
+		}
+		$gamer->startTimer();
 		
 		$rivalsData = array();
 		foreach ($rivals as $rival) {
@@ -487,6 +491,7 @@ class GameController extends PublicController {
 				'active' => $rival->isHere(),
 			);
 		}
+		
 		
 		return json_encode(array(
 			'ok' => true,
