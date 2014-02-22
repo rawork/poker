@@ -883,19 +883,18 @@ class GameController extends PublicController {
 			return json_encode(array('ok' => false));
 		}
 
-		$gameId = intval(array_shift($params));
+		$gameId = array_shift($params);
 		if (!$gameId) {
-			throw $this->createNotFoundException('');
+			return json_encode(array('ok' => false));
 		}
 		
 		$gamedoc = $this->get('odm')
 				->getRepository('\Fuga\GameBundle\Document\Board')
-				->findOneByBoard($gameId)
+				->findOneByBoard(intval($gameId))
 				->getQuery()->getSingleResult();
 		try {
 			$game = new Game($gamedoc, $this->get('container'));
 			$game->sync();
-			$this->get('log')->addError('sync2.OK');
 		} catch (\Exception $e) {
 			$this->get('log')->addError('sync2.ERROR:'.$e->getMessage());
 		}

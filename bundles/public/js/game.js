@@ -471,6 +471,13 @@ function onToggleOut() {
 	}, "json");
 }
 
+function onSync() {
+    $.post('/game/sync2/'+ gameid, {},
+        function(data){
+
+        }, "json");
+}
+
 function stopTime() {
 	var highestIntervalId = setInterval(";");
 	for (var i = 0 ; i <= highestIntervalId ; i++) {
