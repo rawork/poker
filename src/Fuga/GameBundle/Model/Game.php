@@ -7,6 +7,7 @@ use Fuga\GameBundle\Model\Deck;
 use Fuga\GameBundle\Model\RealGamer;
 use Fuga\GameBundle\Model\Exception\GameException;
 use Fuga\Component\Container;
+use Fuga\GameBundle\Document\Board;
 
 class Game implements GameInterface {
 	
@@ -44,7 +45,7 @@ class Game implements GameInterface {
 		'answer'     => array('handler' => 'onNoAnswer', 'holder' => 'answer-timer', 'time' => 14),
 	);
 	
-	public function __construct( $doc, Container $container) {
+	public function __construct(Board $doc, Container $container) {
 		$this->container = $container;
 		$this->doc = $doc;
 		
@@ -80,6 +81,10 @@ class Game implements GameInterface {
 	
 	public function setMover($value) {
 		$this->doc->setMover($value);
+	}
+
+	public function getUpdated() {
+		return $this->doc->getUpdated();
 	}
 	
 	public function setUpdated($value) {
@@ -183,8 +188,13 @@ class Game implements GameInterface {
 		if (time() > $this->doc->getFromtime()) {
 			$seconds = time() - $this->doc->getFromtime();
 			$this->minbet = ($seconds - $seconds % $this->upTimer) / $this->upTimer + 1;
+			if ($this->minbet > $this->doc->getMinbet()) {
+				$this->doc->setMinbet($this->minbet);
+				$this->doc->setUpdated(time());
+				$this->save();
+			}
 		} else {
-			$this->minbet = 1;
+			$this->minbet = $this->doc->getMinbet();
 		}		
 		
 		return $this;

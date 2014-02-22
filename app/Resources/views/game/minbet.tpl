@@ -1,1 +1,1 @@
-{if !$game->isState(0) && !$game->isState(6)}Минимальная ставка: <div id="min-bet">{$game->minbet}</div>{/if}
+Минимальная ставка: <div id="min-bet">{$game->minbet}</div>

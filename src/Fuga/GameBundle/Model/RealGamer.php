@@ -4,6 +4,7 @@ namespace Fuga\GameBundle\Model;
 
 use Fuga\Component\Container;
 use Fuga\GameBundle\Model\Game;
+use Fuga\GameBundle\Document\Gamer;
 use Fuga\GameBundle\Model\Exception\GameException;
 
 class RealGamer {
@@ -26,7 +27,7 @@ class RealGamer {
 		'change'     => array('handler' => 'onClickNoChange', 'holder' => 'change-timer', 'time' => 31),
 	);
 	
-	public function __construct($doc, Container $container) {
+	public function __construct(Gamer $doc, Container $container) {
 		$this->container    = $container;
 		$this->doc = $doc;
 		
@@ -127,11 +128,13 @@ class RealGamer {
 	
 	public function getDeniedQuestions() {
 		$denied = $this->doc->getDenied();
-		if (count($denied) > 0) {
-			return implode(',', $denied);
-		} else {
-			return '0'; 
-		}
+//		if (count($denied) > 0) {
+//			return implode(',', $denied);
+//		} else {
+//			return '0';
+//		}
+
+		return $denied ?: array(0);
 	}
 	
 	public function addDeniedQuestion($id) {
@@ -266,11 +269,26 @@ class RealGamer {
 	}
 	
 	public function changeCard($card) {
-		$questions = $this->container->getItems(
-				'game_poll', 
-				'id < 141 AND id NOT IN('.$this->getDeniedQuestions().')'
+//		$questions = $this->container->getItems(
+//				'game_poll',
+//				'id < 141 AND id NOT IN('.$this->getDeniedQuestions().')'
+//		);
+//		$question = $questions[array_rand($questions)];
+		$questiondoc = $this->container->get('odm')
+				->createQueryBuilder('\Fuga\GameBundle\Document\Question')
+				->field('question')->notIn($this->getDeniedQuestions())
+				->limit(1)
+				->skip(rand(1,40))
+				->getQuery()->getSingleResult();
+		$question = array(
+			'id'      => $questiondoc->getQuestion(),
+			'name'    => $questiondoc->getName(),
+			'answer1' => $questiondoc->getAnswer1(),
+			'answer2' => $questiondoc->getAnswer2(),
+			'answer3' => $questiondoc->getAnswer3(),
+			'answer4' => $questiondoc->getAnswer4(),
+			'answer'  => $questiondoc->getAnswer(),
 		);
-		$question = $questions[array_rand($questions)];
 		$this->question = $question;
 		$this->doc->setCard($card);
 		$this->doc->setQuestion(array($question));

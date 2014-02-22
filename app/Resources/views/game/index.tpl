@@ -29,6 +29,7 @@
 	var gameid = {$game->getId()};
 	var gamerid = {$gamer->getId()};
 	var gamerseat = {$gamer->getSeat()};
+    var gameupdated = {$game->getUpdated()};
 	var cardimages = {$deck->names(true)};
 </script>
 

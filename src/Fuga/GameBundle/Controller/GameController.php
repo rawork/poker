@@ -849,26 +849,58 @@ class GameController extends PublicController {
 			
 		return $this->render('game/error.tpl', compact('error'));
 	}
-	
+
 	public function syncAction() {
-		if (isset($_SERVER['REQUEST_URI'])) {
-			$this->get('router')->redirect('/');
+		$user = $this->get('security')->getCurrentUser();
+		if (!$user || !$this->get('security')->isGroup('admin') ) {
+			$this->get('router')->redirect('/game');
 		}
-		
+
 		$boards = $this->get('odm')
-				->createQueryBuilder('\Fuga\GameBundle\Document\Board')
-				->field('state')->gt(0)
-				->field('state')->notEqual(6)
-				->getQuery()->execute();
+			->createQueryBuilder('\Fuga\GameBundle\Document\Board')
+			->field('state')->gt(0)
+			->field('state')->notEqual(6)
+			->getQuery()->execute();
 		foreach ($boards as $gamedoc) {
 			try {
 				$game = new Game($gamedoc, $this->get('container'));
 				$game->sync();
 			} catch (\Exception $e) {
 				$this->get('log')->addError('cron.ERROR:'.$e->getMessage());
-			}	
+			}
+		}
+
+	}
+	
+	public function sync2Action($params) {
+		if (!$this->get('router')->isXmlHttpRequest()) {
+			$this->get('router')->redirect('/game/game');
+		}
+
+		$user = $this->get('security')->getCurrentUser();
+		if (!$user)
+		{
+			return json_encode(array('ok' => false));
+		}
+
+		$gameId = intval(array_shift($params));
+		if (!$gameId) {
+			throw $this->createNotFoundException('');
 		}
 		
+		$gamedoc = $this->get('odm')
+				->getRepository('\Fuga\GameBundle\Document\Board')
+				->findOneByBoard($gameId)
+				->getQuery()->getSingleResult();
+		try {
+			$game = new Game($gamedoc, $this->get('container'));
+			$game->sync();
+			$this->get('log')->addError('sync2.OK');
+		} catch (\Exception $e) {
+			$this->get('log')->addError('sync2.ERROR:'.$e->getMessage());
+		}
+
+		return json_encode(array('ok' => true));
 	}
 
 }

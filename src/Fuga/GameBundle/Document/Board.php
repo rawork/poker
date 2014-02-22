@@ -42,6 +42,9 @@ class Board
 	
 	/** @ODM\Int */
     private $maxbet = 0;
+
+	/** @ODM\Int */
+	private $minbet = 1;
 	
 	/** @ODM\Int */
     private $dealer = 0;
@@ -570,5 +573,27 @@ class Board
     public function getUpdated()
     {
         return $this->updated;
+    }
+
+    /**
+     * Set minbet
+     *
+     * @param int $minbet
+     * @return self
+     */
+    public function setMinbet($minbet)
+    {
+        $this->minbet = $minbet;
+        return $this;
+    }
+
+    /**
+     * Get minbet
+     *
+     * @return int $minbet
+     */
+    public function getMinbet()
+    {
+        return $this->minbet;
     }
 }

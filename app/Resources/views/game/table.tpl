@@ -86,7 +86,7 @@
 {elseif $game->isState(2) || $game->isState(3) || $game->isState(4)}
 <div class="game-flop">	
 	{foreach from=$game->getFlop() item=card}
-	<div class="card{if ($game->isState(2) || $game->isState(3) || $game->isState(4)) && $gamer->isCombination($card.name)} hint{/if}{if $game->isState(4) && $game->isCombination($card.name)} active{/if}" data-card-name="{$card.name}">
+	<div class="card{if ($game->isState(3) || $game->isState(4)) && $gamer->isCombination($card.name)} hint{/if}{if $game->isState(4) && $game->isCombination($card.name)} active{/if}">
 		{if $game->isState(3) || $game->isState(4)}<img src="/bundles/public/img/cards/{$card.name}.png" />
 		{else}
 		<img src="/bundles/public/img/shirt.png" />

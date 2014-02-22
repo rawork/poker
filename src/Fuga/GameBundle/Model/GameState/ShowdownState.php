@@ -112,16 +112,39 @@ class ShowdownState extends AbstractState {
 				$doc->setRank('');
 				$doc->setCombination(array());
 				$doc->setWinner(false);
-				$query = '1=1';
-				if ($denied = $doc->getDenied()) {
-					$query = 'id < 141 AND id NOT IN('.implode(',', $denied).')';
+//				$query = '1=1';
+//				if ($denied = $doc->getDenied()) {
+//					$query = 'id < 141 AND id NOT IN('.implode(',', $denied).')';
+//				}
+//				$questions = $this->game->container->getItems('game_poll', $query);
+//				shuffle($questions);
+//				$buy = array_slice($questions, 0, 3);
+//				foreach ($buy as $question) {
+//					$denied[] = $question['id'];
+//				}
+
+				$buy = array();
+				$denied = $doc->getDenied() ?: array(0);
+				$questions = $this->game->container->get('odm')
+					->createQueryBuilder('\Fuga\GameBundle\Document\Question')
+					->field('question')->notIn($denied)
+					->limit(3)
+					->skip(rand(1,40))
+					->getQuery()->execute();
+
+				foreach ($questions as $questiondoc) {
+					$buy[] = array(
+						'id'      => $questiondoc->getQuestion(),
+						'name'    => $questiondoc->getName(),
+						'answer1' => $questiondoc->getAnswer1(),
+						'answer2' => $questiondoc->getAnswer2(),
+						'answer3' => $questiondoc->getAnswer3(),
+						'answer4' => $questiondoc->getAnswer4(),
+						'answer'  => $questiondoc->getAnswer(),
+					);
+					$denied[] = $questiondoc->getQuestion();
 				}
-				$questions = $this->game->container->getItems('game_poll', $query);
-				shuffle($questions);
-				$buy = array_slice($questions, 0, 3);
-				foreach ($buy as $question) {
-					$denied[] = $question['id'];
-				}
+
 				$doc->setBuy($buy);
 				$doc->setDenied($denied);
 			}

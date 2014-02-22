@@ -57,7 +57,7 @@ var eventTimers = {};
 
 function hasEventTimer(name) {
 	if (eventTimers[name] !== undefined) {
-		if (Date.now() - eventTimers[name] < 5000) {
+		if (Date.now() - eventTimers[name] < 2000) {
 //			console.log('loop event ', name);
 			return true;
 		} else {
@@ -280,8 +280,6 @@ function onClickCheck() {
 			$('#gamer-cards').html(data.cards);
 			$('#bank').html(data.bank);
 			$('#bets').html(data.bets);
-			$('.gamer-container').append(data.winner);
-			$('.gamer-container').append(data.hint);
 			updateRivals(data.rivals);
 			gameTimerId = setInterval(startTimer, 1000);
 		} else {
@@ -326,8 +324,6 @@ function onDistribute() {
 			$('#chips').html(data.chips);
 			$('#bet').html(data.bet);
 			$('#bank').html(data.bank);
-			$('#bank').html(data.bank);
-			$('#gamer-cards').empty();
 			updateRivals(data.rivals);
 			if (data.state == 1) {
 				$('#gamer-cards').html(data.cards);
@@ -430,7 +426,6 @@ function onNext() {
 	stopTimer();
 	$.post('/game/next', {},
 	function(data){
-		console.log('onNext', data);
 		if (data.ok) {
 			if (data.table) {
 				$('#table').html(data.table);
@@ -563,17 +558,20 @@ function updateRivals(rivals) {
 		if (rivals[i].chips !== undefined) {
 			$('.gamer-chips[data-bot-id='+i+']').html(rivals[i].chips);
 		}
-		if (rivals[i].cards !== undefined) {
+
+        if (rivals[i].cards !== undefined) {
 			$('.gamer-cards[data-bot-id='+i+']').html(rivals[i].cards);
 		}
-		if (rivals[i].active == 1 && rivals[i].state == 3) {
+
+        if (rivals[i].active == 1 && rivals[i].state == 3) {
 			$('.gamer-status[data-bot-id='+i+']').addClass('notready').html('Вне игры');
 		} else if (rivals[i].active == 1 && rivals[i].state == 1) {
 			$('.gamer-status[data-bot-id='+i+']').removeClass('notready').html('Активен');
 		} else {
 			$('.gamer-status[data-bot-id='+i+']').addClass('notready').html('Не активен');
 		}
-		if (rivals[i].bet !== undefined) {
+
+        if (rivals[i].bet !== undefined) {
 			$('.gamer-bet[data-bot-id='+i+']').html(rivals[i].bet);
 		}
 	}
@@ -629,7 +627,7 @@ function enableButtons(state) {
 
 function initGame() {
 	stopTime();
-	setInterval(startTime, 1000);
+    gameTimeId = setInterval(startTime, 1000);
 	$(document).on('click', '.choose', onChooseCard);
 	$(document).on('click', 'a[data-action=nobuyanswer]',    onClickNoBuyAnswer);
 	$(document).on('click', '.question-answer',              onChooseAnswer);
@@ -643,13 +641,13 @@ function initGame() {
 	$(document).on('click', 'button[data-action=fold]',      onFold);
 	$(document).on('click', 'button[data-action=buy]',       onBuy);
 	$(document).on('click', 'button[data-action=out]',       onToggleOut);
-	$(document).on('change', '#input_bet', onChangeBetInput);
+//	$(document).on('change', '#input_bet', onChangeBetInput);
 	enableButtons();
 	gameTimerId = setInterval(startTimer, 1000);
 //	setInterval(onUpdate, 3000);
 	$('.gamer-container').zoomcard();
 	$('.game-board-container').preloadImages(cardimages);
-	console.log($.cookie('timerhandler'));
+//	console.log($.cookie('timerhandler'));
 }
 
 $(document).ready(function(){
@@ -658,17 +656,186 @@ $(document).ready(function(){
 
 var gameupdated = 0;
 
-function startUpdate(games) {
-	for (i in games) {
-		if (games[i]['board'] == gameid && games[i]['updated'] > gameupdated) {
-			gameupdated = games[i]['updated'];
-//			console.log('update ' + Date.now());
-			onUpdate();
-		}
-	}
+function startUpdate(data) {
+    if (data.board.board == gameid && data.board.updated > gameupdated) {
+        gameupdated = data.board.updated;
+        console.log('update ' + Date.now());
+        onWSUpdate(data);
+    }
 }
 
-var ws = new WebSocket('ws://' + window.location.hostname + ':3001');
+function updateWSRivals(rivals, board) {
+    for (var j in rivals) {
+        $('.gamer-chips[data-bot-id=' + rivals[j].user + ']').html(rivals[j].chips);
+        $('.gamer-bet[data-bot-id=' + rivals[j].user + ']').html(rivals[j].bet);
+
+        if (rivals[j].cards){
+            $('.gamer-cards[data-bot-id=' + rivals[j].user + ']').empty();
+            for (i in rivals[j].cards) {
+                if (board.state == 4) {
+                    var src = '/bundles/public/img/cards/' + rivals[j].cards[i].name + '.png';
+                } else {
+                    var src = '/bundles/public/img/shirt.png';
+                }
+                var card = $('<div><img src="'+src+'"></div>').addClass('card').attr('data-card-id', i);
+                if (board.state == 4 && $.inArray(rivals[j].cards[i].name, board.combination) > -1) {
+                    card.addClass('active');
+                }
+
+                $('.gamer-cards[data-bot-id=' + rivals[j].user + ']').append(card);
+            }
+        } else if ($.inArray(board.state, [2, 3, 4]) > -1 && rivals[j].active) {
+            $('.gamer-cards[data-bot-id=' + rivals[j].user + ']').html('<div class="pass">ПАС</div>');
+        } else {
+            $('.gamer-cards[data-bot-id=' + rivals[j].user + ']').empty();
+        }
+
+        if (rivals[j].active == 1 && rivals[j].state == 3) {
+            $('.gamer-status[data-bot-id='+rivals[j].user+']').addClass('notready').html('Вне игры');
+        } else if (rivals[j].active == 1 && rivals[j].state == 1) {
+            $('.gamer-status[data-bot-id='+rivals[j].user+']').removeClass('notready').html('Активен');
+        } else {
+            $('.gamer-status[data-bot-id='+rivals[j].user+']').addClass('notready').html('Не активен');
+        }
+
+    }
+}
+
+function getRivalPosition(rivalSeat, numOfGamers, seat) {
+    if (rivalSeat == seat) {
+        return 0;
+    }
+
+    var position = leftOffset = rightOffset = 0;
+
+    switch(numOfGamers){
+        case 2:
+            return 3;
+        case 3:
+            leftOffset = 1;
+            rightOffset = 2;
+            break;
+        case 4:
+            leftOffset = 1;
+            rightOffset = 1;
+            break;
+        case 5:
+            leftOffset = 0;
+            rightOffset = 1;
+            break;
+        default:
+            leftOffset = 0;
+            rightOffset = 0;
+            break;
+    }
+    if (rivalSeat > seat) {
+        position = rivalSeat - seat + leftOffset;
+    } else {
+        position = 6 - (seat - rivalSeat + rightOffset);
+    }
+
+    return position;
+}
+
+function setTimer(timerData) {
+    var currentTimer = $.cookie('timerhandler');
+    var currentStop = $.cookie('timerstop');
+    if (timerData.length == 1 && currentTimer != timerData[0].handler && currentStop != timerData[0].time) {
+        $.cookie('timerhandler', timerData[0].handler, {path: '/'});
+        $.cookie('timerholder', timerData[0].holder, {path: '/'});
+        $.cookie('timerstop', timerData[0].time, {path: '/'});
+        gameTimerId = setInterval(startTimer, 1000);
+    }
+}
+
+
+function onWSUpdate(data) {
+    stopTimer();
+    var state = $.cookie('gamestate');
+    if (state > 0 && data.board.state == 0 ) {
+        window.location.reload();
+    }
+
+    $('#table').html(data.table);
+
+    if (data.gamer.cards){
+        $('#gamer-cards').empty();
+        for (i in data.gamer.cards) {
+            var src = '/bundles/public/img/cards/' + data.gamer.cards[i].name + '.png';
+            var card = $('<div><img src="'+src+'"></div>').addClass('card').attr('data-card-name', data.gamer.cards[i].name).attr('data-card-id', i);
+            if (data.board.state == 1) {
+                card.addClass('choose');
+            }
+            if (!data.gamer.winner && $.inArray(data.board.state, [2, 3, 4]) > -1 && $.inArray(data.gamer.cards[i].name, data.gamer.combination) > -1) {
+                card.addClass('hint');
+            }
+            if (data.board.state == 4 && $.inArray(data.gamer.cards[i].name, data.board.combination) > -1) {
+                card.addClass('active');
+            }
+
+            $('#gamer-cards').append(card);
+        }
+    } else if ($.inArray(data.board.state, [2, 3, 4])  > -1) {
+        $('#gamer-cards').html('<div class="pass">ПАС</div>');
+    } else {
+        $('#gamer-cards').empty();
+    }
+
+    $('#bank').html(data.board.bank);
+    $('#bets').html(data.board.bets);
+    $('#chips').html(data.gamer.chips);
+    $('#bet').html(data.gamer.bet);
+
+    $('.game-winner').remove();
+    if (data.board.state == 4) {
+        for( i in data.board.winner) {
+            var winner = $('<div></div>')
+                .addClass('game-winner winner' + getRivalPosition(data.board.winner[i].seat, data.board.winner[i].numOfGamers, data.gamer.seat))
+                .html('Победитель &laquo;'+ data.board.winner[i].name + '&raquo;');
+            $('.gamer-container').append(winner);
+        }
+    }
+
+    $('.gamer-hint').remove();
+    if ($.inArray(data.board.state, [2, 3, 4])  > -1 && data.gamer.rank && !data.gamer.winner){
+        var hint = $('<div></div>').addClass('gamer-hint hint0').html('&laquo;'+data.gamer.rank+'&raquo;');
+        $('.gamer-container').append(hint);
+    }
+
+    var bet = +$('#input_bet').val();
+    $('#min-bet').html(data.board.minbet);
+    if (bet == NaN || data.board.minbet > bet) {
+        $('#input_bet').val(data.board.minbet);
+    }
+
+    $.cookie('gamerstate', data.gamer.state, {path: '/'});
+    $.cookie('gamestate', data.board.state, {path: '/'});
+    $.cookie('gamemaxbet', data.board.maxbet, {path: '/'});
+    $.cookie('gamemover', data.board.mover, {path: '/'});
+
+    updateWSRivals(data.gamers, data.board);
+
+    if (data.board.state == 6) {
+        $('.gamer-cards').empty();
+        $('.game-min-bet').empty();
+        $('.game-main-banks').empty();
+        stopTime();
+    } else {
+        if ($.inArray(data.board.state, [2,3]) > -1 && data.gamer.seat == data.board.mover) {
+            console.log('torgi settimer');
+            setTimer(data.board.timer);
+        } else if ($.inArray(data.board.state, [2,3]) == -1) {
+            setTimer(data.board.timer);
+            setTimer(data.gamer.timer);
+        }
+    }
+
+    enableButtons();
+
+    console.log($.cookie('timerhandler'));
+}
+
+var ws = new WebSocket('ws://' + window.location.hostname + ':3001/game/' + gameid + '/' + gamerid);
 
 ws.onmessage = function (event) {
 	startUpdate(JSON.parse(event.data));

@@ -673,4 +673,26 @@ class Gamer {
     {
         return $this->updated;
     }
+
+    /**
+     * Set bank
+     *
+     * @param int $bank
+     * @return self
+     */
+    public function setBank($bank)
+    {
+        $this->bank = $bank;
+        return $this;
+    }
+
+    /**
+     * Get bank
+     *
+     * @return int $bank
+     */
+    public function getBank()
+    {
+        return $this->bank;
+    }
 }

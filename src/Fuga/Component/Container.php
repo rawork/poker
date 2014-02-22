@@ -105,7 +105,7 @@ class Container
 	}
 	
 	public function initialize() {
-//		$this->tables = $this->getAllTables();
+		$this->tables = $this->getAllTables();
 	}
 
 	public function getModule($name) {
