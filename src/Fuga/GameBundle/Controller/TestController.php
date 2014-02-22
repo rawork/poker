@@ -83,18 +83,18 @@ class TestController extends PublicController {
 	}
 
 	public function qAction() {
-		$questions = $this->get('container')->getItems('game_poll', '1=1');
-		foreach ($questions as $question) {
-			$q = new Question();
-			$q->setQuestion(intval($question['id']));
-			$q->setName($question['name']);
-			$q->setAnswer1($question['answer1']);
-			$q->setAnswer2($question['answer2']);
-			$q->setAnswer3($question['answer3']);
-			$q->setAnswer4($question['answer4']);
-			$q->setAnswer(intval($question['answer']));
-			$this->get('odm')->persist($q);
-		}
-		$this->get('odm')->flush();
+//		$questions = $this->get('container')->getItems('game_poll', '1=1');
+//		foreach ($questions as $question) {
+//			$q = new Question();
+//			$q->setQuestion(intval($question['id']));
+//			$q->setName($question['name']);
+//			$q->setAnswer1($question['answer1']);
+//			$q->setAnswer2($question['answer2']);
+//			$q->setAnswer3($question['answer3']);
+//			$q->setAnswer4($question['answer4']);
+//			$q->setAnswer(intval($question['answer']));
+//			$this->get('odm')->persist($q);
+//		}
+//		$this->get('odm')->flush();
 	}
 }

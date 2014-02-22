@@ -158,6 +158,7 @@ function onClickChange() {
 	function(data){
 		if (data.ok) {
 			$('#table').html(data.table);
+            gameupdated = data.updated;
 			gameTimerId = setInterval(startTimer, 1000);
 		}
 	}, "json");
@@ -174,6 +175,8 @@ function onClickNoChange() {
 			if (data.hint){
 				$('.gamer-container').append(data.hint);
 			}
+            enableButtons();
+
 			gameTimerId = setInterval(startTimer, 1000);
 		}  else {
 //			window.location.reload();
@@ -205,6 +208,7 @@ function onAnswer(n) {
 			if (data.hint){
 				$('.gamer-container').append(data.hint);
 			}
+
 			gameTimerId = setInterval(startTimer, 1000);
 		} else {
 //			window.location.reload();
@@ -258,6 +262,7 @@ function onBet(chips) {
 			$('#bank').html(data.bank);
 			$('#bets').html(data.bets);
 			updateRivals(data.rivals);
+
 			gameTimerId = setInterval(startTimer, 1000);
 		} else {
 //			window.location.reload();
@@ -281,6 +286,7 @@ function onClickCheck() {
 			$('#bank').html(data.bank);
 			$('#bets').html(data.bets);
 			updateRivals(data.rivals);
+
 			gameTimerId = setInterval(startTimer, 1000);
 		} else {
 //			window.location.reload();
@@ -303,6 +309,8 @@ function onFold() {
 			$('#table').html(data.table);
 			$('#gamer-cards').html(data.cards);
 			$('.gamer-hint').remove();
+            
+            
 			gameTimerId = setInterval(startTimer, 1000);
 		} else {
 //			window.location.reload();
@@ -333,6 +341,7 @@ function onDistribute() {
 				$('.game-main-bank').empty();
 			}
 			enableButtons();
+
 			gameTimerId = setInterval(startTimer, 1000);
 		} else {
 			onUpdate();
@@ -358,6 +367,7 @@ function onShowBuy() {
 			}
 			updateRivals(data.rivals);
 			enableButtons();
+
 			gameTimerId = setInterval(startTimer, 1000);
 		}
 	}, "json");
@@ -369,6 +379,8 @@ function onBuy() {
 	function(data){
 		if (data.ok) {
 			$('#table').html(data.table);
+            enableButtons();
+
 			gameTimerId = setInterval(startTimer, 1000);
 		} else {
 //			window.location.reload();
@@ -396,6 +408,7 @@ function onBuyAnswer(n) {
 			$('#table').html(data.table);
 			$('#chips').html(data.chips);
 			enableButtons();
+
 			gameTimerId = setInterval(startTimer, 1000);
 		} else {
 //			window.location.reload();
@@ -412,6 +425,8 @@ function onEndRound() {
 	function(data){
 		if (data.ok) {
 			$('#table').html(data.table);
+            enableButtons();
+
 			gameTimerId = setInterval(startTimer, 1000);
 		} else {
 //			window.location.reload();
@@ -435,6 +450,7 @@ function onNext() {
 			}
 			enableButtons();
 			updateRivals(data.rivals);
+
 			gameTimerId = setInterval(startTimer, 1000);
 		} else {
 			onUpdate();
@@ -447,6 +463,7 @@ function onStart() {
 	function(data){
 		if (data.ok) {
 			$.cookie('gamestate', data.state, {path: '/'});
+
 			window.location.reload();
 		}
 	}, "json");
@@ -528,7 +545,7 @@ function startTimer() {
 	if (timerstop < now) {
 		$('#'+ timerName).html( "00:00:00" );
 		var timerhandler = $.cookie('timerhandler');
-//		console.log(timerhandler);
+		console.log(timerhandler);
 		$.cookie('timerhandler', '', {path: '/'});
 		stopTimer();
 		if (timerhandler !== 'null') {
@@ -664,6 +681,7 @@ $(document).ready(function(){
 var gameupdated = 0;
 
 function startUpdate(data) {
+
     if (data.board.board == gameid && data.board.updated > gameupdated) {
         gameupdated = data.board.updated;
         console.log('update ' + Date.now());
@@ -678,7 +696,7 @@ function updateWSRivals(rivals, board) {
 
         if (rivals[j].cards){
             $('.gamer-cards[data-bot-id=' + rivals[j].user + ']').empty();
-            for (i in rivals[j].cards) {
+            for (var i in rivals[j].cards) {
                 if (board.state == 4) {
                     var src = '/bundles/public/img/cards/' + rivals[j].cards[i].name + '.png';
                 } else {
@@ -758,6 +776,7 @@ function setTimer(timerData) {
 
 function onWSUpdate(data) {
     stopTimer();
+
     var state = $.cookie('gamestate');
     if (state > 0 && data.board.state == 0 ) {
         window.location.reload();
@@ -765,9 +784,13 @@ function onWSUpdate(data) {
 
     $('#table').html(data.table);
 
+    console.log('GAMESTATE', data.board.state);
+    console.log('GAMEMOVER', data.board.mover);
+    console.log('GAMERSEAT', data.gamer.seat);
+
     if (data.gamer.cards){
         $('#gamer-cards').empty();
-        for (i in data.gamer.cards) {
+        for (var i in data.gamer.cards) {
             var src = '/bundles/public/img/cards/' + data.gamer.cards[i].name + '.png';
             var card = $('<div><img src="'+src+'"></div>').addClass('card').attr('data-card-name', data.gamer.cards[i].name).attr('data-card-id', i);
             if (data.board.state == 1) {
@@ -795,7 +818,7 @@ function onWSUpdate(data) {
 
     $('.game-winner').remove();
     if (data.board.state == 4) {
-        for( i in data.board.winner) {
+        for(var i in data.board.winner) {
             var winner = $('<div></div>')
                 .addClass('game-winner winner' + getRivalPosition(data.board.winner[i].seat, data.board.winner[i].numOfGamers, data.gamer.seat))
                 .html('Победитель &laquo;'+ data.board.winner[i].name + '&raquo;');
@@ -839,7 +862,7 @@ function onWSUpdate(data) {
 
     enableButtons();
 
-    console.log($.cookie('timerhandler'));
+//    console.log($.cookie('timerhandler'));
 }
 
 var ws = new WebSocket('ws://' + window.location.hostname + ':3001/game/' + gameid + '/' + gamerid);

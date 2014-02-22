@@ -142,6 +142,7 @@ class GameController extends PublicController {
 			'chips' => $gamer->getChips(),
 			'cards' => $this->render('game/cards.tpl', compact('game', 'gamer')),
 			'hint'  => $this->render('game/hint.tpl', compact('game', 'gamer')),
+			'updated' => $game->getUpdated(),
 			'change_times' => $gamer->getTimes(),
 		));
 	}
@@ -177,6 +178,7 @@ class GameController extends PublicController {
 		return json_encode(array(
 			'ok' => true,
 			'table' => $this->render('game/table.tpl', compact('game', 'gamer')),
+			'updated' => $game->getUpdated(),
 		));
 	}
 	
@@ -213,6 +215,7 @@ class GameController extends PublicController {
 			'ok' => true,
 			'table' => $this->render('game/table.tpl', compact('game', 'gamer')),
 			'hint' => $this->render('game/hint.tpl', compact('game', 'gamer')),
+			'updated' => $game->getUpdated(),
 		));
 	}
 	
@@ -249,6 +252,7 @@ class GameController extends PublicController {
 			'table' => $this->render('game/table.tpl', compact('game', 'gamer')),
 			'cards' => $this->render('game/cards.tpl', compact('game', 'gamer')),
 			'winner'=> $this->render('game/winner.tpl', compact('game', 'gamer')),
+			'updated' => $game->getUpdated(),
 		));
 	}
 	
@@ -292,6 +296,7 @@ class GameController extends PublicController {
 			'state' => $game->getStateNo(),
 			'hint'  => $this->render('game/hint.tpl', compact('game', 'gamer')),
 			'winner'=> $this->render('game/winner.tpl', compact('game', 'gamer')),
+			'updated' => $game->getUpdated(),
 		));
 	}
 	
@@ -334,6 +339,7 @@ class GameController extends PublicController {
 			'state' => $game->getStateNo(),
 			'hint'  => $this->render('game/hint.tpl', compact('game', 'gamer')),
 			'winner'=> $this->render('game/winner.tpl', compact('game', 'gamer')),
+			'updated' => $game->getUpdated(),
 		));
 	}
 	
@@ -400,6 +406,7 @@ class GameController extends PublicController {
 			'gamerstate' => $gamer->getState(),
 			'mover' => $game->isMover($gamer->getSeat()) ? 1 : 0,
 			'rivals' => $rivalsData,
+			'updated' => $game->getUpdated(),
 		));
 	}
 	
@@ -435,6 +442,7 @@ class GameController extends PublicController {
 			'ok' => true,
 			'table' => $this->render('game/table.tpl', compact('game', 'gamer')),
 			'state' => $game->getStateNo(),
+			'updated' => $game->getUpdated(),
 		));
 	}
 	
@@ -504,6 +512,7 @@ class GameController extends PublicController {
 			'gamerstate' => $gamer->getState(),
 			'mover' => $game->isMover($gamer->getSeat()) ? 1 : 0,
 			'rivals' => $rivalsData,
+			'updated' => $game->getUpdated(),
 		));
 	}
 	
@@ -538,6 +547,7 @@ class GameController extends PublicController {
 		return json_encode(array(
 			'ok' => true,
 			'table' => $this->render('game/table.tpl', compact('game', 'gamer')),
+			'updated' => $game->getUpdated(),
 		));
 	}
 	
@@ -573,6 +583,7 @@ class GameController extends PublicController {
 		return json_encode(array(
 			'ok' => true,
 			'table' => $this->render('game/table.tpl', compact('game', 'gamer')),
+			'updated' => $game->getUpdated(),
 		));
 	}
 	
@@ -609,6 +620,7 @@ class GameController extends PublicController {
 			'ok' => true,
 			'table' => $this->render('game/table.tpl', compact('game', 'gamer')),
 			'chips' => $gamer->getChips(),
+			'updated' => $game->getUpdated(),
 		));
 	}
 	
@@ -681,6 +693,7 @@ class GameController extends PublicController {
 			'mover' => $game->getMover(),
 			'rivals'=> $rivalsData,
 			'minbet' => $game->minbet,
+			'updated' => $game->getUpdated(),
 		));
 	}
 	
@@ -713,6 +726,7 @@ class GameController extends PublicController {
 		return json_encode(array(
 			'ok' => true,
 			'state' => 1,
+			'updated' => $game->getUpdated(),
 		));
 	}
 	
