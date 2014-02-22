@@ -784,9 +784,9 @@ function onWSUpdate(data) {
 
     $('#table').html(data.table);
 
-    console.log('GAMESTATE', data.board.state);
-    console.log('GAMEMOVER', data.board.mover);
-    console.log('GAMERSEAT', data.gamer.seat);
+//    console.log('GAMESTATE', data.board.state);
+//    console.log('GAMEMOVER', data.board.mover);
+//    console.log('GAMERSEAT', data.gamer.seat);
 
     if (data.gamer.cards){
         $('#gamer-cards').empty();
@@ -852,7 +852,7 @@ function onWSUpdate(data) {
         stopTime();
     } else {
         if ($.inArray(data.board.state, [2,3]) > -1 && data.gamer.seat == data.board.mover) {
-            console.log('torgi settimer');
+//            console.log('torgi settimer');
             setTimer(data.board.timer);
         } else if ($.inArray(data.board.state, [2,3]) == -1) {
             setTimer(data.board.timer);
