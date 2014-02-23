@@ -691,7 +691,7 @@ function updateWSRivals(rivals, board) {
         $('.gamer-chips[data-bot-id=' + rivals[j].user + ']').html(rivals[j].chips);
         $('.gamer-bet[data-bot-id=' + rivals[j].user + ']').html(rivals[j].bet);
 
-        if (rivals[j].cards){
+        if (rivals[j].cards.length > 0){
             $('.gamer-cards[data-bot-id=' + rivals[j].user + ']').empty();
             for (var i in rivals[j].cards) {
                 if (board.state == 4) {
