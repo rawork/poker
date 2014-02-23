@@ -951,6 +951,7 @@ class GameController extends PublicController {
 			->createQueryBuilder('\Fuga\GameBundle\Document\Board')
 			->field('board')->gte($startId)
 			->field('board')->lte($stopId)
+			->sort('board')
 			->getQuery()->execute();
 
 		$time = time();
