@@ -925,7 +925,7 @@ class GameController extends PublicController {
 		$startId = $startId ? intval($startId) : 1;
 
 		$stopId = array_shift($params);
-		$stopId = $stopId ? intval($stopId) : 79;
+		$stopId = $stopId ? intval($stopId) : 100;
 
 		$this->get('container')->setVar('javascript', 'gamepanel');
 		$this->get('container')->setVar('title', 'Админ панель игры');
