@@ -41,14 +41,7 @@ class PreflopState extends AbstractState {
 					->field('fold')->equals(false)
 					->field('chips')->gt(0)
 					->getQuery()->execute();
-			$gamers2 = $this->game->container->get('odm')
-				->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
-				->field('board')->equals($this->game->getId())
-				->field('active')->equals(true)
-				->field('move')->equals('nomove')
-				->field('chips')->gt(0)
-				->getQuery()->execute();
-			if (count($gamers) < 2 && count($gamers2) == 0) {
+			if (count($gamers) < 2) {
 				$this->game->confirmBets();
 				$this->game->setWinner();
 				$this->game->setTimer('distribute');
