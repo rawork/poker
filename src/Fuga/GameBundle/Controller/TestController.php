@@ -63,13 +63,13 @@ class TestController extends PublicController {
 			$board = 0;
 			while (($buffer = fgetcsv($fh, 4096, ';')) !== false) {
 //				var_dump($buffer);
-				if (intval($buffer[6]) > $board) {
-					$board = intval($buffer[6]);
+				if (intval($buffer[4]) > $board) {
+					$board = intval($buffer[4]);
 					$seat = 1;
 				} else {
 					$seat++; 
 				}
-				$user = $this->get('container')->getItem('user_user', 'email="'.$buffer[3].'"');
+				$user = $this->get('container')->getItem('user_user', 'email="'.$buffer[0].'"');
 				$account = $this->get('container')->getItem('account_member', 'user_id='.$user['id']);
 				echo 'UPDATE account_member SET board_id='.($board+1).', seat='.$seat.'  WHERE id='.$account['id'].";\n<br>";
 			}

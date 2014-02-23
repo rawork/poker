@@ -4,7 +4,7 @@ namespace Fuga\GameBundle\Model\GameState;
 
 use Fuga\GameBundle\Model\GameInterface;
 
-class BuyState extends AbstractState {
+class 		BuyState extends AbstractState {
 	
 	public function __construct(GameInterface $game) {
 		parent::__construct($game);
@@ -15,7 +15,6 @@ class BuyState extends AbstractState {
 			$gamers = $this->game->container->get('odm')
 				->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
 				->field('board')->equals($this->game->getId())
-				->field('active')->equals(true)
 				->getQuery()->execute();
 			foreach ($gamers as $doc) {
 				$doc->setActive($doc->getChips() >= $this->game->minbet);

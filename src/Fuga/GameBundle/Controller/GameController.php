@@ -27,6 +27,12 @@ class GameController extends PublicController {
 		$user = $this->get('security')->getCurrentUser();
 		
 		try {
+
+
+			if (1 == 2) {
+				throw new GameException('<div class="alert alert-danger">Игра не запущена.<br> Требуется обновление браузера.<br> Обратитесь к администратору.</div>');
+			}
+
 			if ( strtotime($this->getParam('access_date').' 00:00:01') > time()  ) {
 				if (!$user || !$this->get('security')->isGroup('admin')) {
 					throw new GameException('Игровой зал открыт<br> только в период 

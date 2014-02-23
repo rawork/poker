@@ -103,6 +103,11 @@ class ShowdownState extends AbstractState {
 				}
 				if (time() > $this->game->stopbuytime) {
 					$doc->setActive($doc->getChips() >= $this->game->minbet);
+					if (!$doc->getActive()) {
+						$this->game->acceptBet($doc->getChips());
+						$this->game->confirmBets();
+						$doc->setChips(0);
+					}
 				}	
 				$doc->setBet(0);
 				$doc->setBet2(0);
