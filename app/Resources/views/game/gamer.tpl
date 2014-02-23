@@ -22,7 +22,7 @@
 		&nbsp;&nbsp;&nbsp;&nbsp;
 		<button disabled="true" class="btn btn-success" data-action="bet">Ставка</button>
 		<button disabled="true" class="btn btn-primary" data-action="check">Чек</button>
-		<button disabled="true"class="btn btn-danger" data-action="fold">Пас</button>
+		<button disabled="true" class="btn btn-danger" data-action="fold">Пас</button>
 		&nbsp;&nbsp;&nbsp;&nbsp;
 		<button disabled="true" class="btn btn-primary btn-buy" data-action="buy">Покупка фишек</button>
 		<button disabled="true" class="btn btn-warning" data-action="out">{if $gamer->isState(3)}В игре{else}Вне игры{/if}</button>

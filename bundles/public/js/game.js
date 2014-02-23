@@ -436,6 +436,7 @@ function onEndRound() {
 
 function onNext() {
 	if (hasEventTimer('next')) {
+        console.log('onNext LOOP');
 		return;
 	}
 	stopTimer();
@@ -453,7 +454,7 @@ function onNext() {
 
 			gameTimerId = setInterval(startTimer, 1000);
 		} else {
-			onUpdate();
+			window.location.reload();
 		}
 	}, "json");
 }
