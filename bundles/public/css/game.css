@@ -696,3 +696,7 @@ body {
 .game-panel .title {
     font-weight: bold;
 }
+
+.game-panel .title.red {
+    color: #fb4e0c;
+}
