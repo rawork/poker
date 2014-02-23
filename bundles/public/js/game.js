@@ -785,7 +785,7 @@ function onWSUpdate(data) {
 //    console.log('GAMEMOVER', data.board.mover);
 //    console.log('GAMERSEAT', data.gamer.seat);
 
-    if (data.gamer.cards){
+    if (data.gamer.cards.length > 0){
         $('#gamer-cards').empty();
         for (var i in data.gamer.cards) {
             var src = '/bundles/public/img/cards/' + data.gamer.cards[i].name + '.png';
