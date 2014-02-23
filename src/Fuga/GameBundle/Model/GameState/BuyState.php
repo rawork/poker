@@ -23,6 +23,8 @@ class 		BuyState extends AbstractState {
 					$this->game->confirmBets();
 					$doc->setChips(0);
 				}
+				$doc->setQuestion(array());
+				$doc->setBuy(array());
 			}
 			$this->game->confirmBets();
 			$this->game->save();
