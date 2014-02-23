@@ -13,7 +13,7 @@ function onReload() {
 
 function initPanel() {
     $(document).on('click', 'button[data-action=sync]', onSync);
-    setInterval(onReload, 10000);
+    setInterval(onReload, 20000);
 }
 
 $(document).ready(function() {
