@@ -830,7 +830,7 @@ class GameController extends PublicController {
 				->findOneByBoard(intval($boardId));
 		if (!$game) {
 			$board = $this->get('container')->getItem('game_board', $boardId);
-			if (!board) {
+			if (!$board) {
 				$error = 'Настройки игры для зала с ID='.$boardId.' не найдены.';
 
 				return $this->render('game/error.tpl', compact('error'));
