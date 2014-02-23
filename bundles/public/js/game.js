@@ -622,7 +622,7 @@ function enableButtons(state) {
 			if (gamemover == gamerseat && gamerstate == 1) {
 				$('.game-buttons button[data-action=fold]').prop('disabled', false);
 				$('.game-buttons button[data-action=allin]').prop('disabled', false);
-				if (minbet < chips && (maxbet - bet) < chips) {
+				if (chips > minbet  &&  chips > (maxbet - bet)) {
 					if (bet == 0 && maxbet == 0 && state == 2) {
 						$('.game-buttons button[data-action=bet]').prop('disabled', false);
 					} else if ( maxbet > bet ) {
@@ -635,7 +635,9 @@ function enableButtons(state) {
 						$('.game-buttons button[data-action=check]').prop('disabled', false);
 						$('.game-buttons button[data-action=bet]').prop('disabled', false);
 					}
-				}
+				} else if (bet == maxbet) {
+                    $('.game-buttons button[data-action=check]').prop('disabled', false);
+                }
 			}
 			break;	
 		case 5:
