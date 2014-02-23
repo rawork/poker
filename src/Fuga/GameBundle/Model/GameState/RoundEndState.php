@@ -60,6 +60,7 @@ class RoundEndState extends AbstractState {
 						$doc->setActive(false);
 						$doc->setState(0);
 					}
+					$this->game->save();
 				}
 				$this->game->confirmBets();
 				
@@ -69,11 +70,13 @@ class RoundEndState extends AbstractState {
 
 				$this->game->setState(AbstractState::STATE_CHANGE);
 			}
-			
+
+			$this->game->setUpdated(time());
 			$this->game->save();
 			$this->game->unlock($gamer->getId());
 			
 		} catch (\Exception $e) {
+			$this->game->setUpdated(time());
 			$this->game->save();
 			$this->game->unlock($gamer->getId());
 		}
