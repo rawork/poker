@@ -437,7 +437,7 @@ class Container
 					$config->setHydratorDir(__DIR__ . '/../../../app/cache/hydrators');
 					$config->setHydratorNamespace('Hydrators');
 					$config->setAutoGenerateProxyClasses('development' == PRJ_ENV);
-					$config->getAutoGenerateHydratorClasses('development' == PRJ_ENV);
+					$config->setAutoGenerateHydratorClasses('development' == PRJ_ENV);
 					$config->setDefaultDB(MONGO_BASE);
 					
 					$config->setMetadataDriverImpl(\Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver::create(__DIR__ . '/../GameBundle/Document'));
