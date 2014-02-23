@@ -128,13 +128,17 @@ class PreflopState extends AbstractState {
 						.' :preflop.find.outtimer '
 						.(intval($timer['time']) - time())
 				);
-				
+
+				$gamerdoc->setState(3);
+				$this->game->save();
+
 				$this->game->container->get('odm')
-						->createQueryBuilder('\Fuga\GameBundle\Document\Board')
-						->findAndUpdate()
-						->field('board')->equals($this->game->getId())
-						->field('gamer')->set(0)
-						->getQuery()->execute();
+					->createQueryBuilder('\Fuga\GameBundle\Document\Board')
+					->findAndUpdate()
+					->field('board')->equals($this->game->getId())
+					->field('updated')->set(time())
+					->field('gamer')->set(0)
+					->getQuery()->execute();
 				
 				$gamer = new RealGamer($gamerdoc, $this->game->container);
 			}

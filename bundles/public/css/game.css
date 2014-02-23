@@ -680,3 +680,19 @@ body {
 	line-height: 50px;
 	font-family: 'Conv_Art. Lebedev Studio - ALSSchlangesans-Bold';
 }
+
+.game-panel {
+    width: 120px;
+    border: 1px double #fb4e0c;
+    height: 130px;
+    float: left;
+    text-align: center;
+}
+
+.game-panel div {
+    margin: 3px;
+}
+
+.game-panel .title {
+    font-weight: bold;
+}

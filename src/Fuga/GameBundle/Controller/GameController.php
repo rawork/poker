@@ -904,8 +904,7 @@ class GameController extends PublicController {
 		
 		$gamedoc = $this->get('odm')
 				->getRepository('\Fuga\GameBundle\Document\Board')
-				->findOneByBoard(intval($gameId))
-				->getQuery()->getSingleResult();
+				->findOneByBoard(intval($gameId));
 		try {
 			$game = new Game($gamedoc, $this->get('container'));
 			$game->sync();
@@ -914,6 +913,66 @@ class GameController extends PublicController {
 		}
 
 		return json_encode(array('ok' => true));
+	}
+
+	public function panelAction($params) {
+		$user = $this->get('security')->getCurrentUser();
+		if (!$user || !$this->get('security')->isGroup('admin') ) {
+			$this->get('router')->redirect('/game');
+		}
+
+		$startId = array_shift($params);
+		$startId = $startId ? intval($startId) : 1;
+
+		$stopId = array_shift($params);
+		$stopId = $stopId ? intval($stopId) : 79;
+
+		$this->get('container')->setVar('javascript', 'gamepanel');
+		$this->get('container')->setVar('title', 'Админ панель игры');
+		$this->get('container')->setVar('h1', 'Админ панель игры');
+
+		$boarddocs = $this->get('odm')
+			->createQueryBuilder('\Fuga\GameBundle\Document\Board')
+			->field('board')->gte($startId)
+			->field('board')->lte($stopId)
+			->getQuery()->execute();
+
+		$time = time();
+		$boards = array();
+
+		foreach ($boarddocs as $board) {
+			$timer0 = 0;
+			$timer = $board->getTimer();
+			if ($timer) {
+				$timer = array_shift($timer);
+				$timer0 = intval($timer['time']) - time();
+			} else {
+				$gamers = $this->get('odm')
+					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+					->field('board')->equals($board->getBoard())
+					->field('active')->equals(true)
+					->getQuery()->execute();
+				foreach ($gamers as $gamer) {
+					$timer = $gamer->getTimer();
+					if ($timer) {
+						$timer = array_shift($timer);
+						if (intval($timer['time']) - time() < 0) {
+							$timer0 = intval($timer['time']) - time();
+							break;
+						}
+					}
+				}
+			}
+			$boards[] = array(
+				'id' => $board->getBoard(),
+				'name' => $board->getName(),
+				'state' => $board->getState(),
+				'mover' => $board->getMover(),
+				'timer' => $timer0,
+			);
+		}
+
+		return $this->render('game/panel.tpl', compact('boards', 'time'));
 	}
 
 }
