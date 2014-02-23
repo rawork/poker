@@ -515,8 +515,8 @@ class Game implements GameInterface {
 		return false;
 	}
 	
-	public function start($gamerId) {
-		$this->state->startGame($gamerId);
+	public function start($gamer) {
+		$this->state->startGame($gamer);
 	}
 	
 	public function fold($gamer) {

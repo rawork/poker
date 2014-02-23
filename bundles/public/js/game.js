@@ -462,11 +462,7 @@ function onNext() {
 function onStart() {
 	$.post('/game/start', {},
 	function(data){
-		if (data.ok) {
-			$.cookie('gamestate', data.state, {path: '/'});
-
-			window.location.reload();
-		}
+		window.location.reload();
 	}, "json");
 }
 

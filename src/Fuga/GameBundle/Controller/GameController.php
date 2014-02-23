@@ -717,7 +717,9 @@ class GameController extends PublicController {
 			$gamedoc = $this->get('odm')
 					->getRepository('\Fuga\GameBundle\Document\Board')
 					->findOneByBoard($gamerdoc->getBoard());
+			$gamer = new RealGamer($gamerdoc, $this->get('container'));
 			$game = new Game($gamedoc, $this->get('container'));
+			$game->start($gamer);
 			$game->removeTimer();
 		} catch (GameException $e) {
 			$this->get('log')->addError($e->getMessage());
