@@ -46,10 +46,9 @@ class GameController extends PublicController {
 			$gamerdoc = $this->get('odm')
 					->getRepository('\Fuga\GameBundle\Document\Gamer')
 					->findOneByUser(intval($user['id']));
-			
-			if (!$gamerdoc || 
-				(!$this->get('security')->isGroup('admin') && !$this->get('security')->isGroup('gamer'))) {
-				throw new GameException('Вы не являетесь игроком. Для участия в игре войдите на сайт с логином и паролем игрока<br>'.$this->call('Fuga:Public:Account:login'));
+
+			if (!$gamerdoc) {
+				throw new GameException('Для вашего аккаунта не найдены данные игрока. Обратитесь к администратору.');
 			}
 
 			$gamedoc = $this->get('odm')
