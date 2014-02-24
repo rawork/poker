@@ -3,6 +3,7 @@
 namespace Fuga\GameBundle\Model\GameState;
 
 use Fuga\GameBundle\Model\GameInterface;
+use Fuga\GameBundle\Model\RealGamer;
 
 class FlopState extends AbstractState {
 	

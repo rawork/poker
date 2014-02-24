@@ -4,6 +4,7 @@ namespace Fuga\GameBundle\Model\GameState;
 
 use Fuga\GameBundle\Model\GameInterface;
 use Fuga\GameBundle\Model\Combination;
+use Fuga\GameBundle\Model\RealGamer;
 
 class JokerState extends AbstractState {
 	
