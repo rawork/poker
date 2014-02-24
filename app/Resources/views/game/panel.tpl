@@ -9,3 +9,14 @@
     <div><button class="btn btn-warning" data-board-id="{$board.id}" data-action="sync">Sync</button></div>
 </div>
 {/foreach}
+<div class="clearfix"></div>
+
+{foreach from=$boards item=board}
+{if $board.state == 6}
+<div> {$board.name}, Состояние: {$board.state},
+    {foreach from=gamers item=gamer}
+    {$gamer->getLastname()} {$gamer->getName()} {$gamer->getChips()},
+    {/foreach}
+</div>
+{/if}
+{/foreach}

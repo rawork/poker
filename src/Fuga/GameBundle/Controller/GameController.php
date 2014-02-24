@@ -974,16 +974,16 @@ class GameController extends PublicController {
 			$timer0 = 0;
 			$timername = '';
 			$timer = $board->getTimer();
+			$gamers = $this->get('odm')
+				->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+				->field('board')->equals($board->getBoard())
+				->field('active')->equals(true)
+				->getQuery()->execute();
 			if ($timer) {
 				$timer = array_shift($timer);
 				$timer0 = intval($timer['time']) - time();
 				$timername = $timer['handler'];
 			} else {
-				$gamers = $this->get('odm')
-					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
-					->field('board')->equals($board->getBoard())
-					->field('active')->equals(true)
-					->getQuery()->execute();
 				foreach ($gamers as $gamer) {
 					$timer = $gamer->getTimer();
 					if ($timer) {
@@ -1008,6 +1008,7 @@ class GameController extends PublicController {
 				'mover' => $board->getMover(),
 				'timer' => $timer0,
 				'timername' => $timername,
+				'gamers' => $gamers,
 			);
 		}
 
