@@ -992,9 +992,14 @@ class GameController extends PublicController {
 					}
 				}
 			}
+
+			$date = new \DateTime();
+			$date->setTimestamp($board->getFromtime());
+
 			$boards[] = array(
 				'id' => $board->getBoard(),
 				'name' => $board->getName(),
+				'fromtime' => $date,
 				'state' => $board->getState(),
 				'mover' => $board->getMover(),
 				'timer' => $timer0,

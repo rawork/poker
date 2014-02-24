@@ -682,9 +682,9 @@ body {
 }
 
 .game-panel {
-    width: 120px;
+    width: 110px;
     border: 1px double #fb4e0c;
-    height: 130px;
+    height: 175px;
     float: left;
     text-align: center;
 }
