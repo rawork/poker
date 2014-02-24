@@ -893,17 +893,20 @@ class GameController extends PublicController {
 	}
 
 	public function syncAction() {
-		$boards = $this->get('odm')
-			->createQueryBuilder('\Fuga\GameBundle\Document\Board')
-			->field('state')->gt(0)
-			->field('state')->notEqual(6)
-			->getQuery()->execute();
-		foreach ($boards as $gamedoc) {
-			try {
-				$game = new Game($gamedoc, $this->get('container'));
-				$game->sync();
-			} catch (\Exception $e) {
-				$this->get('log')->addError('cron.ERROR:'.$e->getMessage());
+		for ($i = 0; $i < 4; $i++) {
+			sleep(10);
+			$boards = $this->get('odm')
+				->createQueryBuilder('\Fuga\GameBundle\Document\Board')
+				->field('state')->gt(0)
+				->field('state')->notEqual(6)
+				->getQuery()->execute();
+			foreach ($boards as $gamedoc) {
+				try {
+					$game = new Game($gamedoc, $this->get('container'));
+					$game->sync();
+				} catch (\Exception $e) {
+					$this->get('log')->addError('cron.ERROR:'.$e->getMessage());
+				}
 			}
 		}
 
