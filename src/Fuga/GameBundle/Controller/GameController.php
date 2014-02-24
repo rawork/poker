@@ -893,11 +893,6 @@ class GameController extends PublicController {
 	}
 
 	public function syncAction() {
-		$user = $this->get('security')->getCurrentUser();
-		if (!$user || !$this->get('security')->isGroup('admin') ) {
-			$this->get('router')->redirect('/game');
-		}
-
 		$boards = $this->get('odm')
 			->createQueryBuilder('\Fuga\GameBundle\Document\Board')
 			->field('state')->gt(0)
