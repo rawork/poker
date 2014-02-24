@@ -80,7 +80,6 @@ class ChangeState extends AbstractState {
 					->field('gamer')->set(0)
 					->getQuery()->execute();
 
-//				$gamerdoc->setState(3);
 				$gamerdoc->setTimer(array());
 				$gamerdoc->setTimes(0);
 				$this->game->save();

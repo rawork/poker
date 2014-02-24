@@ -129,9 +129,6 @@ class PreflopState extends AbstractState {
 						.(intval($timer['time']) - time())
 				);
 
-//				$gamerdoc->setState(3);
-				$this->game->save();
-
 				$this->game->container->get('odm')
 					->createQueryBuilder('\Fuga\GameBundle\Document\Board')
 					->findAndUpdate()
