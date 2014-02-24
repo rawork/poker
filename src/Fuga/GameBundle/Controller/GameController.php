@@ -893,8 +893,8 @@ class GameController extends PublicController {
 	}
 
 	public function syncAction() {
-		for ($i = 0; $i < 4; $i++) {
-			sleep(10);
+		for ($i = 0; $i < 3; $i++) {
+			sleep(12);
 			$boards = $this->get('odm')
 				->createQueryBuilder('\Fuga\GameBundle\Document\Board')
 				->field('state')->gt(0)
