@@ -619,7 +619,7 @@ function enableButtons(state) {
 	switch (state) {
 		case 2:
 		case 3:
-			if (gamemover == gamerseat && gamerstate == 1) {
+			if (gamemover == gamerseat && gamerstate > 0) {
 				$('.game-buttons button[data-action=fold]').prop('disabled', false);
 				$('.game-buttons button[data-action=allin]').prop('disabled', false);
 				if (chips > minbet  &&  chips > (maxbet - bet)) {
