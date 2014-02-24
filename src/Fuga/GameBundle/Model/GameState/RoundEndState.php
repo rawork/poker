@@ -94,7 +94,7 @@ class RoundEndState extends AbstractState {
 				->getQuery()->getSingleResult();
 		$timer = $this->game->getTimer();
 		$timer = array_shift($timer);
-		if (!$timer || intval($timer['time'])+5 < time()) { 
+		if ($timer && intval($timer['time'])+5 < time()) {
 			$this->game->container->get('log')->addError(
 					'game'.$this->game->getId()
 					.' :roundend.find.outtimer '
@@ -110,7 +110,7 @@ class RoundEndState extends AbstractState {
 		}
 		
 		if ($gamer) {
-			$this->nextGame($gamer);			
+			$this->game->next($gamer);
 		}
 	}
 	

@@ -200,7 +200,7 @@ class ShowdownState extends AbstractState {
 				->getQuery()->getSingleResult();
 		$timer = $this->game->getTimer();
 		$timer = array_shift($timer);
-		if (!$timer || intval($timer['time'])+5 < time()) { 
+		if ($timer && intval($timer['time'])+5 < time()) {
 			$this->game->container->get('log')->addError(
 					'game'.$this->game->getId()
 					.' :showdown.find.outtimer '
@@ -216,7 +216,7 @@ class ShowdownState extends AbstractState {
 		}
 		
 		if ($gamer) {
-			$this->distributeWin($gamer);			
+			$this->game->distribute($gamer);
 		}
 	}
 	

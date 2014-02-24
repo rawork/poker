@@ -579,6 +579,7 @@ class Game implements GameInterface {
 	
 	public function nochange(RealGamer $gamer) {
 		$gamer->removeTimer();
+		$gamer->setTimes(0);
 		$gamer->save();
 		$this->state->changeCards($gamer);
 	}

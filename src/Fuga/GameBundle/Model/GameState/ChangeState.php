@@ -65,15 +65,12 @@ class ChangeState extends AbstractState {
 		foreach ($gamers as $gamerdoc) {
 			$timer = $gamerdoc->getTimer();
 			$timer = array_shift($timer);
-			if (!$timer || intval($timer['time'])+5 < time()) {
+			if ($timer && intval($timer['time'])+5 < time()) {
 				$this->game->container->get('log')->addError(
 						'game'.$this->game->getId()
 						.' :change.find.outtimer '
 						.(intval($timer['time']) - time())
 				);
-
-				$gamerdoc->setState(3);
-				$this->game->save();
 
 				$this->game->container->get('odm')
 					->createQueryBuilder('\Fuga\GameBundle\Document\Board')
@@ -82,7 +79,8 @@ class ChangeState extends AbstractState {
 					->field('updated')->set(time())
 					->field('gamer')->set(0)
 					->getQuery()->execute();
-				
+
+				$gamerdoc->setState(3);
 				$gamerdoc->setTimer(array());
 				$gamerdoc->setTimes(0);
 				$this->game->save();
@@ -93,7 +91,7 @@ class ChangeState extends AbstractState {
 		}
 		
 		if ($gamer) {
-			$this->changeCards($gamer);			
+			$this->game->nochange($gamer);
 		}
 	}
 	
