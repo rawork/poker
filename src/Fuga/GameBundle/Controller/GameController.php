@@ -100,7 +100,7 @@ class GameController extends PublicController {
 			throw new \Exception($e->getMessage());
 		}
 		
-		$this->get('container')->setVar('javascript', 'game');
+		$this->get('container')->setVar('javascript', 'game2');
 		
 		return $this->render('game/index.tpl', array(
 			'game'   => $game,
@@ -969,12 +969,15 @@ class GameController extends PublicController {
 		$time = time();
 		$boards = array();
 
+
 		foreach ($boarddocs as $board) {
 			$timer0 = 0;
+			$timername = '';
 			$timer = $board->getTimer();
 			if ($timer) {
 				$timer = array_shift($timer);
 				$timer0 = intval($timer['time']) - time();
+				$timername = $timer['handler'];
 			} else {
 				$gamers = $this->get('odm')
 					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
@@ -987,6 +990,7 @@ class GameController extends PublicController {
 						$timer = array_shift($timer);
 						if (intval($timer['time']) - time() < 0) {
 							$timer0 = intval($timer['time']) - time();
+							$timername = $timer['handler'];
 							break;
 						}
 					}
@@ -1003,6 +1007,7 @@ class GameController extends PublicController {
 				'state' => $board->getState(),
 				'mover' => $board->getMover(),
 				'timer' => $timer0,
+				'timername' => $timername,
 			);
 		}
 
