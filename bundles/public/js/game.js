@@ -636,6 +636,7 @@ function enableButtons(state) {
 						$('.game-buttons button[data-action=bet]').prop('disabled', false);
 					}
 				} else if (bet == maxbet) {
+                    $('.game-buttons button[data-action=bet]').prop('disabled', false);
                     $('.game-buttons button[data-action=check]').prop('disabled', false);
                 }
 			}
