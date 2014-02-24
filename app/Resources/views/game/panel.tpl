@@ -14,7 +14,7 @@
 {foreach from=$boards item=board}
 {if $board.state == 6}
 <div> {$board.name}, Состояние: {$board.state},
-    {foreach from=gamers item=gamer}
+    {foreach from=$board.gamers item=gamer}
     {$gamer->getLastname()} {$gamer->getName()} {$gamer->getChips()},
     {/foreach}
 </div>
