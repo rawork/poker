@@ -30,6 +30,9 @@ class Gamer {
 	
 	/** @ODM\Int */
     private $bet = 0;
+
+	/** @ODM\Int */
+	private $ques = 0;
 	
 	/** @ODM\Int */
     private $bank = 0;
@@ -694,5 +697,27 @@ class Gamer {
     public function getBank()
     {
         return $this->bank;
+    }
+
+    /**
+     * Set ques
+     *
+     * @param int $ques
+     * @return self
+     */
+    public function setQues($ques)
+    {
+        $this->ques = $ques;
+        return $this;
+    }
+
+    /**
+     * Get ques
+     *
+     * @return int $ques
+     */
+    public function getQues()
+    {
+        return $this->ques;
     }
 }

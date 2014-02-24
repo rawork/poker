@@ -30,6 +30,9 @@ class Gamer {
 	
 	/** @ODM\Int */
     private $bet = 0;
+
+	/** @ODM\Int */
+	private $ques = 0;
 	
 	/** @ODM\Int */
     private $bank = 0;

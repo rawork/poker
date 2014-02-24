@@ -47,8 +47,8 @@ class ChangeState extends AbstractState {
 				$this->game->startTimer();
 			}
 		} else {
-			$this->game->setUpdated(time());
-			$this->game->save();
+//			$this->game->setUpdated(time());
+//			$this->game->save();
 		}
 		
 		return $this->game->getStateNo();

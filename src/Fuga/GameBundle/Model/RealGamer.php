@@ -65,6 +65,14 @@ class RealGamer {
 	public function setRank($value){
 		$this->doc->setRank($value);
 	}
+
+	public function getQues(){
+		return $this->doc->getQues();
+	}
+
+	public function setQues($value){
+		$this->doc->setQues($value);
+	}
 	
 	public function setTimes($value){
 		$this->doc->setTimes($value);
@@ -351,10 +359,12 @@ class RealGamer {
 					usleep(100000);
 					continue;
 				}
+
 				$cardNo = $this->doc->getCard();
 				$myCards = $this->doc->getCards();
 				$myCards[$cardNo] = array_shift($game->getCards(1));
 				$this->doc->setCards($myCards);
+				$this->doc->setQues($this->doc->getQues() + 1);
 				$game->unlock($this->getId());
 				$isChanged = true;
 			}
@@ -385,6 +395,7 @@ class RealGamer {
 			throw new GameException('Потерялся вопрос');
 		}
 		if ($answerNo == $this->question['answer']) {
+			$this->doc->setQues($this->doc->getQues() + 1);
 			$this->doc->setChips($this->doc->getChips() + $game->minbet);
 			$this->doc->setActive($this->doc->getChips() > 0); // TODO ???$game->minbet 
 		}
