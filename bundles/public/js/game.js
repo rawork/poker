@@ -608,7 +608,7 @@ function onChangeBetInput() {
 
 function enableButtons(state) {
 	$('.game-buttons button').prop('disabled', true);
-	state = state || +$.cookie('gamestate');
+	var state = state || +$.cookie('gamestate');
 	var gamerstate = +$.cookie('gamerstate');
 	var gamemover = +$.cookie('gamemover');
 	var minbet = +$('#min-bet').html();
