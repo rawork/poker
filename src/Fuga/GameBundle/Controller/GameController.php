@@ -752,7 +752,7 @@ class GameController extends PublicController {
 			return json_encode(array('ok' => false));
 		}
 		
-		$state = $this->get('util')->post('state', true, 0);
+		$state = $this->get('util')->post('state', true, 1);
 		
 		try {
 			$this->get('odm')
@@ -761,10 +761,22 @@ class GameController extends PublicController {
 				->field('user')->equals(intval($user['id']))
 				->field('state')->set($state)
 				->getQuery()->execute();
-		} catch (Exception\GameException $e) {
+			$gamerdoc = $this->get('odm')
+				->getRepository('\Fuga\GameBundle\Document\Gamer')
+				->findOneByUser(intval($user['id']));
+
+			$gamedoc = $this->get('odm')
+				->getRepository('\Fuga\GameBundle\Document\Board')
+				->findOneByBoard($gamerdoc->getBoard());
+
+			$game = new Game($gamedoc, $this->get('container'));
+			$game->setUpdated(time());
+			$game->save();
+
+		} catch (GameException $e) {
+			$this->get('log')->addError($e->getMessage());
 			return json_encode(array(
 				'ok' => false,
-				'error' => $e->getMessage(),
 			));
 		}
 		
