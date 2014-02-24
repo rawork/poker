@@ -191,34 +191,34 @@ class ShowdownState extends AbstractState {
 		return $this->game->getStateNo();
 	}
 	
-	public function sync() {
-		$gamer = null;
-		$gamerdoc = $this->game->container->get('odm')
-				->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
-				->field('board')->equals($this->game->getId())
-				->field('state')->gt(0)
-				->getQuery()->getSingleResult();
-		$timer = $this->game->getTimer();
-		$timer = array_shift($timer);
-		if ($timer && intval($timer['time'])+5 < time()) {
-			$this->game->container->get('log')->addError(
-					'game'.$this->game->getId()
-					.' :showdown.find.outtimer '
-					.(intval($timer['time']) - time())
-			);
-			$this->game->container->get('odm')
-				->createQueryBuilder('\Fuga\GameBundle\Document\Board')
-				->findAndUpdate()
-				->field('board')->equals($this->game->getId())
-				->field('gamer')->set(0)
-				->getQuery()->execute();
-			$gamer = new RealGamer($gamerdoc, $this->game->container);
-		}
-		
-		if ($gamer) {
-			$this->game->distribute($gamer);
-		}
-	}
+//	public function sync() {
+//		$gamer = null;
+//		$gamerdoc = $this->game->container->get('odm')
+//				->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+//				->field('board')->equals($this->game->getId())
+//				->field('state')->gt(0)
+//				->getQuery()->getSingleResult();
+//		$timer = $this->game->getTimer();
+//		$timer = array_shift($timer);
+//		if ($timer && intval($timer['time'])+5 < time()) {
+//			$this->game->container->get('log')->addError(
+//					'game'.$this->game->getId()
+//					.' :showdown.find.outtimer '
+//					.(intval($timer['time']) - time())
+//			);
+//			$this->game->container->get('odm')
+//				->createQueryBuilder('\Fuga\GameBundle\Document\Board')
+//				->findAndUpdate()
+//				->field('board')->equals($this->game->getId())
+//				->field('gamer')->set(0)
+//				->getQuery()->execute();
+//			$gamer = new RealGamer($gamerdoc, $this->game->container);
+//		}
+//
+//		if ($gamer) {
+//			$this->game->distribute($gamer);
+//		}
+//	}
 	
 }
 
