@@ -865,7 +865,7 @@ function onWSUpdate(data) {
 //    console.log($.cookie('timerhandler'));
 }
 
-var ws = new WebSocket('ws://' + window.location.hostname + ':3001/game/' + gameid + '/' + gamerid);
+var ws = new WebSocket('ws://' + window.location.hostname + ':8080/game/' + gameid + '/' + gamerid);
 
 ws.onmessage = function (event) {
 	startUpdate(JSON.parse(event.data));
