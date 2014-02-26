@@ -363,9 +363,23 @@ class Game implements GameInterface {
 			}
 		}
 
-		$winner = $combination->compare($suites);
-		$allinWinner = $combination->compare($allins);
-		$this->doc->setWinner(array_merge($winner, $allinWinner));
+		$winner0 = $combination->compare($suites);
+		$allins0 = $combination->compare($allins);
+		if (count($winner0) == 0) {
+			$maxallinbank = $this->getBank();
+		} else {
+			$maxallinbank = 0;
+			foreach ($allins0 as $winner) {
+				if ($winner['bank'] > $maxallinbank) {
+					$maxallinbank = $winner['bank'];
+				}
+			}
+			if ($maxallinbank == $this->getBank()) {
+				$winner0 = array();
+			}
+		}
+
+		$this->doc->setWinner(array_merge($winner0, $allins0));
 		$combinations = array();
 		foreach ($this->doc->getWinner() as $winner) {
 			foreach ($winner['cards'] as $card) {

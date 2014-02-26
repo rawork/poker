@@ -356,7 +356,7 @@ class RealGamer {
 			$isChanged = false;
 			while (!$isChanged) {
 				if (!$game->lock($this->getId())) {
-					usleep(100000);
+					usleep(5000);
 					continue;
 				}
 
