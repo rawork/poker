@@ -365,9 +365,7 @@ class Game implements GameInterface {
 
 		$winner0 = $combination->compare($suites);
 		$allins0 = $combination->compare($allins);
-		if (count($winner0) == 0) {
-			$maxallinbank = $this->getBank();
-		} else {
+		if (count($winner0) > 0) {
 			$maxallinbank = 0;
 			foreach ($allins0 as $winner) {
 				if ($winner['bank'] > $maxallinbank) {
