@@ -2,4 +2,7 @@
 {foreach from=$game->getWinner() item=winner}
 	<div class="game-winner winner{$gamer->getRivalPosition($winner.seat, $winner.numOfGamers)}">Победитель &laquo;{$winner.name}&raquo;</div>
 {/foreach}
+{foreach from=$game->getWinnera() item=winner}
+    <div class="game-winner winner{$gamer->getRivalPosition($winner.seat, $winner.numOfGamers)}">Победитель &laquo;{$winner.name}&raquo;</div>
+{/foreach}
 {/if}

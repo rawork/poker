@@ -70,6 +70,10 @@ class Game implements GameInterface {
 	public function getWinner() {
 		return $this->doc->getWinner();
 	}
+
+	public function getWinnera() {
+		return $this->doc->getWinnera();
+	}
 	
 	public function getTimer() {
 		return $this->doc->getTimer();
@@ -432,9 +436,11 @@ class Game implements GameInterface {
 			.' bank '.$this->getBank()
 		);
 
-		$this->doc->setWinner(array_merge($winner0, $allins0));
+		$this->doc->setWinner($winner0);
+		$this->doc->setWinnera($allins0);
 		$combinations = array();
-		foreach ($this->doc->getWinner() as $winner) {
+		$winners = array_merge($winner0, $allins0);
+		foreach ($winners as $winner) {
 			foreach ($winner['cards'] as $card) {
 				$combinations[] = $card['name'];
 			}

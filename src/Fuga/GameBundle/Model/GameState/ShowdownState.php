@@ -19,25 +19,9 @@ class ShowdownState extends AbstractState {
 
 			$this->game->removeTimer();
 			
-			$winners = array();
-			$allins  = array();
+			$winners = $this->game->getWinner();
+			$allins  = $this->game->getWinnera();
 			$bank = $this->game->takeBank();
-			
-			$ids = array();
-			
-			foreach ($this->game->getWinner() as $winner) {
-				if (in_array($winner['user'], $ids)) {
-					continue;
-				}
-				
-				$ids[] = $winner['user'];
-				
-				if ($winner['allin']) {
-					$allins[] = $winner;
-				} else {
-					$winners[] = $winner;
-				}
-			}
 			
 			if (count($allins) > 0) {
 				if (count($winners) == 0) {
@@ -63,6 +47,7 @@ class ShowdownState extends AbstractState {
 				foreach ($allins as &$winner) {
 					$winner['win'] = $share;
 				}
+				unset($winner);
 
 				$bank -= $maxallinbank; 
 			}
@@ -79,29 +64,32 @@ class ShowdownState extends AbstractState {
 				foreach ($winners as &$winner) {
 					$winner['win'] = $share;
 				}
+				unset($winner);
 			}
-			
+
 			$winners = array_merge($winners, $allins);
-			
+
 			$gamers = $this->game->container->get('odm')
 					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
 					->field('board')->equals($this->game->getId())
 					->field('active')->equals(true)
 					->getQuery()->execute();
-			
+
+			$ids = array();
+
 			foreach ($gamers as $doc) {
 				foreach ($winners as $winner) {
 					if ($doc->getUser() == $winner['user']) {
 						$doc->setChips( $doc->getChips() + $winner['win'] );
 						foreach ($winner['cards'] as $card) {
-							if ($card['name'] == 'joker') {
+							if ($card['name'] == 'joker' && !in_array($winner['user'], $ids)) {
+								$ids[] = $winner['user'];
 								$doc->setChips( $doc->getChips() + 2 );
-								break;
 							}
 						}
-						break;
 					}
 				}
+
 				if (time() > $this->game->stopbuytime) {
 					$doc->setActive($doc->getChips() >= $this->game->minbet);
 					if (!$doc->getActive()) {
@@ -118,6 +106,7 @@ class ShowdownState extends AbstractState {
 				$doc->setRank('');
 				$doc->setCombination(array());
 				$doc->setWinner(false);
+				$doc->setFold(false);
 //				$query = '1=1';
 //				if ($denied = $doc->getDenied()) {
 //					$query = 'id < 141 AND id NOT IN('.implode(',', $denied).')';

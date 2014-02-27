@@ -823,6 +823,12 @@ function onWSUpdate(data) {
                 .html('Победитель &laquo;'+ data.board.winner[i].name + '&raquo;');
             $('.gamer-container').append(winner);
         }
+        for(var i in data.board.winnera) {
+            var winner = $('<div></div>')
+                .addClass('game-winner winner' + getRivalPosition(data.board.winnera[i].seat, data.board.winnera[i].numOfGamers, data.gamer.seat))
+                .html('Победитель &laquo;'+ data.board.winnera[i].name + '&raquo;');
+            $('.gamer-container').append(winner);
+        }
     }
 
     $('.gamer-hint').remove();
