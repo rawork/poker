@@ -106,7 +106,8 @@ class FlopState extends AbstractState {
 			if ($timer && intval($timer['time'])+15 < time()) {
 				$this->game->container->get('log')->addError(
 						'game'.$this->game->getId()
-						.' :preflop.find.outtimer '
+						.'-gamer'.$gamerdoc->getUser()
+						.' :flop.find.outtimer '
 						.(intval($timer['time']) - time())
 				);
 

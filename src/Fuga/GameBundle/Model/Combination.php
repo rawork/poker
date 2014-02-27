@@ -501,12 +501,20 @@ class Combination {
 			'kiker'  => 0,
 			'cards' => array(),
 		);
-		
+		$i = 0;
 		foreach ($suite as $card) {
 			if (0 == count($cards['cards'])) {
 				$cards['cards'][] = $card;
+				$cards['weight'] += $card['weight'];
+			} else {
+				$index = 1000000 / pow(10, $i);
+				$cards['kiker'] += $card['weight'] * $index;
 			}
-			$cards['weight'] += $card['weight'];
+
+			if (count($cards['cards']) == 5) {
+				break;
+			}
+			$i++;
 		}
 		
 		return $cards;

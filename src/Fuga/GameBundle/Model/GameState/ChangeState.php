@@ -68,6 +68,7 @@ class ChangeState extends AbstractState {
 			if ($timer && intval($timer['time'])+15 < time()) {
 				$this->game->container->get('log')->addError(
 						'game'.$this->game->getId()
+						.'-gamer'.$gamerdoc->getUser()
 						.' :change.find.outtimer '
 						.(intval($timer['time']) - time())
 				);
