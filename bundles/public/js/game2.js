@@ -681,7 +681,6 @@ $(document).ready(function(){
 var gameupdated = 0;
 
 function startUpdate(data) {
-
     if (data.board.board == gameid && data.board.updated > gameupdated) {
         gameupdated = data.board.updated;
         console.log('update ' + Date.now());

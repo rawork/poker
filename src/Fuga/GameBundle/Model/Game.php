@@ -388,10 +388,23 @@ class Game implements GameInterface {
 			$cards['numOfGamers'] = $this->numOfGamers();
 			$cards['name'] = $combination->rankName($cards['rank']);
 			$cards['allin'] = $gamer->getAllin();
-			
+
 			$allins[] = $cards;
+
+			$this->container->get('log')->addError(
+				'game'.$this->getId()
+				.'-gamer'.$gamer->getUser()
+				.' cards '
+				.serialize($cards)
+			);
+
 			if (!$cards['allin']) {
 				$suites[] = $cards;
+				$this->container->get('log')->addError(
+					'game'.$this->getId()
+					.'-gamer'.$gamer->getUser()
+					.' cards also NO VABANK'
+				);
 			}
 		}
 
@@ -407,7 +420,17 @@ class Game implements GameInterface {
 			if ($maxallinbank == $this->getBank()) {
 				$winner0 = array();
 			}
+
+			$this->container->get('log')->addError(
+				'game'.$this->getId()
+				.' allinbank '.$maxallinbank
+			);
 		}
+
+		$this->container->get('log')->addError(
+			'game'.$this->getId()
+			.' bank '.$this->getBank()
+		);
 
 		$this->doc->setWinner(array_merge($winner0, $allins0));
 		$combinations = array();

@@ -31,7 +31,7 @@ class GameController extends PublicController {
 
 			$bro = new BrowserDetective();
 
-			if (!($bro->isBrowser('Firefox') && $bro->overBrowserVersion(11))
+			if (!($bro->isBrowser('Firefox') && $bro->overBrowserVersion(15))
 				&& !($bro->isBrowser('Chrome') && $bro->overBrowserVersion(14))
 				&& !($bro->isBrowser('Safari') && $bro->overBrowserVersion(6))) {
 				throw new GameException('<div class="alert alert-danger">Игра не запущена.<br> Требуется обновление браузера.<br> Обратитесь к администратору.</div>');
