@@ -11,12 +11,14 @@
 {/foreach}
 <div class="clearfix"></div>
 
+<ol>
 {foreach from=$boards item=board}
 {if $board.state == 6}
-<div> {$board.name}, Состояние: {$board.state},
+<li> {$board.name}, Состояние: {$board.state},
     {foreach from=$board.gamers item=gamer}
     {$gamer->getLastname()} {$gamer->getName()} {$gamer->getChips()},
     {/foreach}
-</div>
+</li>
 {/if}
 {/foreach}
+</ol>
