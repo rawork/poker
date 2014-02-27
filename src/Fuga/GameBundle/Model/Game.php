@@ -107,6 +107,38 @@ class Game implements GameInterface {
 		
 		return $cards;
 	}
+
+	public function getAsyncCards($num, $gamerId) {
+		$isChanged = false;
+		$cards = array();
+		while (!$isChanged) {
+			if (!$this->lock($gamerId)) {
+				usleep(10000);
+				$this->container->get('log')->addError('CANT TAKE ASYNC CARD gamer-'.$gamerId);
+				continue;
+			}
+			$gamedoc = $this->container->get('odm')
+				->createQueryBuilder($this->repo)
+				->field('board')->equals($this->getId())
+				->getQuery()->getSingleResult();
+			$deck = $gamedoc->getCards();
+			$cards = array();
+			for ($i = 0; $i < $num; $i++) {
+				$cards[] = array_shift($deck);
+			}
+			$this->container->get('odm')
+				->createQueryBuilder($this->repo)
+				->findAndUpdate()
+				->field('board')->equals($this->getId())
+				->field('cards')->set($deck)
+				->getQuery()->execute();
+
+			$this->unlock($gamerId);
+			$isChanged = true;
+		}
+
+		return $cards;
+	}
 	
 	public function setFlop(array $flop) {
 		$this->doc->setFlop($flop);

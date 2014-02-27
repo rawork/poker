@@ -17,21 +17,11 @@ class FlopState extends AbstractState {
 				return $this->game->getStateNo();
 			}
 			$this->game->removeTimer();
+			$this->game->save();
 			if ($gamer->getBet() > $this->game->getMaxbet()) {
 				$this->game->setMaxbet($gamer->getBet());
 			}
-			$gamers = $this->game->container->get('odm')
-					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
-					->findAndUpdate()
-					->field('board')->equals($this->game->getId())
-					->field('active')->equals(true)
-					->field('state')->lt(1)
-					->field('fold')->set(true)
-					->field('allin')->set(false)
-					->field('bet')->set(0)
-					->field('cards')->set(array())
-					->getQuery()->execute();
-			
+
 			$this->game->stopTimer();
 			// Find who not FOLD
 			$gamers = $this->game->container->get('odm')

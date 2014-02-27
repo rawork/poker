@@ -277,6 +277,8 @@ class RealGamer {
 	}
 	
 	public function changeCard($card) {
+		$this->removeTimer();
+		$this->save();
 //		$questions = $this->container->getItems(
 //				'game_poll',
 //				'id < 141 AND id NOT IN('.$this->getDeniedQuestions().')'
@@ -286,7 +288,7 @@ class RealGamer {
 				->createQueryBuilder('\Fuga\GameBundle\Document\Question')
 				->field('question')->notIn($this->getDeniedQuestions())
 				->limit(1)
-				->skip(rand(1,40))
+				->skip(rand(1,20))
 				->getQuery()->getSingleResult();
 		$question = array(
 			'id'      => $questiondoc->getQuestion(),
@@ -353,21 +355,11 @@ class RealGamer {
 		}
 		$this->doc->setTimes($this->doc->getTimes()-1);
 		if ($answerNo == $this->question['answer']) {
-			$isChanged = false;
-			while (!$isChanged) {
-				if (!$game->lock($this->getId())) {
-					usleep(2000);
-					continue;
-				}
-
-				$cardNo = $this->doc->getCard();
-				$myCards = $this->doc->getCards();
-				$myCards[$cardNo] = array_shift($game->getCards(1));
-				$this->doc->setCards($myCards);
-				$this->doc->setQues($this->doc->getQues() + 1);
-				$game->unlock($this->getId());
-				$isChanged = true;
-			}
+			$cardNo = $this->doc->getCard();
+			$myCards = $this->doc->getCards();
+			$myCards[$cardNo] = array_shift($game->getAsyncCards(1, $this->getId()));
+			$this->doc->setCards($myCards);
+			$this->doc->setQues($this->doc->getQues() + 1);
 		} else {
 			$this->giveChips(-1);
 		}

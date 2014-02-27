@@ -881,7 +881,10 @@ ws.onclose = function (event) {
 	} else {
 		console.log('Disconnect with error');
 	}
-	console.log('Code ' + event.code);
+    console.log('Code ' + event.code);
+    if (event.code == 1006) {
+        alert('Нет соединения с игровым сервером. Обновите страницу браузера (F5). При повторении ошибки обратитесь к администратору клуба.');
+    }
 };
 
 ws.onerror = function (err) {
