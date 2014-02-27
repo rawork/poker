@@ -542,6 +542,10 @@ class Game implements GameInterface {
 		if ($gamer->getAllin()) {
 			$gamer->setBank($this->getBank() + $this->getBets());
 		}
+		if ($gamer->getBet() > $this->getMaxbet()) {
+			$this->setMaxbet($gamer->getBet());
+		}
+
 		$this->save();
 
 		setcookie('gamemaxbet', $this->doc->getMaxbet(), time() + $this->cookietime, '/');
