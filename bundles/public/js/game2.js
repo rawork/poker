@@ -714,9 +714,9 @@ function updateWSRivals(rivals, board) {
             $('.gamer-cards[data-bot-id=' + rivals[j].user + ']').empty();
         }
 
-        if (rivals[j].active == 1 && rivals[j].state == 3) {
+        if (rivals[j].active == true && rivals[j].state == 3) {
             $('.gamer-status[data-bot-id='+rivals[j].user+']').addClass('notready').html('Вне игры');
-        } else if (rivals[j].active == 1 && rivals[j].state == 1) {
+        } else if (rivals[j].active == true && rivals[j].state == 1) {
             $('.gamer-status[data-bot-id='+rivals[j].user+']').removeClass('notready').html('Активен');
         } else {
             $('.gamer-status[data-bot-id='+rivals[j].user+']').addClass('notready').html('Не активен');
