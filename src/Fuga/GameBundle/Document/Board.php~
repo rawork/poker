@@ -21,6 +21,9 @@ class Board
 	
 	/** @ODM\Collection */
     private $winner = array();
+
+	/** @ODM\Collection */
+	private $winnera = array();
 	
 	/** @ODM\Collection */
     private $combination = array();

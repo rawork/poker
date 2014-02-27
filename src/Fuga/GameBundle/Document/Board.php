@@ -21,6 +21,9 @@ class Board
 	
 	/** @ODM\Collection */
     private $winner = array();
+
+	/** @ODM\Collection */
+	private $winnera = array();
 	
 	/** @ODM\Collection */
     private $combination = array();
@@ -595,5 +598,27 @@ class Board
     public function getMinbet()
     {
         return $this->minbet;
+    }
+
+    /**
+     * Set winnera
+     *
+     * @param collection $winnera
+     * @return self
+     */
+    public function setWinnera($winnera)
+    {
+        $this->winnera = $winnera;
+        return $this;
+    }
+
+    /**
+     * Get winnera
+     *
+     * @return collection $winnera
+     */
+    public function getWinnera()
+    {
+        return $this->winnera;
     }
 }

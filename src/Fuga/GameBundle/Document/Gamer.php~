@@ -698,4 +698,26 @@ class Gamer {
     {
         return $this->bank;
     }
+
+    /**
+     * Set ques
+     *
+     * @param int $ques
+     * @return self
+     */
+    public function setQues($ques)
+    {
+        $this->ques = $ques;
+        return $this;
+    }
+
+    /**
+     * Get ques
+     *
+     * @return int $ques
+     */
+    public function getQues()
+    {
+        return $this->ques;
+    }
 }
