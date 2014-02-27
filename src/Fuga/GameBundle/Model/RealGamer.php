@@ -290,15 +290,18 @@ class RealGamer {
 				->limit(1)
 				->skip(rand(1,2))
 				->getQuery()->getSingleResult();
-		$question = array(
-			'id'      => $questiondoc->getQuestion(),
-			'name'    => $questiondoc->getName(),
-			'answer1' => $questiondoc->getAnswer1(),
-			'answer2' => $questiondoc->getAnswer2(),
-			'answer3' => $questiondoc->getAnswer3(),
-			'answer4' => $questiondoc->getAnswer4(),
-			'answer'  => $questiondoc->getAnswer(),
-		);
+		$question = array();
+		if ($questiondoc) {
+			$question = array(
+				'id'      => $questiondoc->getQuestion(),
+				'name'    => $questiondoc->getName(),
+				'answer1' => $questiondoc->getAnswer1(),
+				'answer2' => $questiondoc->getAnswer2(),
+				'answer3' => $questiondoc->getAnswer3(),
+				'answer4' => $questiondoc->getAnswer4(),
+				'answer'  => $questiondoc->getAnswer(),
+			);
+		}
 		$this->question = $question;
 		$this->doc->setCard($card);
 		$this->doc->setQuestion(array($question));
