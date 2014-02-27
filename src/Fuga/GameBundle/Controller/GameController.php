@@ -1013,4 +1013,32 @@ class GameController extends PublicController {
 		return $this->render('game/panel.tpl', compact('boards', 'time'));
 	}
 
+	public function testAction() {
+		$user = $this->get('security')->getCurrentUser();
+		if (!$user || !$this->get('security')->isGroup('admin') ) {
+			$this->get('router')->redirect('/game');
+		}
+
+		$gamerdoc = $this->get('odm')
+			->getRepository('\Fuga\GameBundle\Document\Gamer')
+			->findOneByUser(intval($user['id']));
+
+		$gamedoc = $this->get('odm')
+			->getRepository('\Fuga\GameBundle\Document\Board')
+			->findOneByBoard($gamerdoc->getBoard());
+		$game = new Game($gamedoc, $this->get('container'));
+
+		$game->newDeck();
+		$game->save();
+		for ($i = 0; $i < 26; $i++) {
+			$cards = $game->getAsyncCards(1, $gamerdoc->getUser());
+			$this->get('log')->addError('user '.$gamerdoc->getUser().' take 1 card'.serialize($cards));
+		}
+
+//		echo 'ready';
+		//sleep(2);
+
+		$this->get('router')->reload();
+	}
+
 }
