@@ -122,7 +122,7 @@ class PreflopState extends AbstractState {
 		if ($gamerdoc) {
 			$timer = $this->game->getTimer();
 			$timer = array_shift($timer);
-			if ($timer && intval($timer['time'])+5 < time()) {
+			if ($timer && intval($timer['time'])+15 < time()) {
 				$this->game->container->get('log')->addError(
 						'game'.$this->game->getId()
 						.' :preflop.find.outtimer '
