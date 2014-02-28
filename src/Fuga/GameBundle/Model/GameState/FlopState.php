@@ -93,7 +93,7 @@ class FlopState extends AbstractState {
 		if ($gamerdoc) {
 			$timer = $this->game->getTimer();
 			$timer = array_shift($timer);
-			if ($timer && intval($timer['time'])+60 < time()) {
+			if ($timer && intval($timer['time'])+30 < time()) {
 				$this->game->container->get('log')->addError(
 						'game'.$this->game->getId()
 						.'-gamer'.$gamerdoc->getUser()
