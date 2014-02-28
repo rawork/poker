@@ -117,7 +117,7 @@ class Game implements GameInterface {
 		$cards = array();
 		while (!$isChanged) {
 			if (!$this->lock($gamerId)) {
-				usleep(20000);
+				usleep(10000);
 //				$this->container->get('log')->addError('CANT TAKE ASYNC CARD gamer-'.$gamerId);
 				continue;
 			}

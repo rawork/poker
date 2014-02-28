@@ -288,7 +288,7 @@ class RealGamer {
 				->createQueryBuilder('\Fuga\GameBundle\Document\Question')
 				->field('question')->notIn($this->getDeniedQuestions())
 				->limit(1)
-				->skip(rand(1,20))
+				->skip(rand(1,2))
 				->getQuery()->getSingleResult();
 		$question = array();
 		if ($questiondoc) {
