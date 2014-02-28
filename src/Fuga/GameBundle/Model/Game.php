@@ -118,7 +118,7 @@ class Game implements GameInterface {
 		while (!$isChanged) {
 			if (!$this->lock($gamerId)) {
 				usleep(10000);
-//				$this->container->get('log')->addError('CANT TAKE ASYNC CARD gamer-'.$gamerId);
+				$this->container->get('log')->addError('CANT TAKE ASYNC CARD gamer-'.$gamerId);
 				continue;
 			}
 			$gamedoc = $this->container->get('odm')

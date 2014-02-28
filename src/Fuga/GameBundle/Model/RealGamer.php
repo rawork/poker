@@ -438,7 +438,7 @@ class RealGamer {
 			$this->doc->setQuestion(array());
 			$this->doc->setCanbuy(false);
 		}
-		
+
 		$this->save();
 	}
 	
