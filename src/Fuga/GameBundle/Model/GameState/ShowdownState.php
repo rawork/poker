@@ -124,7 +124,7 @@ class ShowdownState extends AbstractState {
 					->createQueryBuilder('\Fuga\GameBundle\Document\Question')
 					->field('question')->notIn($denied)
 					->limit(3)
-					->skip(rand(1,20))
+					->skip(rand(1,2))
 					->getQuery()->execute();
 
 				foreach ($questions as $questiondoc) {
