@@ -40,7 +40,7 @@ class Game implements GameInterface {
 		'prebuy'     => array('handler' => 'onShowBuy', 'holder' => 'joker-timer', 'time' => 6),
 		'next'		 => array('handler' => 'onNext', 'holder' => 'round-end-timer', 'time' => 6),
 		'nonactive'  => false,//array('handler' => 'onNext', 'holder' => 'wait-timer', 'time' => 61),
-		'bet'        => array('handler' => 'onFold', 'holder' => 'game-timer', 'time' => 31),
+		'bet'        => array('handler' => 'onFold', 'holder' => 'game-timer', 'time' => 46),
 		'buy'        => array('handler' => 'onEndRound', 'holder' => 'buy-timer', 'time' => 121),
 		'answer'     => array('handler' => 'onNoAnswer', 'holder' => 'answer-timer', 'time' => 14),
 	);

@@ -23,7 +23,7 @@ class RealGamer {
 	
 	private $timers     = array(
 		'answer'     => array('handler' => 'onNoAnswer', 'holder' => 'answer-timer', 'time' => 14),
-		'bet'        => array('handler' => 'onFold', 'holder' => 'game-timer', 'time' => 31),
+		'bet'        => array('handler' => 'onFold', 'holder' => 'game-timer', 'time' => 46),
 		'change'     => array('handler' => 'onClickNoChange', 'holder' => 'change-timer', 'time' => 31),
 	);
 	
