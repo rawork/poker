@@ -592,7 +592,7 @@ class GameController extends PublicController {
 		return json_encode(array(
 			'ok' => true,
 			'table' => $this->render('game/table.tpl', compact('game', 'gamer')),
-			'updated' => $game->getUpdated(),
+			'canbuy' => $gamer->getCanbuy(),
 		));
 	}
 	

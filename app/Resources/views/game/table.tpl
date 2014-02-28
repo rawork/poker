@@ -132,7 +132,7 @@
 		</div>
 	</div>
 </div>
-{elseif $gamer->getBuy()}
+{elseif $gamer->getCanbuy()}
 <div class="game-message-container">
 	<div class="game-message">
 		<div class="row-fluid">

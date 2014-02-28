@@ -599,4 +599,26 @@ class Board
     {
         return $this->minbet;
     }
+
+    /**
+     * Set winnera
+     *
+     * @param collection $winnera
+     * @return self
+     */
+    public function setWinnera($winnera)
+    {
+        $this->winnera = $winnera;
+        return $this;
+    }
+
+    /**
+     * Get winnera
+     *
+     * @return collection $winnera
+     */
+    public function getWinnera()
+    {
+        return $this->winnera;
+    }
 }

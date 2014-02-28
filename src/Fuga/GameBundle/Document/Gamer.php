@@ -78,6 +78,9 @@ class Gamer {
 	
 	/** @ODM\Collection */
     private $buy = array();
+
+	/** @ODM\Boolean */
+	private $canbuy = false;
 	
 	/** @ODM\String */
     private $rank;
@@ -719,5 +722,27 @@ class Gamer {
     public function getQues()
     {
         return $this->ques;
+    }
+
+    /**
+     * Set canbuy
+     *
+     * @param boolean $canbuy
+     * @return self
+     */
+    public function setCanbuy($canbuy)
+    {
+        $this->canbuy = $canbuy;
+        return $this;
+    }
+
+    /**
+     * Get canbuy
+     *
+     * @return boolean $canbuy
+     */
+    public function getCanbuy()
+    {
+        return $this->canbuy;
     }
 }

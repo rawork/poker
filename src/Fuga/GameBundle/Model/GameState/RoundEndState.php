@@ -54,6 +54,7 @@ class RoundEndState extends AbstractState {
 					
 					$doc->setQuestion(array());
 					$doc->setBuy(array());
+					$doc->setCanbuy(false);
 					if ($this->game->getRound() >= 3 
 						&& $doc->getState() == 0) {
 						$this->game->acceptBet($doc->getChips());

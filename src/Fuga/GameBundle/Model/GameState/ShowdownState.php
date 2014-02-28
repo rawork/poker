@@ -97,7 +97,9 @@ class ShowdownState extends AbstractState {
 						$this->game->confirmBets();
 						$doc->setChips(0);
 					}
-				}	
+				} else {
+					$doc->setCanbuy(true);
+				}
 				$doc->setBet(0);
 				$doc->setBet2(0);
 				$doc->setBank(0);
@@ -107,41 +109,6 @@ class ShowdownState extends AbstractState {
 				$doc->setCombination(array());
 				$doc->setWinner(false);
 				$doc->setFold(false);
-//				$query = '1=1';
-//				if ($denied = $doc->getDenied()) {
-//					$query = 'id < 141 AND id NOT IN('.implode(',', $denied).')';
-//				}
-//				$questions = $this->game->container->getItems('game_poll', $query);
-//				shuffle($questions);
-//				$buy = array_slice($questions, 0, 3);
-//				foreach ($buy as $question) {
-//					$denied[] = $question['id'];
-//				}
-
-				$buy = array();
-				$denied = $doc->getDenied() ?: array(0);
-				$questions = $this->game->container->get('odm')
-					->createQueryBuilder('\Fuga\GameBundle\Document\Question')
-					->field('question')->notIn($denied)
-					->limit(3)
-					->skip(rand(1,2))
-					->getQuery()->execute();
-
-				foreach ($questions as $questiondoc) {
-					$buy[] = array(
-						'id'      => $questiondoc->getQuestion(),
-						'name'    => $questiondoc->getName(),
-						'answer1' => $questiondoc->getAnswer1(),
-						'answer2' => $questiondoc->getAnswer2(),
-						'answer3' => $questiondoc->getAnswer3(),
-						'answer4' => $questiondoc->getAnswer4(),
-						'answer'  => $questiondoc->getAnswer(),
-					);
-					$denied[] = $questiondoc->getQuestion();
-				}
-
-				$doc->setBuy($buy);
-				$doc->setDenied($denied);
 			}
 
 			$this->game->emptyWinner();

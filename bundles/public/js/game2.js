@@ -379,6 +379,7 @@ function onBuy() {
 	function(data){
 		if (data.ok) {
 			$('#table').html(data.table);
+            $.cookie('gamercanbuy', data.canbuy ? 1 : 0, {path: '/'});
             enableButtons();
 
 			gameTimerId = setInterval(startTimer, 1000);
@@ -610,6 +611,7 @@ function enableButtons(state) {
 	$('.game-buttons button').prop('disabled', true);
 	state = state || +$.cookie('gamestate');
 	var gamerstate = +$.cookie('gamerstate');
+    var gamercanbuy = +$.cookie('gamercanbuy');
 	var gamemover = +$.cookie('gamemover');
 	var minbet = +$('#min-bet').html();
 	var maxbet = +$.cookie('gamemaxbet');
@@ -642,7 +644,9 @@ function enableButtons(state) {
 			}
 			break;	
 		case 5:
-			$('.game-buttons button[data-action=buy]').prop('disabled', false);
+            if (gamercanbuy == 1) {
+			    $('.game-buttons button[data-action=buy]').prop('disabled', false);
+            }
 			break;
 		default:
 	}
@@ -844,6 +848,7 @@ function onWSUpdate(data) {
     }
 
     $.cookie('gamerstate', data.gamer.state, {path: '/'});
+    $.cookie('gamercanbuy', data.gamer.canbuy ? 1 : 0, {path: '/'});
     $.cookie('gamestate', data.board.state, {path: '/'});
     $.cookie('gamemaxbet', data.board.maxbet, {path: '/'});
     $.cookie('gamemover', data.board.mover, {path: '/'});

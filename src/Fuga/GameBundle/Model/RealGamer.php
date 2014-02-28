@@ -44,6 +44,7 @@ class RealGamer {
 		$this->haveBuyQuestion();
 		
 		setcookie('gamerstate', $this->doc->getState(), time() + $this->cookietime, '/');
+		setcookie('gamercanbuy', $this->doc->getCanbuy() ? 1 : 0, time() + $this->cookietime, '/');
 	}
 	
 	public function getId() {
@@ -116,6 +117,10 @@ class RealGamer {
 	
 	public function getBuy(){
 		return $this->doc->getBuy();
+	}
+
+	public function getCanbuy(){
+		return $this->doc->getCanbuy();
 	}
 	
 	public function getCards(){
@@ -290,9 +295,8 @@ class RealGamer {
 				->limit(1)
 				->skip(rand(1,2))
 				->getQuery()->getSingleResult();
-		$question = array();
 		if ($questiondoc) {
-			$question = array(
+			$this->question = array(
 				'id'      => $questiondoc->getQuestion(),
 				'name'    => $questiondoc->getName(),
 				'answer1' => $questiondoc->getAnswer1(),
@@ -301,14 +305,19 @@ class RealGamer {
 				'answer4' => $questiondoc->getAnswer4(),
 				'answer'  => $questiondoc->getAnswer(),
 			);
+			$this->doc->setCard($card);
+			$this->doc->setQuestion(array($this->question));
+			$this->addDeniedQuestion($this->question['id']);
+			$this->setTimer('answer');
+			$this->startTimer();
+			$this->save();
+		} else {
+			$this->container->get('log')->addError(
+				'gamer '.$this->doc->getLastname().' '.$this->doc->getName().' no question'
+			);
+			$this->nochangeCard();
 		}
-		$this->question = $question;
-		$this->doc->setCard($card);
-		$this->doc->setQuestion(array($question));
-		$this->addDeniedQuestion($question['id']);
-		$this->setTimer('answer');
-		$this->startTimer();
-		$this->save();
+
 	}
 	
 	public function haveBuyQuestion() {
@@ -317,6 +326,32 @@ class RealGamer {
 	}
 	
 	public function buyChips() {
+		if ($this->doc->getCanbuy()) {
+			$buy = array();
+			$denied = $this->doc->getDenied();
+			$questions = $this->container->get('odm')
+				->createQueryBuilder('\Fuga\GameBundle\Document\Question')
+				->field('question')->notIn($denied)
+				->limit(3)
+				->getQuery()->execute();
+
+			foreach ($questions as $questiondoc) {
+				$buy[] = array(
+					'id'      => $questiondoc->getQuestion(),
+					'name'    => $questiondoc->getName(),
+					'answer1' => $questiondoc->getAnswer1(),
+					'answer2' => $questiondoc->getAnswer2(),
+					'answer3' => $questiondoc->getAnswer3(),
+					'answer4' => $questiondoc->getAnswer4(),
+					'answer'  => $questiondoc->getAnswer(),
+				);
+				$denied[] = $questiondoc->getQuestion();
+			}
+			$this->doc->setBuy($buy);
+			$this->doc->setDenied($denied);
+			$this->doc->setCanbuy(false);
+		}
+
 		$buy = $this->doc->getBuy();
 		if (is_array($buy) && count($buy) > 0) {
 			$question = array_shift($buy);
@@ -324,11 +359,15 @@ class RealGamer {
 			$this->question = $question;
 			$this->doc->setQuestion(array($question));
 			$this->doc->setBuy($buy);
-			$this->save();
+		} else {
+			$this->doc->setCanbuy(false);
 		}
+
+		$this->save();
 	}
 	
 	public function nochangeCard() {
+		$this->removeTimer();
 		$this->doc->setTimes(0);
 		if ($this->checkActive()) {
 			$this->checkCombination();
@@ -404,6 +443,7 @@ class RealGamer {
 		} else {
 			$this->question = null;
 			$this->doc->setQuestion(array());
+			$this->doc->setCanbuy(false);
 		}
 		$this->save();
 		
