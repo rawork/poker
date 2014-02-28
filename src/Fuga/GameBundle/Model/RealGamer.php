@@ -41,7 +41,6 @@ class RealGamer {
 		
 		$this->question = array_shift($question);
 		$this->combination = array_shift($combination);
-		$this->haveBuyQuestion();
 		
 		setcookie('gamerstate', $this->doc->getState(), time() + $this->cookietime, '/');
 		setcookie('gamercanbuy', $this->doc->getCanbuy() ? 1 : 0, time() + $this->cookietime, '/');
@@ -284,11 +283,6 @@ class RealGamer {
 	public function changeCard($card) {
 		$this->removeTimer();
 		$this->save();
-//		$questions = $this->container->getItems(
-//				'game_poll',
-//				'id < 141 AND id NOT IN('.$this->getDeniedQuestions().')'
-//		);
-//		$question = $questions[array_rand($questions)];
 		$questiondoc = $this->container->get('odm')
 				->createQueryBuilder('\Fuga\GameBundle\Document\Question')
 				->field('question')->notIn($this->getDeniedQuestions())
@@ -321,7 +315,6 @@ class RealGamer {
 	}
 	
 	public function haveBuyQuestion() {
-		setcookie('gamebuy', $this->doc->getBuy() ? 1 : 0, time() + $this->cookietime, '/');
 		return count($this->doc->getBuy()) > 0;
 	}
 	
@@ -445,9 +438,8 @@ class RealGamer {
 			$this->doc->setQuestion(array());
 			$this->doc->setCanbuy(false);
 		}
-		$this->save();
 		
-		return $this->haveBuyQuestion();
+		$this->save();
 	}
 	
 	public function checkCombination($flop = array()){

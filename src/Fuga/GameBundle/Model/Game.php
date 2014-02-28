@@ -633,11 +633,6 @@ class Game implements GameInterface {
 		$this->state->buyChips($gamer);
 	}
 	
-	public function buyanswer($gamer, $n) {
-		$gamer->answerBuyQuestion($n);
-		$this->state->answerBuyQuestion($gamer);
-	}
-	
 	public function next($gamer) {
 		$this->state->nextGame($gamer);
 	}
