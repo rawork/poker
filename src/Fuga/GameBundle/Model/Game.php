@@ -373,6 +373,22 @@ class Game implements GameInterface {
 	}
 	
 	public function setWinner() {
+		$flop = $this->getFlop();
+		$names = array();
+		foreach ($flop as $card) {
+			$names[] = $card['name'];
+		}
+
+		$this->container->get('log')->addError(
+			'setwinner game'.$this->getId()
+			.'-bank '.$this->getBank()
+		);
+
+		$this->container->get('log')->addError(
+			'setwinner game'.$this->getId()
+			.'-flop '.implode(',', $names)
+		);
+
 		$combination = new Combination();
 		$suites = array();
 		$allins = array();
@@ -384,7 +400,19 @@ class Game implements GameInterface {
 				->field('fold')->equals(false)
 				->getQuery()->execute();
 		foreach ($gamers as $gamer) {
-			$cards = $combination->get($gamer->getCards(), $this->getFlop());
+			$hand = $gamer->getCards();
+			$names = array();
+			foreach ($hand as $card) {
+				$names[] = $card['name'];
+			}
+
+			$this->container->get('log')->addError(
+				'setwinner game'.$this->getId()
+				.'-gamer'.$gamer->getUser()
+				.'-cards '.implode(',', $names)
+			);
+
+			$cards = $combination->get($hand, $flop);
 			$cards['user'] = $gamer->getUser();
 			$cards['bank'] = $gamer->getBank();
 			$cards['win']  = 0;
@@ -395,17 +423,22 @@ class Game implements GameInterface {
 
 			$allins[] = $cards;
 
+			$names = array();
+			foreach ($cards['cards'] as $card) {
+				$names[] = $card['name'];
+			}
+
 			$this->container->get('log')->addError(
-				'game'.$this->getId()
+				'setwinner game'.$this->getId()
 				.'-gamer'.$gamer->getUser()
-				.' cards '
-				.serialize($cards)
+				.' combination '.$cards['name']
+				.' '.implode(',', $names)
 			);
 
 			if (!$cards['allin']) {
 				$suites[] = $cards;
 				$this->container->get('log')->addError(
-					'game'.$this->getId()
+					'setwinner game'.$this->getId()
 					.'-gamer'.$gamer->getUser()
 					.' cards also NO VABANK'
 				);
@@ -415,35 +448,31 @@ class Game implements GameInterface {
 		$winner0 = $combination->compare($suites);
 		$allins0 = $combination->compare($allins);
 		if (count($winner0) > 0) {
+
 			$maxallinbank = 0;
+
 			foreach ($allins0 as $winner) {
 				if ($winner['bank'] > $maxallinbank) {
 					$maxallinbank = $winner['bank'];
 				}
 			}
+
 			if ($maxallinbank == $this->getBank()) {
 				$winner0 = array();
 			}
-
-			$this->container->get('log')->addError(
-				'game'.$this->getId()
-				.' allinbank '.$maxallinbank
-			);
 		}
-
-		$this->container->get('log')->addError(
-			'game'.$this->getId()
-			.' bank '.$this->getBank()
-		);
 
 		$this->doc->setWinner($winner0);
 		$this->doc->setWinnera($allins0);
 		$combinations = array();
 		$winners = array_merge($winner0, $allins0);
+
 		foreach ($winners as $winner) {
+
 			foreach ($winner['cards'] as $card) {
 				$combinations[] = $card['name'];
 			}
+
 			$this->container->get('odm')
 					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
 					->findAndUpdate()
