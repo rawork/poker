@@ -224,6 +224,9 @@ class Game implements GameInterface {
 		if (time() > $this->doc->getFromtime()) {
 			$seconds = time() - $this->doc->getFromtime();
 			$this->minbet = ($seconds - $seconds % $this->upTimer) / $this->upTimer + 1;
+
+//			$this->minbet = pow(2, ($seconds - $seconds % $this->upTimer) / $this->upTimer);
+
 			if ($this->minbet > $this->doc->getMinbet()) {
 				$this->doc->setMinbet($this->minbet);
 				$this->doc->setUpdated(time());

@@ -213,9 +213,16 @@ class RealGamer {
 	}
 	
 	public function bet($bet, $maxbet) {
+
+		$this->container->get('log')->addError(
+			'gamer'.$this->getId()
+			.' bet '.$bet
+		);
+
 		if ($this->doc->getChips() <= 0) {
 			return 0;
 		}
+
 		if ( $maxbet > $this->doc->getChips() ) {
 			$this->doc->setAllin(true);
 			$bet = $this->doc->getChips();
@@ -223,6 +230,12 @@ class RealGamer {
 			$this->doc->setAllin(true);
 			$bet = $this->doc->getChips();
 		}
+
+		$this->container->get('log')->addError(
+			'gamer'.$this->getId()
+			.' realbet '.$bet
+		);
+
 		$this->doc->setChips( $this->doc->getChips() - $bet );
 		$this->doc->setBet( $this->doc->getBet() + $bet );
 		$this->doc->setBet2( $this->doc->getBet2() + $bet );
@@ -234,8 +247,14 @@ class RealGamer {
 	
 	public function check($maxbet) {
 		$bet = $maxbet - $this->doc->getBet();
+
+		$this->container->get('log')->addError(
+			'gamer'.$this->getId()
+			.' check '.$bet
+		);
+
 		if ($bet < 0) {
-			throw new GameException('Неправильная ставка');
+			return 0;
 		}
 		if ($this->doc->getChips() <= 0) {
 			return 0;
@@ -245,6 +264,11 @@ class RealGamer {
 			$this->doc->setAllin(true);
 			$bet = $this->doc->getChips();
 		}
+
+		$this->container->get('log')->addError(
+			'gamer'.$this->getId()
+			.' realcheck '.$bet
+		);
 		
 		$this->doc->setChips( $this->doc->getChips() - $bet );
 		$this->doc->setBet( $this->doc->getBet() + $bet );
@@ -369,6 +393,11 @@ class RealGamer {
 	}
 	
 	public function foldCards() {
+		$this->container->get('log')->addError(
+			'gamer'.$this->getId()
+			.' foldcards'
+		);
+
 		$this->doc->setTimer(array());
 		$this->doc->setCards(array());
 		$this->doc->setFold(true);
@@ -379,10 +408,12 @@ class RealGamer {
 	
 	public function answerQuestion($answerNo, Game $game) {
 		$this->removeTimer();
+		$this->save();
 		if ($this->doc->getTimes() > 0 && !$this->question) {
 			return 0;
 		}
 		if ($this->doc->getTimes() <= 0) {
+			$this->question = null;
 			$this->doc->setQuestion(array());
 			$this->doc->setTimes(0);
 			$this->save();

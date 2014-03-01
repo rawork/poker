@@ -80,13 +80,39 @@ class ShowdownState extends AbstractState {
 			foreach ($gamers as $doc) {
 				foreach ($winners as $winner) {
 					if ($doc->getUser() == $winner['user']) {
+
+						$this->game->container->get('log')->addError(
+							'distribute game'.$this->game->getId()
+							.' gamer '.$doc->getUser()
+							.' chips before '.$doc->getChips()
+						);
+
 						$doc->setChips( $doc->getChips() + $winner['win'] );
+
+						$this->game->container->get('log')->addError(
+							'distribute game'.$this->game->getId()
+							.' gamer '.$doc->getUser()
+							.' win '.$winner['win']
+						);
+
 						foreach ($winner['cards'] as $card) {
 							if ($card['name'] == 'joker' && !in_array($winner['user'], $ids)) {
 								$ids[] = $winner['user'];
 								$doc->setChips( $doc->getChips() + 2 );
+
+								$this->game->container->get('log')->addError(
+									'distribute game'.$this->game->getId()
+									.' gamer'.$doc->getUser()
+									.' joker add 2 chips'
+								);
 							}
 						}
+
+						$this->game->container->get('log')->addError(
+							'distribute game'.$this->game->getId()
+							.' gamer '.$doc->getUser()
+							.' chips after '.$doc->getChips()
+						);
 					}
 				}
 
