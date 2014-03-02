@@ -37,12 +37,26 @@ class RoundEndState extends AbstractState {
 					$doc->setFold(false);
 					if ($doc->getState() > 0) {
 						$doc->setCards($this->game->getCards(4));
-						$doc->setTimes(2);
-						$doc->setTimer(array(array(
-							'handler' => 'onClickNoChange', 
-							'holder' => 'change-timer', 
-							'time' => time() +31
-						)));
+						$quesCount = $this->game->container->get('odm')
+							->createQueryBuilder('\Fuga\GameBundle\Document\Question')
+							->field('question')->notIn($doc->getDenied())
+							->count()
+							->getQuery()->execute();
+						if ($quesCount > 0) {
+							$doc->setTimes(2);
+							$doc->setTimer(array(array(
+								'handler' => 'onClickNoChange',
+								'holder' => 'change-timer',
+								'time' => time() + 31
+							)));
+						} else {
+							$doc->setTimes(0);
+							$doc->setTimer(array(array(
+								'handler' => 'onClickNoChange',
+								'holder' => 'change-timer',
+								'time' => time() + 6
+							)));
+						}
 					} else {
 						$doc->setFold(true);
 						$doc->setTimes(0);
@@ -57,10 +71,17 @@ class RoundEndState extends AbstractState {
 					$doc->setCanbuy(false);
 					if ($this->game->getRound() >= 3 
 						&& $doc->getState() == 0) {
+
 						$this->game->acceptBet($doc->getChips());
 						$doc->setChips(0);
 						$doc->setActive(false);
 						$doc->setState(0);
+
+						$this->game->container->get('log')->addError(
+							'noactive 3rounds game'.$this->game->getId()
+							.'-gamer'.$doc->getUser()
+						);
+
 					}
 					$this->game->save();
 				}

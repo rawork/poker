@@ -82,6 +82,16 @@ class TestController extends PublicController {
 		}
 	}
 
+	public function testAction() {
+		$quesCount = $this->get('odm')
+			->createQueryBuilder('\Fuga\GameBundle\Document\Question')
+			->field('question')->notIn(array(101,102,103,104))
+			->field('question')->range(10,20)
+			->count()
+			->getQuery()->execute();
+		var_dump($quesCount);
+	}
+
 	public function qAction() {
 //		$questions = $this->get('container')->getItems('game_poll', '1=1');
 //		foreach ($questions as $question) {
