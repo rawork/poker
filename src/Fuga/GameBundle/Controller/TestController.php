@@ -92,6 +92,113 @@ class TestController extends PublicController {
 		var_dump($quesCount);
 	}
 
+	public function resAction() {
+		$gamers = $this->get('odm')
+			->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+			->field('active')->equals(true)
+			->field('chips')->gt(7)
+			->sort('board')
+			->getQuery()->execute();
+		foreach ($gamers as $gamer) {
+			$board = $this->get('odm')
+				->createQueryBuilder('\Fuga\GameBundle\Document\Board')
+				->field('state')->equals(6)
+				->field('board')->equals($gamer->getBoard())
+				->getQuery()->execute();
+			$data = array(
+				$gamer->getLastname(),
+				$gamer->getName(),
+				'Фишки '.$gamer->getChips(),
+				'Зал '.($gamer->getBoard()-1),
+			);
+			if ($board) {
+				echo implode(';', $data);
+				echo '<br>';
+			}
+		}
+	}
+
+	public function res2Action() {
+		$gamers = $this->get('odm')
+			->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+			->sort('board')
+			->getQuery()->execute();
+		foreach ($gamers as $gamer) {
+			$board = $this->get('odm')
+				->createQueryBuilder('\Fuga\GameBundle\Document\Board')
+				->field('state')->equals(6)
+				->field('board')->equals($gamer->getBoard())
+				->getQuery()->execute();
+			$denied = $gamer->getDenied();
+			$data = array(
+				$gamer->getLastname(),
+				$gamer->getName(),
+				'Вопросов '.count(array_unique($denied)),
+				'Ответов '.($gamer->getQues()-1),
+			);
+			if ($board) {
+				echo implode(';', $data);
+				echo '<br>';
+			}
+		}
+	}
+
+	public function chipsAction() {
+		$winners = array(
+			array('user' => 1 , 'win' => 5, 'cards' => array(array('name' => 'joker'))),
+			array('user' => 1 , 'win' => 5, 'cards' => array(array('name' => 'joker'))),
+		);
+
+		$gamers = $this->get('odm')
+			->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+			->field('board')->equals(1)
+			->getQuery()->execute();
+
+			$ids = array();
+
+			foreach ($gamers as $doc) {
+				foreach ($winners as $winner) {
+					if ($doc->getUser() == $winner['user']) {
+
+						$this->get('log')->addError(
+							'distribute game1'
+							.' gamer '.$doc->getUser()
+							.' chips before '.$doc->getChips()
+						);
+
+						$doc->setChips( $doc->getChips() + $winner['win'] );
+
+						$this->get('log')->addError(
+							'distribute game1'
+							.' gamer '.$doc->getUser()
+							.' win '.$winner['win']
+						);
+
+						foreach ($winner['cards'] as $card) {
+							if ($card['name'] == 'joker' && !in_array($winner['user'], $ids)) {
+								$ids[] = $winner['user'];
+								$doc->setChips( $doc->getChips() + 2 );
+
+								$this->get('log')->addError(
+									'distribute game1'
+									.' gamer '.$doc->getUser()
+									.' joker add 2 chips'
+								);
+							}
+						}
+
+						$this->get('log')->addError(
+							'distribute game1'
+							.' gamer '.$doc->getUser()
+							.' chips after '.$doc->getChips()
+						);
+					}
+				}
+
+			}
+		$this->get('odm')->flush();
+	}
+
 	public function qAction() {
 //		$questions = $this->get('container')->getItems('game_poll', '1=1');
 //		foreach ($questions as $question) {
