@@ -199,6 +199,28 @@ class TestController extends PublicController {
 		$this->get('odm')->flush();
 	}
 
+	public function winnerAction() {
+		$fh = fopen($_SERVER['DOCUMENT_ROOT'].'/'.'winner.csv', 'r');
+		if ($fh) {
+			$seat = 0;
+			$board = 0;
+			while (($buffer = fgetcsv($fh, 4096, ';')) !== false) {
+//				var_dump($buffer);
+
+				$user = $this->get('container')->getItem('user_user', 'email="'.$buffer[0].'"');
+				$account = $this->get('container')->getItem('account_member', 'user_id='.$user['id']);
+				echo 'UPDATE user_user SET group_id=2 WHERE id='.$user['id'].";<br>";
+				echo 'UPDATE account_member SET rounds=2, chips='.$buffer[3].'  WHERE id='.$account['id'].";\n<br>";
+			}
+			if (!feof($fh)) {
+//				echo "Error: unexpected fgets() fail\n";
+				exit;
+			}
+			fclose($fh);
+			exit;
+		}
+	}
+
 	public function qAction() {
 //		$questions = $this->get('container')->getItems('game_poll', '1=1');
 //		foreach ($questions as $question) {
