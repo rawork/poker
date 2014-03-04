@@ -180,6 +180,7 @@ class GameController extends PublicController {
 			$gamer = new RealGamer($gamerdoc, $this->get('container'));
 			$game = new Game($gamedoc, $this->get('container'));
 			$gamer->changeCard($card);
+			$game->change($gamer);
 		} catch (GameException $e) {
 			$this->get('log')->addError($e->getMessage());
 		}
