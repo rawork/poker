@@ -49,7 +49,7 @@ class AccountController extends PublicController {
 		$this->get('container')->setVar('javascript', 'members');
 		
 		$date1_start = new \DateTime($this->getParam('bet1_start').' 00:00:01');
-		$date1_end = new \DateTime($this->getParam('bet1_end').' 23:59:59');
+		$date1_end = new \DateTime($this->getParam('bet1_end').' 12:00:00');
 		$date2_start = new \DateTime($this->getParam('bet2_start').' 00:00:01');
 		$date2_end = new \DateTime($this->getParam('bet2_end').' 23:59:59');
 		$now = new \Datetime();
