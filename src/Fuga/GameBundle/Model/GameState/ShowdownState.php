@@ -143,11 +143,12 @@ class ShowdownState extends AbstractState {
 			$this->game->setMaxbet(0);
 			$this->game->save();
 
-			if (!$this->game->existsJoker()) {
-				$this->game->setTimer('prebuy');
-				$this->game->startTimer();
-				$this->game->setState(AbstractState::STATE_JOKER);
-			} elseif (time() > $this->game->stopbuytime) {
+//			if (!$this->game->existsJoker()) {
+//				$this->game->setTimer('prebuy');
+//				$this->game->startTimer();
+//				$this->game->setState(AbstractState::STATE_JOKER);
+//			} else
+			if (time() > $this->game->stopbuytime) {
 				if (!$this->game->existsGamers()) {
 					$this->game->removeTimer();
 					$this->game->stopTime();

@@ -18,12 +18,17 @@ class BeginState extends AbstractState {
 				}
 				$this->game->removeTimer();
 				$this->game->newDeck();
+
+				$ante = intval($this->game->minbet / 2);
+
 				$gamers = $this->game->container->get('odm')
 					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
 					->field('board')->equals($this->game->getId())
 					->field('active')->equals(true)
 					->getQuery()->execute();
 				foreach ($gamers as $doc) {
+					$doc->setChips($doc->getChips() - $ante);
+					$this->game->acceptBet($ante);
 					if ($doc->getState() > 0) {
 						$doc->setCards($this->game->getCards(4));
 						$doc->setMove('nomove');
@@ -37,6 +42,7 @@ class BeginState extends AbstractState {
 						$doc->setTimes(0);
 					}
 				}
+				$this->game->confirmBets();
 				$this->game->setFlop($this->game->getCards(3));
 				$this->game->nextDealer();
 				$this->game->nextMover();

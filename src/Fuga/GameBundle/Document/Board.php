@@ -47,7 +47,7 @@ class Board
     private $maxbet = 0;
 
 	/** @ODM\Int */
-	private $minbet = 1;
+	private $minbet = 8;
 	
 	/** @ODM\Int */
     private $dealer = 0;

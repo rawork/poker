@@ -22,7 +22,7 @@ class Game implements GameInterface {
 	const STATE_ROUND_END = 7;
 	const STATE_WAIT = 8;
 
-	public $minbet = 1;
+	public $minbet = 8;
 	public $stopbuytime;
 	public $container;
 	
@@ -38,9 +38,9 @@ class Game implements GameInterface {
 		'change'     => array('handler' => 'onClickNoChange', 'holder' => 'change-timer', 'time' => 31),
 		'distribute' => array('handler' => 'onDistribute', 'holder' => 'game-timer', 'time' => 31),
 		'prebuy'     => array('handler' => 'onShowBuy', 'holder' => 'joker-timer', 'time' => 6),
-		'next'		 => array('handler' => 'onNext', 'holder' => 'round-end-timer', 'time' => 6),
+		'next'		 => array('handler' => 'onNext', 'holder' => 'round-end-timer', 'time' => 14),
 		'nonactive'  => false,//array('handler' => 'onNext', 'holder' => 'wait-timer', 'time' => 61),
-		'bet'        => array('handler' => 'onFold', 'holder' => 'game-timer', 'time' => 46),
+		'bet'        => array('handler' => 'onFold', 'holder' => 'game-timer', 'time' => 61),
 		'buy'        => array('handler' => 'onEndRound', 'holder' => 'buy-timer', 'time' => 121),
 		'answer'     => array('handler' => 'onNoAnswer', 'holder' => 'answer-timer', 'time' => 14),
 	);
@@ -49,7 +49,8 @@ class Game implements GameInterface {
 		$this->container = $container;
 		$this->doc = $doc;
 		
-		$this->stopbuytime = $this->doc->getFromtime() + 2100;
+		$this->stopbuytime = $this->doc->getFromtime() + 1200;
+		$this->stopchangetime = $this->doc->getFromtime() + 3600;
 		$this->setState($this->doc->getState());
 		$this->syncTime();
 		$this->setMinbet();
@@ -223,9 +224,9 @@ class Game implements GameInterface {
 	public function setMinbet() {
 		if (time() > $this->doc->getFromtime()) {
 			$seconds = time() - $this->doc->getFromtime();
-			$this->minbet = ($seconds - $seconds % $this->upTimer) / $this->upTimer + 1;
+//			$this->minbet = ($seconds - $seconds % $this->upTimer) / $this->upTimer + 1;
 
-//			$this->minbet = pow(2, ($seconds - $seconds % $this->upTimer) / $this->upTimer);
+			$this->minbet = pow(2, ($seconds - $seconds % $this->upTimer) / $this->upTimer + 3);
 
 			if ($this->minbet > $this->doc->getMinbet()) {
 				$this->doc->setMinbet($this->minbet);

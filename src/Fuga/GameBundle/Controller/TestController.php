@@ -63,8 +63,8 @@ class TestController extends PublicController {
 			$board = 0;
 			while (($buffer = fgetcsv($fh, 4096, ';')) !== false) {
 //				var_dump($buffer);
-				if (intval($buffer[4]) > $board) {
-					$board = intval($buffer[4]);
+				if (intval($buffer[5]) > $board) {
+					$board = intval($buffer[5]);
 					$seat = 1;
 				} else {
 					$seat++; 

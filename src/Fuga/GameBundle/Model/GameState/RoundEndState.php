@@ -4,6 +4,7 @@ namespace Fuga\GameBundle\Model\GameState;
 
 use Fuga\GameBundle\Model\GameInterface;
 use Fuga\GameBundle\Model\RealGamer;
+use Fuga\GameBundle\Model\Combination;
 
 class RoundEndState extends AbstractState {
 	
@@ -28,6 +29,9 @@ class RoundEndState extends AbstractState {
 				$this->game->setAllin(0);
 				$this->game->setBets(0);
 				$this->game->setRound($this->game->getRound() + 1);
+
+				$ante = intval($this->game->minbet / 2);
+
 				$gamers = $this->game->container->get('odm')
 					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
 					->field('board')->equals($this->game->getId())
@@ -35,27 +39,47 @@ class RoundEndState extends AbstractState {
 					->getQuery()->execute();
 				foreach ($gamers as $doc) {
 					$doc->setFold(false);
+
+					if ($doc->getChips() > $ante) {
+						$doc->setChips($doc->getChips() - $ante);
+					}
+					if (!$doc->getFold()) {
+						$doc->setFold($doc->getChips() <= 0);
+					}
+					$this->game->acceptBet($ante);
+
 					if ($doc->getState() > 0) {
 						$doc->setCards($this->game->getCards(4));
-						$quesCount = $this->game->container->get('odm')
-							->createQueryBuilder('\Fuga\GameBundle\Document\Question')
-							->field('question')->notIn($doc->getDenied())
-							->count()
-							->getQuery()->execute();
-						if ($quesCount > 0) {
-							$doc->setTimes(2);
-							$doc->setTimer(array(array(
-								'handler' => 'onClickNoChange',
-								'holder' => 'change-timer',
-								'time' => time() + 31
-							)));
+						if ($this->game->stopchangetime > time()) {
+							$quesCount = $this->game->container->get('odm')
+								->createQueryBuilder('\Fuga\GameBundle\Document\Question')
+								->field('question')->notIn($doc->getDenied())
+								->count()
+								->getQuery()->execute();
+							if ($quesCount > 0) {
+								$doc->setTimes(2);
+								$doc->setTimer(array(array(
+									'handler' => 'onClickNoChange',
+									'holder' => 'change-timer',
+									'time' => time() + 31
+								)));
+							} else {
+								$doc->setTimes(0);
+								$doc->setTimer(array(array(
+									'handler' => 'onClickNoChange',
+									'holder' => 'change-timer',
+									'time' => time() + 6
+								)));
+							}
 						} else {
-							$doc->setTimes(0);
-							$doc->setTimer(array(array(
-								'handler' => 'onClickNoChange',
-								'holder' => 'change-timer',
-								'time' => time() + 6
-							)));
+							$combination = new Combination();
+							$cards = $combination->get($doc->getCards(), array());
+							$combinations = array();
+							foreach ($cards['cards'] as $card) {
+								$combinations[] = $card['name'];
+							}
+							$doc->setRank($combination->rankName($cards['rank']));
+							$doc->setCombination($combinations);
 						}
 					} else {
 						$doc->setFold(true);
@@ -90,8 +114,15 @@ class RoundEndState extends AbstractState {
 				$this->game->nextDealer();
 				$this->game->nextMover();
 				$this->game->setFlop($this->game->getCards(3));
-
-				$this->game->setState(AbstractState::STATE_CHANGE);
+				if ( $this->game->stopchangetime > time() ) {
+					$this->game->setState(AbstractState::STATE_CHANGE);
+				} else {
+					$this->game->setTimer('bet');
+					if ($this->game->isMover($gamer->getSeat())) {
+						$this->game->startTimer();
+					}
+					$this->game->setState(AbstractState::STATE_PREFLOP);
+				}
 			}
 
 			$this->game->setUpdated(time());
