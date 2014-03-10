@@ -116,14 +116,7 @@ class ShowdownState extends AbstractState {
 					}
 				}
 
-				if (time() > $this->game->stopbuytime) {
-					$doc->setActive($doc->getChips() >= $this->game->minbet);
-					if (!$doc->getActive()) {
-						$this->game->acceptBet($doc->getChips());
-						$this->game->confirmBets();
-						$doc->setChips(0);
-					}
-				} else {
+				if (time() < $this->game->stopbuytime) {
 					$doc->setCanbuy(true);
 				}
 				$doc->setBet(0);
@@ -136,6 +129,74 @@ class ShowdownState extends AbstractState {
 				$doc->setWinner(false);
 				$doc->setFold(false);
 			}
+			$this->game->save();
+
+			if (time() > $this->game->stopbuytime) {
+
+				$ante = intval($this->game->minbet / 2);
+
+				$activeGamers = $this->game->container->get('odm')
+					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+					->field('board')->equals($this->game->getId())
+					->field('active')->equals(true)
+					->count()
+					->getQuery()->execute();
+
+				$nomoneyGamers = $this->game->container->get('odm')
+					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+					->field('board')->equals($this->game->getId())
+					->field('active')->equals(true)
+					->field('chips')->lte($ante)
+					->count()
+					->getQuery()->execute();
+
+				$this->game->container->get('log')->addError(
+					'$activeGamers'.$activeGamers
+				);
+
+				$this->game->container->get('log')->addError(
+					'$nomoneyGamers'.$activeGamers
+				);
+
+				if ($activeGamers == $nomoneyGamers) {
+					$winner = $this->game->container->get('odm')
+						->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+						->field('board')->equals($this->game->getId())
+						->field('active')->equals(true)
+						->sort('chips', 'desc')
+						->getQuery()->getSingleResult();
+
+					if ($winner->getUser() != $gamer->getId()) {
+						$gamer->setActive(false);
+					}
+
+					$this->game->container->get('odm')
+						->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+						->update()
+						->multiple(true)
+						->field('board')->equals($this->game->getId())
+						->field('user')->notEqual($winner->getUser())
+						->field('active')->set(false)
+						->getQuery()->execute();
+				} else {
+					$gamers = $this->game->container->get('odm')
+						->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+						->field('board')->equals($this->game->getId())
+						->field('active')->equals(true)
+						->getQuery()->execute();
+
+					foreach ($gamers as $doc) {
+						$doc->setActive($doc->getChips() > $ante);
+						if (!$doc->getActive()) {
+							$this->game->acceptBet($doc->getChips());
+							$doc->setChips(0);
+						}
+					}
+					$this->game->confirmBets();
+
+				}
+			}
+
 
 			$this->game->emptyWinner();
 			$this->game->setFlop(array());

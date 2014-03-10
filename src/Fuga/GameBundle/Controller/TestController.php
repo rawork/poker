@@ -221,6 +221,102 @@ class TestController extends PublicController {
 		}
 	}
 
+	public function import2Action() {
+		$questions = array();
+		$fh = fopen($_SERVER['DOCUMENT_ROOT'].'/'.'questions.txt', 'r');
+		if ($fh) {
+			$i = 1;
+			$name = '';
+			$answer1 = $answer2 = $answer3 = $answer4 = '';
+			$answer = 0;
+			while (($buffer = fgets($fh, 4096)) !== false) {
+				switch ($i) {
+					case 1:
+						$buffer = substr($buffer, strpos($buffer, '.') + 2);
+						$name = trim($buffer);
+						break;
+					case 2:
+						if (substr($buffer, 0, 1) == '>') {
+							$answer = 1;
+							$buffer = trim(substr($buffer, 1));
+						}
+						$answer1 = trim($buffer);
+						break;
+					case 3:
+						if (substr($buffer, 0, 1) == '>') {
+							$answer = 2;
+							$buffer = trim(substr($buffer, 1));
+						}
+						$answer2 = trim($buffer);
+						break;
+					case 4:
+						if (substr($buffer, 0, 1) == '>') {
+							$answer = 3;
+							$buffer = trim(substr($buffer, 1));
+						}
+						$answer3 = trim($buffer);
+						break;
+					case 5;
+						if (substr($buffer, 0, 1) == '>') {
+							$answer = 4;
+							$buffer = trim(substr($buffer, 1));
+						}
+						$answer4 = trim($buffer);
+						break;
+					case 6:
+						$questions[] = array(
+							$name,
+							$answer1,
+							$answer2,
+							$answer3,
+							$answer4,
+							$answer,
+						);
+						$i = 0;
+						$name = '';
+						$answer1 =$answer2 = $answer3 = $answer4 = '';
+						$answer = 0;
+						break;
+				}
+
+//				echo $buffer.' - '.$i.'<br>';
+				$i++;
+			}
+			$questions[] = array(
+				$name,
+				$answer1,
+				$answer2,
+				$answer3,
+				$answer4,
+				$answer,
+			);
+
+			if (!feof($fh)) {
+//				echo "Error: unexpected fgets() fail\n";
+			}
+			fclose($fh);
+		}
+
+		for ($i = 0; $i < 20; $i++) {
+			shuffle($questions);
+		}
+
+		foreach ($questions as $question) {
+			list($name, $answer1, $answer2, $answer3, $answer4, $answer) = $question;
+			echo "INSERT INTO game_poll(name,answer1,answer2,answer3,answer4,answer,created,updated) VALUES('$name','$answer1','$answer2','$answer3','$answer4',$answer,NOW(),'0000-00-00 00:00:00');\n<br>";
+		}
+		exit;
+	}
+
+	public function quAction() {
+		$questions0 = $this->get('odm')
+			->createQueryBuilder('\Fuga\GameBundle\Document\Question')
+			->field('question')->notIn(array(0))
+			->getQuery()->execute()->toArray();
+
+		var_dump(array_values($questions0));
+	}
+
 	public function qAction() {
 //		$questions = $this->get('container')->getItems('game_poll', '1=1');
 //		foreach ($questions as $question) {

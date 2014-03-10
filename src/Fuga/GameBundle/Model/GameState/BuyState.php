@@ -13,21 +13,63 @@ class 		BuyState extends AbstractState {
 	
 	public function endRound($gamer) {
 		try {
-			$gamers = $this->game->container->get('odm')
+			$ante = intval($this->game->minbet / 2);
+
+			$activeGamers = $this->game->container->get('odm')
 				->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
 				->field('board')->equals($this->game->getId())
+				->field('active')->equals(true)
+				->count()
 				->getQuery()->execute();
-			foreach ($gamers as $doc) {
-				$doc->setActive($doc->getChips() >= $this->game->minbet);
-				if (!$doc->getActive()) {
-					$this->game->acceptBet($doc->getChips());
-					$this->game->confirmBets();
-					$doc->setChips(0);
+
+			$nomoneyGamers = $this->game->container->get('odm')
+				->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+				->field('board')->equals($this->game->getId())
+				->field('active')->equals(true)
+				->field('chips')->lte($ante)
+				->count()
+				->getQuery()->execute();
+
+			if ($activeGamers == $nomoneyGamers) {
+				$winner = $this->game->container->get('odm')
+					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+					->field('board')->equals($this->game->getId())
+					->field('active')->equals(true)
+					->sort('chips', 'desc')
+					->getQuery()->getSingleResult();
+
+				if ($winner->getUser() != $gamer->getId()) {
+					$gamer->setActive(false);
 				}
-				$doc->setQuestion(array());
-				$doc->setBuy(array());
+
+				$this->game->container->get('odm')
+					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+					->update()
+					->multiple(true)
+					->field('board')->equals($this->game->getId())
+					->field('user')->notEqual($winner->getUser())
+					->field('active')->set(false)
+					->getQuery()->execute();
+			} else {
+				$gamers = $this->game->container->get('odm')
+					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+					->field('board')->equals($this->game->getId())
+					->field('active')->equals(true)
+					->getQuery()->execute();
+
+				foreach ($gamers as $doc) {
+					$doc->setActive($doc->getChips() > $ante);
+					if (!$doc->getActive()) {
+						$this->game->acceptBet($doc->getChips());
+						$this->game->confirmBets();
+						$doc->setChips(0);
+					}
+					$doc->setQuestion(array());
+					$doc->setBuy(array());
+				}
+				$this->game->confirmBets();
 			}
-			$this->game->confirmBets();
+
 			$this->game->save();
 			if (!$this->game->existsGamers()) {
 				$this->game->removeTimer();

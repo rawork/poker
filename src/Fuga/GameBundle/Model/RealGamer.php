@@ -105,6 +105,10 @@ class RealGamer {
 	public function getBank() {
 		return $this->doc->getBank();
 	}
+
+	public function setActive($value) {
+		$this->doc->setActive($value);
+	}
 	
 	public function setBank($value) {
 		$this->doc->setBank($value);
@@ -307,12 +311,11 @@ class RealGamer {
 	public function changeCard($card) {
 		$this->removeTimer();
 		$this->save();
-		$questiondoc = $this->container->get('odm')
+		$questions = array_values($this->container->get('odm')
 				->createQueryBuilder('\Fuga\GameBundle\Document\Question')
 				->field('question')->notIn($this->getDeniedQuestions())
-				->limit(1)
-				->skip(rand(1,2))
-				->getQuery()->getSingleResult();
+				->getQuery()->execute()->toArray());
+		$questiondoc = $questions[array_rand($questions)];
 		if ($questiondoc) {
 			$this->question = array(
 				'id'      => $questiondoc->getQuestion(),
@@ -346,13 +349,13 @@ class RealGamer {
 		if ($this->doc->getCanbuy()) {
 			$buy = array();
 			$denied = $this->doc->getDenied();
-			$questions = $this->container->get('odm')
+			$questions = array_values($this->container->get('odm')
 				->createQueryBuilder('\Fuga\GameBundle\Document\Question')
 				->field('question')->notIn($denied)
-				->limit(3)
-				->getQuery()->execute();
-
-			foreach ($questions as $questiondoc) {
+				->getQuery()->execute()->toArray());
+			$randKeys = array_rand($questions, 3);
+			foreach ($randKeys as $key) {
+				$questiondoc = $questions[$key];
 				$buy[] = array(
 					'id'      => $questiondoc->getQuestion(),
 					'name'    => $questiondoc->getName(),
