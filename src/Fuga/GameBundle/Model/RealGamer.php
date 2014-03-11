@@ -125,6 +125,10 @@ class RealGamer {
 	public function getCanbuy(){
 		return $this->doc->getCanbuy();
 	}
+
+	public function setCanbuy($value){
+		$this->doc->setCanbuy($value);
+	}
 	
 	public function getCards(){
 		return $this->doc->getCards();
