@@ -334,7 +334,7 @@ class RealGamer {
 			$this->save();
 		} else {
 			$this->container->get('log')->addError(
-				'gamer '.$this->doc->getLastname().' '.$this->doc->getName().' no question'
+				'gamer '.$this->doc->getLastname().' '.$this->doc->getName().' no change question'
 			);
 			$this->nochangeCard();
 		}
@@ -380,6 +380,9 @@ class RealGamer {
 			$this->doc->setQuestion(array($question));
 			$this->doc->setBuy($buy);
 		} else {
+			$this->container->get('log')->addError(
+				'gamer '.$this->doc->getLastname().' '.$this->doc->getName().' no buy question'
+			);
 			$this->doc->setCanbuy(false);
 		}
 

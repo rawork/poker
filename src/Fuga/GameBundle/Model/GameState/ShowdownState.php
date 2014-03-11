@@ -118,6 +118,7 @@ class ShowdownState extends AbstractState {
 
 				if (time() < $this->game->stopbuytime) {
 					$doc->setCanbuy(true);
+					$gamer->setCanbuy(true);
 				}
 				$doc->setBet(0);
 				$doc->setBet2(0);
@@ -129,6 +130,7 @@ class ShowdownState extends AbstractState {
 				$doc->setWinner(false);
 				$doc->setFold(false);
 			}
+
 			$this->game->save();
 
 			if (time() > $this->game->stopbuytime) {
