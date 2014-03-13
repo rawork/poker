@@ -238,10 +238,12 @@ class RealGamer {
 			return 0;
 		}
 
-		if ( $maxbet > $this->doc->getChips() ) {
+		if ( $maxbet-$this->doc->getBet() > $this->doc->getChips() ) {
 			$this->doc->setAllin(true);
 			$bet = $this->doc->getChips();
-		} elseif ($bet >= $this->doc->getChips()) {
+		}
+
+		if ($bet >= $this->doc->getChips()) {
 			$this->doc->setAllin(true);
 			$bet = $this->doc->getChips();
 		}
