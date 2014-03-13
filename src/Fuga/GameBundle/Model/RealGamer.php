@@ -223,7 +223,14 @@ class RealGamer {
 	public function bet($bet, $maxbet) {
 
 		$this->container->get('log')->addError(
-			'gamer'.$this->getId()
+			'game'.$this->getBoard()
+			.' gamer'.$this->getId()
+			.' maxbet '.$maxbet
+		);
+
+		$this->container->get('log')->addError(
+			'game'.$this->getBoard()
+			.' gamer'.$this->getId()
 			.' bet '.$bet
 		);
 
@@ -240,7 +247,8 @@ class RealGamer {
 		}
 
 		$this->container->get('log')->addError(
-			'gamer'.$this->getId()
+			'game'.$this->getBoard()
+			.' gamer'.$this->getId()
 			.' realbet '.$bet
 		);
 

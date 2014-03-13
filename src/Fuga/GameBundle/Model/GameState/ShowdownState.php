@@ -83,7 +83,7 @@ class ShowdownState extends AbstractState {
 
 						$this->game->container->get('log')->addError(
 							'distribute game'.$this->game->getId()
-							.' gamer '.$doc->getUser()
+							.' gamer'.$doc->getUser()
 							.' chips before '.$doc->getChips()
 						);
 
@@ -91,7 +91,7 @@ class ShowdownState extends AbstractState {
 
 						$this->game->container->get('log')->addError(
 							'distribute game'.$this->game->getId()
-							.' gamer '.$doc->getUser()
+							.' gamer'.$doc->getUser()
 							.' win '.$winner['win']
 						);
 
@@ -102,7 +102,7 @@ class ShowdownState extends AbstractState {
 
 								$this->game->container->get('log')->addError(
 									'distribute game'.$this->game->getId()
-									.' gamer '.$doc->getUser()
+									.' gamer'.$doc->getUser()
 									.' joker add 2 chips'
 								);
 							}
@@ -110,7 +110,7 @@ class ShowdownState extends AbstractState {
 
 						$this->game->container->get('log')->addError(
 							'distribute game'.$this->game->getId()
-							.' gamer '.$doc->getUser()
+							.' gamer'.$doc->getUser()
 							.' chips after '.$doc->getChips()
 						);
 					}
