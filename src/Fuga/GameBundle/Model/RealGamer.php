@@ -446,6 +446,11 @@ class RealGamer {
 			$this->doc->setQues($this->doc->getQues() + 1);
 		} else {
 			$this->giveChips(-1);
+			$this->container->get('log')->addError(
+				'game'.$this->getBoard()
+				.' gamer'.$this->getId()
+				.' change card error -1 chip'
+			);
 		}
 		$this->question = null;
 		$this->doc->setCard(-1);
@@ -473,7 +478,12 @@ class RealGamer {
 		if ($answerNo == $this->question['answer']) {
 			$this->doc->setQues($this->doc->getQues() + 1);
 			$this->doc->setChips($this->doc->getChips() + $game->minbet);
-			$this->doc->setActive($this->doc->getChips() > 0); // TODO ???$game->minbet 
+			$this->doc->setActive($this->doc->getChips() > 0); // TODO ???$game->minbet
+			$this->container->get('log')->addError(
+				'game'.$this->getBoard()
+				.' gamer'.$this->getId()
+				.' buy chips '.$game->minbet
+			);
 		}
 		$buy = $this->doc->getBuy();
 		if (is_array($buy) && count($buy) > 0) {

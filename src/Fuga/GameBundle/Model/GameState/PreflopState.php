@@ -25,74 +25,77 @@ class PreflopState extends AbstractState {
 				$this->game->setMaxbet($gamer->getBet());
 			}
 
-			// Find who not FOLD & have money
 			$gamers = $this->game->container->get('odm')
+				->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+				->field('board')->equals($this->game->getId())
+				->field('active')->equals(true)
+				->field('state')->equals(1)
+				->field('fold')->equals(false)
+				->field('allin')->equals(false)
+				->field('chips')->gt(0)
+				->field('move')->equals('nomove')
+				->getQuery()->execute();
+			if (count($gamers) == 0) {
+				$gamers = $this->game->container->get('odm')
+					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+					->field('board')->equals($this->game->getId())
+					->field('active')->equals(true)
+					->field('state')->equals(1)
+					->field('fold')->equals(false)
+					->field('allin')->equals(false)
+					->field('chips')->gt(0)
+					->field('bet')->lt($this->game->getMaxbet())
+					->getQuery()->execute();
+			}
+
+			if (count($gamers) == 0) {
+				$gamers = $this->game->container->get('odm')
+					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+					->field('board')->equals($this->game->getId())
+					->field('active')->equals(true)
+					->getQuery()->execute();
+				foreach ($gamers as $doc) {
+					if (!$doc->getFold()) {
+						$combination = new Combination();
+						$cards = $combination->get($doc->getCards(), $this->game->getFlop());
+						$combinations = array();
+						foreach ($cards['cards'] as $card) {
+							$combinations[] = $card['name'];
+						}
+						$doc->setRank($combination->rankName($cards['rank']));
+						$doc->setCombination($combinations);
+					}
+					$doc->setBet(0);
+					$doc->setMove('nomove');
+				}
+				$this->game->confirmBets();
+				$this->game->setMaxBet(0);
+
+				// Find who not FOLD & have money
+				$gamers = $this->game->container->get('odm')
 					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
 					->field('board')->equals($this->game->getId())
 					->field('active')->equals(true)
 					->field('fold')->equals(false)
+					->field('allin')->equals(false)
 					->field('chips')->gt(0)
 					->getQuery()->execute();
-			if (count($gamers) < 2) {
-				$this->game->confirmBets();
-				$this->game->setWinner();
-				$this->game->setTimer('distribute');
-				$this->game->startTimer();
-				$this->game->setState(AbstractState::STATE_SHOWDOWN);
-			} else {
-				$gamers = $this->game->container->get('odm')
-						->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
-						->field('board')->equals($this->game->getId())
-						->field('active')->equals(true)
-						->field('state')->equals(1)
-						->field('fold')->equals(false)
-						->field('allin')->equals(false)
-						->field('move')->equals('nomove')
-						->getQuery()->execute();
-				if (count($gamers) == 0) {
-					$gamers = $this->game->container->get('odm')
-							->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
-							->field('board')->equals($this->game->getId())
-							->field('active')->equals(true)
-							->field('state')->equals(1)
-							->field('fold')->equals(false)
-							->field('allin')->equals(false)
-							->field('chips')->gt(0)
-							->field('bet')->lt($this->game->getMaxbet())
-							->getQuery()->execute();
-				}	
-				if (count($gamers) ==  0) {
-					$this->game->confirmBets();
+				if (count($gamers) < 2) {
+					$this->game->setWinner();
+					$this->game->setTimer('distribute');
+					$this->game->startTimer();
+					$this->game->setState(AbstractState::STATE_SHOWDOWN);
+				} else {
 					$this->game->setMover($this->game->getDealer());
 					$this->game->nextMover();
-					$gamers = $this->game->container->get('odm')
-								->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
-								->field('board')->equals($this->game->getId())
-								->field('active')->equals(true)
-								->getQuery()->execute();
-					foreach ($gamers as $doc) {
-						if (!$doc->getFold()) {
-							$combination = new Combination();
-							$cards = $combination->get($doc->getCards(), $this->game->getFlop());
-							$combinations = array();
-							foreach ($cards['cards'] as $card) {
-								$combinations[] = $card['name'];
-							}
-							$doc->setRank($combination->rankName($cards['rank']));
-							$doc->setCombination($combinations);
-						}
-						$doc->setBet(0);
-						$doc->setMove('nomove');
-					}
-					$this->game->setMaxBet(0);
 					$this->game->setTimer('bet');
 					$this->game->setState(AbstractState::STATE_FLOP);
-				} else {
-					$this->game->nextMover();
-					$this->game->setTimer('bet');
 				}
+			} else {
+				$this->game->nextMover();
+				$this->game->setTimer('bet');
 			}
-			
+
 			$this->game->setUpdated(time());
 			$this->game->save();
 			$this->game->unlock($gamer->getId());

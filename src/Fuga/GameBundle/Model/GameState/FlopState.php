@@ -22,56 +22,41 @@ class FlopState extends AbstractState {
 				$this->game->setMaxbet($gamer->getBet());
 			}
 
-			$this->game->stopTimer();
-			// Find who not FOLD
 			$gamers = $this->game->container->get('odm')
+				->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
+				->field('board')->equals($this->game->getId())
+				->field('active')->equals(true)
+				->field('state')->equals(1)
+				->field('fold')->equals(false)
+				->field('allin')->equals(false)
+				->field('chips')->gt(0)
+				->field('move')->equals('nomove')
+				->getQuery()->execute();
+			if (count($gamers) == 0) {
+				$gamers = $this->game->container->get('odm')
 					->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
 					->field('board')->equals($this->game->getId())
 					->field('active')->equals(true)
+					->field('state')->equals(1)
 					->field('fold')->equals(false)
+					->field('allin')->equals(false)
 					->field('chips')->gt(0)
+					->field('bet')->lt($this->game->getMaxbet())
 					->getQuery()->execute();
+			}
 
-			if (count($gamers) < 2) {
+
+			if (count($gamers) ==  0) {
 				$this->game->confirmBets();
 				$this->game->setWinner();
 				$this->game->setTimer('distribute');
 				$this->game->startTimer();
 				$this->game->setState(AbstractState::STATE_SHOWDOWN);
 			} else {
-				$gamers = $this->game->container->get('odm')
-						->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
-						->field('board')->equals($this->game->getId())
-						->field('active')->equals(true)
-						->field('state')->equals(1)
-						->field('fold')->equals(false)
-						->field('allin')->equals(false)
-						->field('move')->equals('nomove')
-						->getQuery()->execute();
-				if (count($gamers) == 0) {
-					$gamers = $this->game->container->get('odm')
-							->createQueryBuilder('\Fuga\GameBundle\Document\Gamer')
-							->field('board')->equals($this->game->getId())
-							->field('active')->equals(true)
-							->field('state')->equals(1)
-							->field('fold')->equals(false)
-							->field('allin')->equals(false)
-							->field('chips')->gt(0)
-							->field('bet')->lt($this->game->getMaxbet())
-							->getQuery()->execute();
-				}
-				if (count($gamers) ==  0) {
-					$this->game->confirmBets();
-					$this->game->setWinner();
-					$this->game->setTimer('distribute');
-					$this->game->startTimer();
-					$this->game->setState(AbstractState::STATE_SHOWDOWN);
-				} else {
-					$this->game->nextMover();
-					$this->game->setTimer('bet');
-				}
+				$this->game->nextMover();
+				$this->game->setTimer('bet');
 			}
-			
+
 			$this->game->setUpdated(time());
 			$this->game->save();
 			$this->game->unlock($gamer->getId());

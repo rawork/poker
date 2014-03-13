@@ -228,7 +228,7 @@ function onClickBet() {
 	}
 	if (maxbet > existbet) {
 		if ((maxbet - existbet) > bet) {
-			alert('Ставка должна быть не меньше ' + ((maxbet - existbet)*2));
+			alert('Ставка должна быть не меньше ' + (maxbet - existbet));
 			return;
 		}
 	} else {
@@ -841,10 +841,14 @@ function onWSUpdate(data) {
         $('.gamer-container').append(hint);
     }
 
-    var bet = +$('#input_bet').val();
+    var betValue = +$('#input_bet').val();
     $('#min-bet').html(data.board.minbet);
-    if (bet == NaN || data.board.minbet > bet) {
-        $('#input_bet').val(data.board.minbet);
+    if (betValue == NaN || data.board.minbet > betValue || data.board.maxbet > betValue) {
+        if (data.board.maxbet > data.board.minbet) {
+            $('#input_bet').val(data.board.maxbet-data.gamer.bet);
+        } else {
+            $('#input_bet').val(data.board.minbet);
+        }
     }
 
     $.cookie('gamerstate', data.gamer.state, {path: '/'});
