@@ -20,7 +20,7 @@ mb_internal_encoding('UTF-8');
 //    |   |   |   |   |- plugin.min.js
 
 $base_url="";  // base url (only domain) of site (without final /). If you prefer relative urls leave empty
-$upload_dir = PRJ_REF.'/files/'; // path from base_url to base of upload folder (with start and final /)
+$upload_dir = '/files/'; // path from base_url to base of upload folder (with start and final /)
 $current_path = '../../files/'; // relative path from filemanager folder to upload folder (with final /)
 //thumbs folder can't put inside upload folder
 $thumbs_base_path = '../../thumbs/'; // relative path from filemanager folder to thumbs folder (with final /)
